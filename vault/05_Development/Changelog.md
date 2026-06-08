@@ -6,6 +6,25 @@
 
 ## [Unreleased]
 
+### 2026-06-08 — Module 04: Review Fixes
+- **Fixed** correct_option remapping: replaced `.index()` with inverse-permutation tracking (safe for duplicate option text)
+- **Fixed** seed derivation: replaced arithmetic `seed * 10000 + id` with SHA-256 hash-based derivation (collision-resistant)
+- **Fixed** `assign_variants()`: returns deep copies to prevent aliasing across seats sharing the same color
+- **Added** input validation: `correct_option` bounds check and empty options check in `generate_variants()`
+- **Added** duplicate seat ID validation in `from_coordinates()`
+- **Renamed** `chromatic_number()` → `num_colors_used()` (mathematical accuracy — greedy coloring returns upper bound)
+- **Removed** dead code branch in `num_colors_used()`
+- **Fixed** 6 documentation drift items across vault files
+- **Fixed** audit integration test: now tests actual `HashChain` linking, not just event creation
+- Added 12 new edge case tests (53 total, up from 42)
+
+### 2026-06-08 — Module 04: Graph Randomization
+- Implemented `GraphBuilder` with grid and radius-based coordinate construction
+- Implemented `GraphColoring` using NetworkX greedy coloring
+- Implemented `VariantGenerator` with deterministic seeding and option shuffling
+- Integrated audit event logging and hash chain linking for graph operations
+- Added comprehensive unit, integration, and edge-case test suites (53 tests)
+
 ### 2026-06-08 — Vault Initialization
 
 #### Added

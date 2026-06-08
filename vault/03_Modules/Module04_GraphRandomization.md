@@ -1,7 +1,7 @@
 # Module 04 — Spatial Graph Randomization
 
 > **Last Updated:** 2026-06-08
-> **Status:** 🔴 Not Started
+> **Status:** 🟢 Complete
 
 ---
 
@@ -51,9 +51,14 @@ Guarantee: no two adjacent seats share the same variant_id
 ```
 For each unique variant_id:
     ↓
-Shuffle question order using variant_id as seed
+Derive variant_seed = SHA-256(base_seed : "variant" : variant_id)[:8] (collision-resistant)
     ↓
-For each question, shuffle option order using (variant_id + question_id) as seed
+Shuffle question order using variant_seed
+    ↓
+For each question at position q_pos:
+  Derive option_seed = SHA-256(base_seed : "options" : variant_id : q_pos)[:8]
+  Shuffle option order using option_seed
+  Remap correct_option index through inverse permutation
     ↓
 Output: variant_map { variant_id → { question_order, option_orders } }
 ```

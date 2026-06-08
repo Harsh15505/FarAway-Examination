@@ -1,12 +1,12 @@
 # FortisExam — Current State
 
 > **Last Updated:** 2026-06-08
-> **Sprint:** Pre-Sprint (Vault Initialization)
-> **Phase:** Planning & Documentation
+> **Sprint:** Sprint 1 (Backend & Crypto)
+> **Phase:** Implementation
 
 ---
 
-## Project Status: 🟡 In Planning
+## Project Status: 🟡 In Progress
 
 ---
 
@@ -16,9 +16,9 @@
 | ------------------------ | -------------- | ---------------------------------- |
 | 01 — Question Pool       | 🔴 Not Started | Awaiting backend scaffold          |
 | 02 — Crypto Delivery     | 🔴 Not Started | Depends on Module 01               |
-| 03 — Authentication      | 🔴 Not Started | Face model selection pending       |
-| 04 — Graph Randomization | 🔴 Not Started | Algorithm design needed            |
-| 05 — State Recovery      | 🔴 Not Started | DB schema needed                   |
+| 03 — Authentication      | 🔴 Not Started | qr-scan, face-verify, jwt          |
+| 04 — Graph Randomization | 🟢 Complete    | layout-graph, coloring, variants   |
+| 05 — State Recovery      | 🔴 Not Started | sqlite-wal, redis-sync, snapshot   |
 | 06 — Anomaly Detection   | 🔴 Not Started | MediaPipe integration planned      |
 | 07 — Audit Ledger        | 🔴 Not Started | Hash chain design finalized in TRD |
 
@@ -45,12 +45,11 @@
 
 | Date | Change | Author |
 |---|---|---|
-| 2026-06-08 | Vault initialized with full structure | AI Agent |
-| 2026-06-08 | PRD, TRD, Architecture documents analyzed | AI Agent |
-| 2026-06-08 | Architecture review completed (4 perspectives) | AI Agent |
-| 2026-06-08 | 6 new decisions added (D-008 → D-013) | AI Agent |
-| 2026-06-08 | 6 new threats added (T-015 → T-020) | AI Agent |
+| 2026-06-08 | Module 04 Graph Randomization implemented (GraphBuilder, GraphColoring, VariantGenerator) | AI Agent |
+| 2026-06-08 | Audit dependencies implemented (hashing, hash_chain, event_logger) | AI Agent |
+| 2026-06-08 | 53 tests passing (24 unit + 25 edge case + 5 integration) | AI Agent |
 | 2026-06-08 | Clerk adopted for admin auth (D-014, ADR-002) | User + AI Agent |
+| 2026-06-08 | Vault initialized with full structure | AI Agent |
 
 ---
 
@@ -62,9 +61,9 @@
 
 ## Next Actions
 
-1. Set up Clerk account + create application
-2. Create repository scaffold (revised monorepo structure)
-3. Begin Phase 1: Core Crypto + Server Scaffold
+1. Complete Phase 1: AES-256-GCM, RSA-2048, JWT handler
+2. Begin Question CRUD API + auto-encryption
+3. PostgreSQL schema design + Alembic migrations
 
 ---
 

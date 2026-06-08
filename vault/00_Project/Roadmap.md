@@ -50,8 +50,8 @@
 | # | Task | Priority | Effort | Depends On |
 |---|---|---|---|---|
 | 9 | Question CRUD API with auto-encryption | P0 | 4h | Phase 1 |
-| 10 | Graph builder + coloring (`shared/graph/`) | P0 | 3h | — |
-| 11 | Variant generator (question/option shuffle) | P0 | 2h | Graph coloring |
+| 10 | Graph builder + coloring (`shared/graph/`) | P0 | 3h | — | ✅ Done |
+| 11 | Variant generator (question/option shuffle) | P0 | 2h | Graph coloring | ✅ Done |
 | 12 | Exam compilation + package generation + signing | P0 | 4h | Questions, Graph |
 | 13 | QR token generation + signing | P0 | 2h | RSA module |
 | 14 | Edge auth endpoint (QR validate + session creation) | P0 | 3h | Edge mode, QR |
