@@ -1,6 +1,6 @@
 # FortisExam — Active Tasks
 
-> **Last Updated:** 2026-06-09
+> **Last Updated:** 2026-06-10
 > **Current Sprint:** Sprint 1 (Backend & Crypto)
 
 ---
@@ -13,7 +13,9 @@
 | ~~Architecture analysis~~ | Docs | AI Agent | ✅ Complete |
 | ~~Sprint planning~~ | Docs | AI Agent | ✅ Complete |
 | ~~Module 04: Graph Randomization~~ | Backend | AI Agent | ✅ Complete |
+| ~~Module 05: State Recovery~~ | Backend | Team Member | ✅ Complete (58 tests, 99% coverage) |
 | ~~Module 07: Audit Ledger~~ | Backend | AI Agent | ✅ 87 tests, 98% coverage |
+| ~~Module 02: Crypto Delivery~~ | Backend | AI Agent | ✅ 219 tests, 92% coverage |
 
 ---
 
@@ -26,27 +28,27 @@
 - [x] ~~Audit event logger (`backend/app/services/audit_service.py`)~~ — Module 07 complete
 
 ### Security (Parallel with Backend)
-- [ ] AES-256-GCM module (`shared/crypto/aes.py`)
-- [ ] RSA-2048 module (`shared/crypto/rsa.py`)
+- [x] ~~AES-256-GCM module (`shared/crypto/aes.py`)~~ — complete (Module 02)
+- [x] ~~RSA-2048 module (`shared/crypto/rsa.py`)~~ — complete (Module 02)
 - [x] ~~SHA-256 hash chain (`shared/audit/hash_chain.py`)~~ — complete
 - [x] ~~Chain verifier (`shared/audit/chain_verifier.py`)~~ — complete (Module 07)
 - [ ] JWT handler (`shared/crypto/jwt_handler.py`)
-- [ ] Unit tests for all crypto modules
+- [x] ~~Unit tests for all crypto modules~~ — 33 tests (Module 02)
 
 ### Infrastructure
 - [ ] Docker Compose initial setup
 - [ ] `.env` configuration
-- [ ] RSA key generation script
+- [x] ~~RSA key generation script~~ — `scripts/generate_keys.py` (Module 02)
 
 ---
 
-## 🚧 IN PROGRESS
-* **Next Module Discovery:** Planning implementation strategy for remaining modules.
+## 🟧 IN PROGRESS
+* **Module 01 (Question Pool):** Next module to implement — Question CRUD API, Alembic migrations.
 
 ## 📝 TODO (Immediate Next)
-* **Module 06 (Background Sync):**
-    * Cloud-Edge sync protocols (answers, audit logs, statuses).
-    * Recovery of sync after network partition.
+* **Alembic migrations** for PostgreSQL (questions, packages, exams, audit_events tables)
+* **Question CRUD API** (`server/app/api/cloud/questions.py`) with AES encryption on save
+* **Clerk Auth middleware** for cloud admin routes
 
 ---
 

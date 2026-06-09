@@ -5,7 +5,7 @@ CRUD endpoints for encrypted questions.
 Protected by Clerk JWT middleware.
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
 router = APIRouter(prefix="/questions")
 

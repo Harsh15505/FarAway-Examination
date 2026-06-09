@@ -1,10 +1,34 @@
 # FortisExam — Changelog
 
-> **Last Updated:** 2026-06-09
+> **Last Updated:** 2026-06-10
 
 ---
 
 ## [Unreleased]
+
+---
+
+### 2026-06-10 — Module 02: Cryptographic Package Delivery (Complete)
+- **Implemented** `shared/crypto/aes.py` — Full AES-256-GCM with fresh nonce per call, tamper detection via GCM auth tag
+- **Implemented** `shared/crypto/rsa.py` — RSA-2048 PSS signing/verification + OAEP key wrapping
+- **Implemented** `server/app/services/package_service.py` — generate, verify_signature, get_wrapped_key, download_payload
+- **Implemented** `server/app/services/distribution_service.py` — D-012 admin-triggered key release, list packages, delivery status
+- **Implemented** `server/app/api/cloud/packages.py` — 4 routes: generate, get, download, verify
+- **Implemented** `server/app/api/cloud/distribution.py` — 2 routes: list packages, delivery status
+- **Implemented** `server/app/api/cloud/exams.py` — added `POST /exams/{id}/release-key` (D-012)
+- **Created** `server/app/schemas/packages.py` — full Pydantic schema set (8 models)
+- **Created** `scripts/generate_keys.py` — RSA key pair bootstrap (server + center)
+- **Created** `tests/unit/test_crypto.py` — 33 unit tests (AES, RSA, HashUtils)
+- **Created** `tests/unit/test_package_service.py` — 13 unit tests (PackageService, mock DB)
+- **Created** `tests/integration/test_package_integration.py` — 8 integration tests (full pipeline)
+- **Created** `tests/security/test_package_security.py` — 15 security tests (T-001 through T-006)
+- **Created** `vault/03_Modules/Module02_CryptoDelivery/ManualTestingChecklist.md`
+- **Results:** 219 total tests passing (all modules), 92% coverage Module 02, zero lint errors
+- **Threats covered:** T-001 (key correctness), T-002 (tampered payload), T-003 (tampered signature), T-004 (key isolation), T-005 (nonce uniqueness), T-006 (package opacity)
+
+### 2026-06-10 — Module 05 Docs Updated
+- Identified and confirmed Module 05 (State Recovery) was fully implemented by team member but undocumented
+- Updated `CurrentState.md` to mark Module 05 as Complete
 
 ### 2026-06-09 — Module 05: State Recovery (Complete)
 - **Implemented** `SnapshotManager` pure logic for building/verifying hashes.

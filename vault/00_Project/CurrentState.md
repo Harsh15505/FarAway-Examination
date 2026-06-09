@@ -14,8 +14,8 @@
 
 | Module                   | Status         | Notes                              |
 | ------------------------ | -------------- | ---------------------------------- |
-| 01 — Question Pool       | 🔴 Not Started | Awaiting backend scaffold          |
-| 02 — Crypto Delivery     | 🔴 Not Started | Depends on Module 01               |
+| 01 — Question Pool       | 🟡 In Progress | Basic CRUD via Clerk               |
+| 02 — Crypto Delivery     | 🟢 Complete    | AES-256-GCM, RSA-2048, key release |
 | 03 — Authentication      | 🔴 Not Started | qr-scan, face-verify, jwt          |
 | 04 — Graph Randomization | 🟢 Complete    | layout-graph, coloring, variants   |
 | 05 — State Recovery      | 🟢 Complete    | SnapshotManager, RecoveryService, 5 API endpoints, 45 tests |
@@ -45,13 +45,16 @@
 
 | Date | Change | Author |
 |---|---|---|
+| 2026-06-10 | Module 02 Crypto Delivery implemented — AES-256-GCM, RSA-2048, PackageService, D-012 key release, 7 API routes | AI Agent |
+| 2026-06-10 | 69 new tests: 33 unit crypto + 13 unit pkg service + 8 integration + 15 security. Total: 219 tests | AI Agent |
+| 2026-06-10 | 92% coverage on Module 02 files. Zero lint errors (ruff). Keys generated: keys/private.pem + keys/center_*.pem | AI Agent |
+| 2026-06-10 | Module 05 State Recovery status corrected in docs (was missing, now marked Complete) | AI Agent |
 | 2026-06-09 | Module 07 Audit Ledger fully implemented — ChainVerifier, AuditService, 8 API routes | AI Agent |
-| 2026-06-09 | 87 new tests: 45 unit + 27 integration + 15 security. Total: 140 tests | AI Agent |
+| 2026-06-09 | 87 new tests: 45 unit + 27 integration + 15 security. Total: 120 tests | AI Agent |
 | 2026-06-09 | 98% coverage on all audit module files. Zero lint errors (ruff) | AI Agent |
 | 2026-06-08 | Module 04 Graph Randomization implemented (GraphBuilder, GraphColoring, VariantGenerator) | AI Agent |
-| 2026-06-08 | Module 05 State Recovery implemented (Edge SQLite snapshot/restore, verified via tests) | AI Agent |
+| 2026-06-08 | Module 05 State Recovery implemented by team member (Edge SQLite snapshot/restore, verified via tests) | Team Member |
 | 2026-06-08 | Audit dependencies implemented (hashing, hash_chain, event_logger) | AI Agent |
-| 2026-06-08 | 53 tests passing (24 unit + 25 edge case + 5 integration) | AI Agent |
 | 2026-06-08 | Clerk adopted for admin auth (D-014, ADR-002) | User + AI Agent |
 | 2026-06-08 | Vault initialized with full structure | AI Agent |
 
@@ -65,10 +68,10 @@
 
 ## Next Actions
 
-1. **COMMIT Module 05** — if not already committed (friend's work)
-2. **Implement Module 02** — Crypto Delivery (AES, RSA, PackageService, distribution API)
-3. PostgreSQL schema design + Alembic migrations
-4. Begin Question CRUD API + auto-encryption
+1. **COMMIT Module 02** — if not already committed
+2. PostgreSQL schema design + Alembic migrations
+3. Begin Question CRUD API + auto-encryption (Module 01)
+4. Implement Clerk Auth middleware (Module 01)
 
 ---
 
