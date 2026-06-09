@@ -40,6 +40,16 @@
 
 ---
 
+## 🚧 IN PROGRESS
+* **Next Module Discovery:** Planning implementation strategy for remaining modules.
+
+## 📝 TODO (Immediate Next)
+* **Module 06 (Background Sync):**
+    * Cloud-Edge sync protocols (answers, audit logs, statuses).
+    * Recovery of sync after network partition.
+
+---
+
 ## 🔵 Blocked
 
 None currently.

@@ -49,6 +49,7 @@
 | 2026-06-09 | 87 new tests: 45 unit + 27 integration + 15 security. Total: 140 tests | AI Agent |
 | 2026-06-09 | 98% coverage on all audit module files. Zero lint errors (ruff) | AI Agent |
 | 2026-06-08 | Module 04 Graph Randomization implemented (GraphBuilder, GraphColoring, VariantGenerator) | AI Agent |
+| 2026-06-08 | Module 05 State Recovery implemented (Edge SQLite snapshot/restore, verified via tests) | AI Agent |
 | 2026-06-08 | Audit dependencies implemented (hashing, hash_chain, event_logger) | AI Agent |
 | 2026-06-08 | 53 tests passing (24 unit + 25 edge case + 5 integration) | AI Agent |
 | 2026-06-08 | Clerk adopted for admin auth (D-014, ADR-002) | User + AI Agent |

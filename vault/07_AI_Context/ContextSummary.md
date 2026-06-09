@@ -10,6 +10,11 @@
 FortisExam is a Zero-Trust, Edge-First examination infrastructure for large-scale national exams (NEET, JEE, UPSC). It prevents paper leaks through encryption, prevents copying through spatial randomization, and ensures accountability through hash-chained audit trails.
 
 ### Current Status
+**Currently Completed:**
+* **Architecture:** Core design, D-001 through D-015, SQLite edge DB (Redis removed).
+* **Module 04 (Graph Randomization):** Core logic, deterministic seeding, graph coloring.
+* **Module 05 (State Recovery):** Auto-snapshots to SQLite on every answer, async API endpoints, hash integrity verification, session status restoration, 58/58 tests passing with 99% coverage.
+* **Module 07 (Audit Ledger):** Chained hashing, generic `EventLogger`, PostgreSQL+SQLite support, 87 unit/integration/security tests passing with 98% coverage.
 - **Phase:** Sprint 1 — Backend & Crypto Implementation (Modules 04 and 07 complete)
 - **Next Step:** Complete remaining Sprint 1 tasks (Crypto primitives, Question API, Server scaffold)
 - **Code exists for:** Graph subsystem (`shared/graph/`), audit module (`server/app/api/common/audit.py`, `server/app/services/audit_service.py`, `shared/audit/`)

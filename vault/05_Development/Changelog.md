@@ -6,6 +6,14 @@
 
 ## [Unreleased]
 
+### 2026-06-09 — Module 05: State Recovery (Complete)
+- **Implemented** `SnapshotManager` pure logic for building/verifying hashes.
+- **Extended** `RecoverySnapshot` model with SQLite UPSERT semantics.
+- **Implemented** `RecoveryService` for persisting answers and restoring state.
+- **Implemented** Edge API routes for `/exam/answer`, `/exam/submit`, and `/recovery/*`.
+- **Created** comprehensive test suite (58 tests: unit, integration, edge cases, security) with 99% coverage.
+- **Created** `ManualTestingChecklist.md` for QA.
+
 ### 2026-06-09 — Module 07: Audit Ledger (Complete)
 - **Implemented** `shared/audit/chain_verifier.py` — ChainVerifier.verify() with 3-check tamper detection
 - **Extended** `server/app/models/audit_event.py` — Added exam_id, actor_role, target_id, synced columns
