@@ -1,11 +1,11 @@
 # FortisExam — Active Tasks
 
-> **Last Updated:** 2026-06-08
-> **Current Sprint:** Sprint 0 (Foundation)
+> **Last Updated:** 2026-06-09
+> **Current Sprint:** Sprint 1 (Backend & Crypto)
 
 ---
 
-## 🟢 In Progress
+## 🟢 Completed
 
 | Task | Track | Assignee | Notes |
 |---|---|---|---|
@@ -13,6 +13,7 @@
 | ~~Architecture analysis~~ | Docs | AI Agent | ✅ Complete |
 | ~~Sprint planning~~ | Docs | AI Agent | ✅ Complete |
 | ~~Module 04: Graph Randomization~~ | Backend | AI Agent | ✅ Complete |
+| ~~Module 07: Audit Ledger~~ | Backend | AI Agent | ✅ 87 tests, 98% coverage |
 
 ---
 
@@ -22,12 +23,13 @@
 - [ ] PostgreSQL schema design + Alembic migrations
 - [ ] FastAPI cloud backend scaffold (`backend/app/main.py`)
 - [ ] Question CRUD API (`backend/app/api/v1/questions.py`)
-- [ ] Audit event logger (`backend/app/services/audit_service.py`)
+- [x] ~~Audit event logger (`backend/app/services/audit_service.py`)~~ — Module 07 complete
 
 ### Security (Parallel with Backend)
 - [ ] AES-256-GCM module (`shared/crypto/aes.py`)
-- [ ] RSA-4096 module (`shared/crypto/rsa.py`)
-- [ ] SHA-256 hash chain (`shared/audit/hash_chain.py`)
+- [ ] RSA-2048 module (`shared/crypto/rsa.py`)
+- [x] ~~SHA-256 hash chain (`shared/audit/hash_chain.py`)~~ — complete
+- [x] ~~Chain verifier (`shared/audit/chain_verifier.py`)~~ — complete (Module 07)
 - [ ] JWT handler (`shared/crypto/jwt_handler.py`)
 - [ ] Unit tests for all crypto modules
 

@@ -1,12 +1,25 @@
 # FortisExam — Changelog
 
-> **Last Updated:** 2026-06-08
+> **Last Updated:** 2026-06-09
 
 ---
 
 ## [Unreleased]
 
-### 2026-06-08 — Module 04: Review Fixes
+### 2026-06-09 — Module 07: Audit Ledger (Complete)
+- **Implemented** `shared/audit/chain_verifier.py` — ChainVerifier.verify() with 3-check tamper detection
+- **Extended** `server/app/models/audit_event.py` — Added exam_id, actor_role, target_id, synced columns
+- **Implemented** `server/app/schemas/audit.py` — Full schema set: EventType (17 types), LogEventRequest, ChainVerificationResult, ExportResponse
+- **Implemented** `server/app/services/audit_service.py` — log_event, get_chain, verify_chain, list_events, export_chain (JSON+CSV)
+- **Implemented** `server/app/api/common/audit.py` — 8 FastAPI routes: log, chain, chain/{exam_id}, verify, verify/{exam_id}, events, export/{exam_id}, stats
+- **Created** `tests/unit/test_audit.py` — 45 unit tests (ChainVerifier, HashChain, EventLogger, schema validation)
+- **Created** `tests/integration/test_audit_integration.py` — 27 integration tests (SQLite in-memory)
+- **Created** `tests/security/test_audit_security.py` — 15 security tests (T-009, T-008, T-004 coverage)
+- **Created** `pytest.ini` — asyncio_mode=auto, coverage configuration
+- **Updated** `tests/conftest.py` — Real RSA key pair generation, asyncio config
+- **Results:** 87 tests passing, 98% coverage, zero lint errors, 10k events < 1s
+- **Threats covered:** T-009 (6 tests), T-008 (2 tests), T-004 (2 tests)
+
 - **Fixed** correct_option remapping: replaced `.index()` with inverse-permutation tracking (safe for duplicate option text)
 - **Fixed** seed derivation: replaced arithmetic `seed * 10000 + id` with SHA-256 hash-based derivation (collision-resistant)
 - **Fixed** `assign_variants()`: returns deep copies to prevent aliasing across seats sharing the same color
