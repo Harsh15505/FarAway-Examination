@@ -8,6 +8,14 @@
 
 ---
 
+### 2026-06-10 — Module 02 & 03 Test Hardening
+- **Fixed** `PytestCollectionWarning` by renaming `TestBase` → `_TestBase` in package integration tests
+- **Added** AES decrypt key-size validation test (covers `aes.py` line 91)
+- **Added** `DistributionService.list_packages()` and `get_delivery_status()` tests (5 new tests)
+- **Added** `JWTHandler.decode_clerk_jwt()` tests with mocked JWKS (4 new tests: valid decode, missing kid, kid not found, fetch failure)
+- **Added** Clerk middleware production path tests (missing auth header, invalid JWT)
+- **Results:** 354 total tests passing, 0 warnings, 0 errors
+
 ### 2026-06-10 — Module 03: Authentication (Complete)
 - **Implemented** `shared/crypto/jwt_handler.py` — RS256 create_token, verify_token, decode_clerk_jwt (JWKS)
 - **Created** `server/app/models/used_nonce.py` — SQLite anti-replay nonce store
