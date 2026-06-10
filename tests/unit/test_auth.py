@@ -459,3 +459,139 @@ class TestExtractRole:
         """No role metadata → defaults to 'expert'."""
         claims = {"sub": "user_123"}
         assert _extract_role_from_claims(claims) == "expert"
+
+
+# ===========================================================================
+# JWTHandler.decode_clerk_jwt() tests (mocked JWKS fetch)
+# ===========================================================================
+
+
+class TestDecodeClerkJWT:
+    """Tests for JWTHandler.decode_clerk_jwt() with mocked httpx."""
+
+    def test_decode_clerk_jwt_valid(self, rsa_keys, monkeypatch):
+        """Valid Clerk JWT with matching kid should decode."""
+        import jwt as pyjwt
+        from jwt.algorithms import RSAAlgorithm
+
+        private_pem, public_pem = rsa_keys
+
+        # Build JWK from public key for JWKS response
+        from cryptography.hazmat.primitives.serialization import load_pem_public_key
+        pub_key = load_pem_public_key(public_pem)
+        jwk_dict = RSAAlgorithm.to_jwk(pub_key, as_dict=True)
+        jwk_dict["kid"] = "test-kid-001"
+        jwk_dict["alg"] = "RS256"
+        jwk_dict["use"] = "sig"
+
+        # Create token with kid in header
+        token = pyjwt.encode(
+            {"sub": "user_clerk", "email": "clerk@test.com", "iat": 1000000000, "exp": 9999999999},
+            private_pem,
+            algorithm="RS256",
+            headers={"kid": "test-kid-001"},
+        )
+
+        # Mock httpx.get
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"keys": [jwk_dict]}
+        mock_response.raise_for_status = MagicMock()
+
+        import httpx
+        monkeypatch.setattr(httpx, "get", lambda *a, **kw: mock_response)
+
+        claims = JWTHandler.decode_clerk_jwt(token, jwks_url="https://clerk.test/.well-known/jwks.json")
+        assert claims["sub"] == "user_clerk"
+        assert claims["email"] == "clerk@test.com"
+
+    def test_decode_clerk_jwt_missing_kid_raises(self, rsa_keys):
+        """Token without kid in header should raise RuntimeError."""
+        import jwt as pyjwt
+        private_pem, _ = rsa_keys
+
+        token = pyjwt.encode(
+            {"sub": "no-kid"},
+            private_pem,
+            algorithm="RS256",
+            # No kid header
+        )
+
+        with pytest.raises(RuntimeError, match="kid"):
+            JWTHandler.decode_clerk_jwt(token, jwks_url="https://clerk.test/.well-known/jwks.json")
+
+    def test_decode_clerk_jwt_kid_not_found_raises(self, rsa_keys, monkeypatch):
+        """Token with kid that doesn't match any JWKS key should raise RuntimeError."""
+        import jwt as pyjwt
+
+        private_pem, _ = rsa_keys
+
+        token = pyjwt.encode(
+            {"sub": "mismatch"},
+            private_pem,
+            algorithm="RS256",
+            headers={"kid": "nonexistent-kid"},
+        )
+
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"keys": []}
+        mock_response.raise_for_status = MagicMock()
+
+        import httpx
+        monkeypatch.setattr(httpx, "get", lambda *a, **kw: mock_response)
+
+        with pytest.raises(RuntimeError, match="No JWKS key found"):
+            JWTHandler.decode_clerk_jwt(token, jwks_url="https://clerk.test/.well-known/jwks.json")
+
+    def test_decode_clerk_jwt_fetch_failure_raises(self, rsa_keys, monkeypatch):
+        """JWKS fetch failure should raise RuntimeError."""
+        import jwt as pyjwt
+
+        private_pem, _ = rsa_keys
+        token = pyjwt.encode(
+            {"sub": "fetch-fail"},
+            private_pem,
+            algorithm="RS256",
+            headers={"kid": "test-kid"},
+        )
+
+        import httpx
+        monkeypatch.setattr(httpx, "get", lambda *a, **kw: (_ for _ in ()).throw(httpx.HTTPError("connection failed")))
+
+        with pytest.raises(RuntimeError, match="Failed to fetch JWKS"):
+            JWTHandler.decode_clerk_jwt(token, jwks_url="https://clerk.test/.well-known/jwks.json")
+
+
+# ===========================================================================
+# Clerk middleware — production path tests
+# ===========================================================================
+
+
+class TestClerkMiddlewareProduction:
+    """Tests for verify_clerk_jwt() in production mode (CLERK_SECRET_KEY set)."""
+
+    @pytest.mark.asyncio
+    async def test_production_no_credentials_raises_401(self, monkeypatch):
+        """Production mode without Authorization header should raise 401."""
+        from fastapi import HTTPException
+        from server.app.config import settings
+        monkeypatch.setattr(settings, "clerk_secret_key", "sk_live_real_key")
+
+        with pytest.raises(HTTPException) as exc_info:
+            await verify_clerk_jwt(credentials=None)
+        assert exc_info.value.status_code == 401
+        assert "Missing Authorization" in exc_info.value.detail
+
+    @pytest.mark.asyncio
+    async def test_production_invalid_jwt_raises_401(self, monkeypatch):
+        """Production mode with an invalid JWT should raise 401."""
+        from fastapi import HTTPException
+        from server.app.config import settings
+        monkeypatch.setattr(settings, "clerk_secret_key", "sk_live_real_key")
+
+        mock_creds = MagicMock()
+        mock_creds.credentials = "invalid-jwt-token"
+
+        with pytest.raises(HTTPException) as exc_info:
+            await verify_clerk_jwt(credentials=mock_creds)
+        assert exc_info.value.status_code == 401
+
