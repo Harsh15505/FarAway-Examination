@@ -17,6 +17,7 @@
 | ~~Module 07: Audit Ledger~~ | Backend | AI Agent | ✅ 87 tests, 98% coverage |
 | ~~Module 02: Crypto Delivery~~ | Backend | AI Agent | ✅ 219 tests, 92% coverage |
 | ~~Module 03: Authentication~~ | Backend | AI Agent | ✅ 282 tests, 81% coverage |
+| ~~Module 02 & 03 Test Hardening~~ | QA | ayaan-goel | ✅ 354 total tests, fixed warnings, +11 new tests |
 
 ---
 
