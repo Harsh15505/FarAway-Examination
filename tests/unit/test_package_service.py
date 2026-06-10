@@ -283,3 +283,79 @@ class TestBuildManifest:
         manifest = PackageService._build_manifest("exam-x", [q], {})
         assert "manifest_hash" in manifest
         assert len(manifest["manifest_hash"]) == 64
+
+
+# ============================================================
+# DistributionService tests
+# ============================================================
+
+from server.app.services.distribution_service import DistributionService
+
+
+class TestDistributionListPackages:
+    """Tests for DistributionService.list_packages()."""
+
+    @pytest.mark.asyncio
+    async def test_list_packages_returns_list(self):
+        """list_packages() should return a list of dicts."""
+        pkg_mock = MagicMock()
+        pkg_mock.id = "pkg-001"
+        pkg_mock.exam_id = "exam-001"
+        pkg_mock.status = "generated"
+        pkg_mock.package_hash = "a" * 64
+        pkg_mock.created_at = None
+
+        mock_result = MagicMock()
+        mock_result.scalars.return_value.all.return_value = [pkg_mock]
+        db = AsyncMock()
+        db.execute = AsyncMock(return_value=mock_result)
+
+        svc = DistributionService(db)
+        result = await svc.list_packages()
+
+        assert len(result) == 1
+        assert result[0]["package_id"] == "pkg-001"
+        assert result[0]["status"] == "generated"
+
+    @pytest.mark.asyncio
+    async def test_list_packages_empty(self):
+        """list_packages() with no packages returns empty list."""
+        mock_result = MagicMock()
+        mock_result.scalars.return_value.all.return_value = []
+        db = AsyncMock()
+        db.execute = AsyncMock(return_value=mock_result)
+
+        svc = DistributionService(db)
+        result = await svc.list_packages()
+        assert result == []
+
+
+class TestDistributionDeliveryStatus:
+    """Tests for DistributionService.get_delivery_status()."""
+
+    @pytest.mark.asyncio
+    async def test_get_delivery_status_found(self):
+        """get_delivery_status() returns dict for existing package."""
+        pkg_mock = MagicMock()
+        pkg_mock.id = "pkg-002"
+        pkg_mock.exam_id = "exam-002"
+        pkg_mock.status = "activated"
+        pkg_mock.package_hash = "b" * 64
+        pkg_mock.created_at = None
+
+        db = _make_db_with_package(pkg_mock)
+        svc = DistributionService(db)
+        result = await svc.get_delivery_status("pkg-002")
+
+        assert result["package_id"] == "pkg-002"
+        assert result["status"] == "activated"
+
+    @pytest.mark.asyncio
+    async def test_get_delivery_status_not_found(self):
+        """get_delivery_status() raises ValueError for missing package."""
+        db = _make_db_with_package(None)
+        svc = DistributionService(db)
+
+        with pytest.raises(ValueError, match="Package not found"):
+            await svc.get_delivery_status("nonexistent")
+

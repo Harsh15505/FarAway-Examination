@@ -29,11 +29,11 @@ from shared.crypto.rsa import RSASigner
 # SQLite-compatible in-memory models
 # ============================================================
 
-class TestBase(DeclarativeBase):
+class _TestBase(DeclarativeBase):
     pass
 
 
-class SQLiteQuestion(TestBase):
+class SQLiteQuestion(_TestBase):
     """SQLite-compatible Question model (String IDs instead of PostgreSQL UUID)."""
     __tablename__ = "questions"
 
@@ -49,7 +49,7 @@ class SQLiteQuestion(TestBase):
     updated_at = Column(DateTime)
 
 
-class SQLitePackage(TestBase):
+class SQLitePackage(_TestBase):
     """SQLite-compatible Package model."""
     __tablename__ = "packages"
 
@@ -88,8 +88,8 @@ async def db_session():
     )
 
     async with engine.begin() as conn:
-        await conn.run_sync(TestBase.metadata.drop_all)
-        await conn.run_sync(TestBase.metadata.create_all)
+        await conn.run_sync(_TestBase.metadata.drop_all)
+        await conn.run_sync(_TestBase.metadata.create_all)
 
     session_factory = async_sessionmaker(
         engine, class_=AsyncSession, expire_on_commit=False

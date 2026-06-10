@@ -139,6 +139,13 @@ class TestAESCipher:
         with pytest.raises(ValueError, match="12 bytes"):
             AESCipher.decrypt(ciphertext, key, b"short", tag)
 
+    def test_decrypt_invalid_key_size_raises_value_error(self):
+        """Decrypt with wrong key size should raise ValueError."""
+        key = AESCipher.generate_key()
+        ciphertext, nonce, tag = AESCipher.encrypt(b"data", key)
+        with pytest.raises(ValueError, match="32 bytes"):
+            AESCipher.decrypt(ciphertext, b"too-short-key", nonce, tag)
+
 
 # ============================================================
 # RSA-2048 Tests
