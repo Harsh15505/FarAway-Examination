@@ -8,6 +8,21 @@
 
 ---
 
+### 2026-06-11 — Module 01: Question Pool System (Complete)
+- **Initialized** Alembic migrations for PostgreSQL schema.
+- **Implemented** `server/alembic/versions/2a7179505022_initial_migration.py` — created `users` and `questions` tables.
+- **Configured** `server/alembic/env.py` for async migrations using SQLAlchemy `async_engine_from_config`.
+- **Implemented** `server/app/services/question_service.py` — Question CRUD with automatic AES-256-GCM encryption and audit logging.
+- **Implemented** `server/app/api/cloud/questions.py` — Cloud API endpoints protected by Clerk RBAC (`admin`, `expert`).
+- **Created** `tests/unit/test_question_service.py` — 5 unit tests for isolated CRUD operations.
+- **Created** `tests/integration/test_questions_api.py` — 5 integration tests mocking Auth and DB.
+- **Created** `tests/security/test_question_security.py` — 2 security tests (T-003, T-004) covering ciphertext and auth tag tampering.
+- **Created** `vault/03_Modules/Module01_QuestionPool/ImplementationPlan.md` and `ManualTestingChecklist.md`.
+- **Results:** 366 total tests passing (all modules). 12 new tests for Module 01.
+- **Threats covered:** Ciphertext tampering, auth tag tampering.
+
+---
+
 ### 2026-06-10 — Module 02 & 03 Test Hardening
 - **Fixed** `PytestCollectionWarning` by renaming `TestBase` → `_TestBase` in package integration tests
 - **Added** AES decrypt key-size validation test (covers `aes.py` line 91)

@@ -18,15 +18,16 @@
 | ~~Module 02: Crypto Delivery~~ | Backend | AI Agent | ✅ 219 tests, 92% coverage |
 | ~~Module 03: Authentication~~ | Backend | AI Agent | ✅ 282 tests, 81% coverage |
 | ~~Module 02 & 03 Test Hardening~~ | QA | ayaan-goel | ✅ 354 total tests, fixed warnings, +11 new tests |
+| ~~Module 01: Question Pool~~ | Backend | AI Agent | ✅ Complete (12 tests, Alembic schema, CRUD) |
 
 ---
 
 ## 🔴 Ready for Sprint 1
 
 ### Backend Core (Start First)
-- [ ] PostgreSQL schema design + Alembic migrations
+- [x] ~~PostgreSQL schema design + Alembic migrations~~ — Complete (Module 01)
 - [ ] FastAPI cloud backend scaffold (`backend/app/main.py`)
-- [ ] Question CRUD API (`backend/app/api/v1/questions.py`)
+- [x] ~~Question CRUD API (`backend/app/api/v1/questions.py`)~~ — Complete (Module 01)
 - [x] ~~Audit event logger (`backend/app/services/audit_service.py`)~~ — Module 07 complete
 
 ### Security (Parallel with Backend)
@@ -45,12 +46,10 @@
 ---
 
 ## 🟧 IN PROGRESS
-* **Module 01 (Question Pool):** Next module — Question CRUD, Alembic migrations, Clerk auth wired.
+* None
 
 ## 📝 TODO (Immediate Next)
-* **Alembic migrations** for PostgreSQL tables
-* **Question CRUD API** with AES encryption on create/update
-* **Wire Clerk middleware** into cloud question/exam routes
+* Edge server scaffold and wiring components
 
 ---
 

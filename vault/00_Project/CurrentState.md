@@ -14,7 +14,7 @@
 
 | Module                   | Status         | Notes                              |
 | ------------------------ | -------------- | ---------------------------------- |
-| 01 — Question Pool       | 🟡 In Progress | Basic CRUD via Clerk               |
+| 01 — Question Pool       | 🟢 Complete    | AES-256-GCM auto-encryption, Clerk JWT auth, Alembic migrations, 12 tests |
 | 02 — Crypto Delivery     | 🟢 Complete    | AES-256-GCM, RSA-2048, key release, 73 tests |
 | 03 — Authentication      | 🟢 Complete    | JWTHandler, QR verify, face embed, Clerk JWKS, RBAC, 69 tests |
 | 04 — Graph Randomization | 🟢 Complete    | layout-graph, coloring, variants   |
@@ -45,6 +45,7 @@
 
 | Date | Change | Author |
 |---|---|---|
+| 2026-06-11 | Module 01 Question Pool implemented — Alembic migrations, Question CRUD APIs with AES encryption, 12 tests. Total tests: 366 | AI Agent |
 | 2026-06-10 | Module 02 & 03 test hardening: +11 tests (354 total), fixed TestBase pytest warning, added AES decrypt/distribution/Clerk JWKS coverage | ayaan-goel |
 | 2026-06-10 | Module 03 Authentication implemented — JWTHandler RS256, QRTokenService, FaceVerificationService, AuthService, Clerk middleware, RBAC | AI Agent |
 | 2026-06-10 | 63 new tests: 35 unit + 7 integration + 21 security. Total: 282 tests all passing | AI Agent |
