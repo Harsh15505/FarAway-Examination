@@ -13,12 +13,13 @@ FortisExam is a Zero-Trust, Edge-First examination infrastructure for large-scal
 **Currently Completed:**
 * **Architecture:** Core design, D-001 through D-015, SQLite edge DB (Redis removed).
 * **Module 02 (Crypto Delivery):** Fully implemented. AES-256-GCM, RSA-2048, and PackageService complete. D-012 Admin key release endpoint active.
+* **Module 03 (Authentication):** Fully implemented. JWTHandler (RS256), QRTokenService (RSA sig + anti-replay nonce), FaceVerificationService (cosine similarity), AuthService (8-step pipeline), Clerk JWKS middleware, RBAC, supervisor override. 63 new tests.
 * **Module 04 (Graph Randomization):** Core logic, deterministic seeding, graph coloring.
 * **Module 05 (State Recovery):** Auto-snapshots to SQLite on every answer, async API endpoints, hash integrity verification, session status restoration, 58/58 tests passing with 99% coverage.
 * **Module 07 (Audit Ledger):** Chained hashing, generic `EventLogger`, PostgreSQL+SQLite support, 87 unit/integration/security tests passing with 98% coverage.
-- **Phase:** Sprint 1 — Backend & Crypto Implementation (Modules 02, 04, 05, and 07 complete)
-- **Next Step:** Complete remaining Sprint 1 tasks (Question API, Server scaffold)
-- **Code exists for:** Graph subsystem (`shared/graph/`), audit module (`server/app/api/common/audit.py`, `server/app/services/audit_service.py`, `shared/audit/`), crypto package (`shared/crypto/`)
+- **Phase:** Sprint 1 — Backend & Crypto Implementation (Modules 02, 03, 04, 05, and 07 complete)
+- **Next Step:** Module 01 (Question Pool) — Alembic migrations, Question CRUD, Clerk auth wired into routes
+- **Code exists for:** Graph subsystem (`shared/graph/`), audit module (`server/app/api/common/audit.py`, `server/app/services/audit_service.py`, `shared/audit/`), crypto package (`shared/crypto/`), auth pipeline (`server/app/services/auth_service.py`, `server/app/middleware/`)
 
 ### Tech Stack
 - Backend: Python, FastAPI, PostgreSQL

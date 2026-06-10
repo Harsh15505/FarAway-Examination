@@ -8,6 +8,25 @@
 
 ---
 
+### 2026-06-10 — Module 03: Authentication (Complete)
+- **Implemented** `shared/crypto/jwt_handler.py` — RS256 create_token, verify_token, decode_clerk_jwt (JWKS)
+- **Created** `server/app/models/used_nonce.py` — SQLite anti-replay nonce store
+- **Implemented** `server/app/services/qr_token_service.py` — QRTokenService (parse → RSA verify → expiry → anti-replay) + QRTokenGenerator
+- **Implemented** `server/app/services/face_verification_service.py` — cosine similarity on 512-dim float32 embeddings
+- **Implemented** `server/app/services/auth_service.py` — 8-step auth orchestration: QR → candidate lookup → face → variant → session → JWT → audit
+- **Implemented** `server/app/middleware/clerk_auth.py` — real Clerk JWKS verification + dev bypass + require_role() RBAC factory
+- **Implemented** `server/app/middleware/edge_auth.py` — RS256 JWT verification for edge session tokens
+- **Implemented** `server/app/api/edge/auth.py` — POST /auth/authenticate + POST /auth/supervisor-override
+- **Created** `server/app/api/cloud/users.py` — GET /users/me + POST /users/sync (admin-only)
+- **Extended** `server/app/schemas/auth.py` — SupervisorOverrideRequest/Response, UserMeResponse, UserSyncRequest/Response
+- **Mounted** users router in `server/app/main.py`
+- **Created** `tests/unit/test_auth.py` — 35 unit tests (JWT, QR token, face similarity, Clerk middleware)
+- **Created** `tests/integration/test_auth_integration.py` — 7 integration tests (QR-only, QR+face, supervisor override)
+- **Created** `tests/security/test_auth_security.py` — 21 security tests (T-007..T-012)
+- **Created** `vault/03_Modules/Module03_Authentication/ManualTestingChecklist.md`
+- **Results:** 282 total tests passing (all modules), 81% coverage Module 03, zero lint errors
+- **Threats covered:** T-007 (replay), T-008 (tampered QR — 5 variants), T-009 (expired), T-010 (wrong key), T-011 (RBAC bypass), T-012 (face spoofing)
+
 ### 2026-06-10 — Module 02: Cryptographic Package Delivery (Complete)
 - **Implemented** `shared/crypto/aes.py` — Full AES-256-GCM with fresh nonce per call, tamper detection via GCM auth tag
 - **Implemented** `shared/crypto/rsa.py` — RSA-2048 PSS signing/verification + OAEP key wrapping

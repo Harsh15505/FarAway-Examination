@@ -16,6 +16,7 @@
 | ~~Module 05: State Recovery~~ | Backend | Team Member | ✅ Complete (58 tests, 99% coverage) |
 | ~~Module 07: Audit Ledger~~ | Backend | AI Agent | ✅ 87 tests, 98% coverage |
 | ~~Module 02: Crypto Delivery~~ | Backend | AI Agent | ✅ 219 tests, 92% coverage |
+| ~~Module 03: Authentication~~ | Backend | AI Agent | ✅ 282 tests, 81% coverage |
 
 ---
 
@@ -32,7 +33,7 @@
 - [x] ~~RSA-2048 module (`shared/crypto/rsa.py`)~~ — complete (Module 02)
 - [x] ~~SHA-256 hash chain (`shared/audit/hash_chain.py`)~~ — complete
 - [x] ~~Chain verifier (`shared/audit/chain_verifier.py`)~~ — complete (Module 07)
-- [ ] JWT handler (`shared/crypto/jwt_handler.py`)
+- [x] ~~JWT handler (`shared/crypto/jwt_handler.py`)~~ — complete (Module 03)
 - [x] ~~Unit tests for all crypto modules~~ — 33 tests (Module 02)
 
 ### Infrastructure
@@ -43,12 +44,12 @@
 ---
 
 ## 🟧 IN PROGRESS
-* **Module 01 (Question Pool):** Next module to implement — Question CRUD API, Alembic migrations.
+* **Module 01 (Question Pool):** Next module — Question CRUD, Alembic migrations, Clerk auth wired.
 
 ## 📝 TODO (Immediate Next)
-* **Alembic migrations** for PostgreSQL (questions, packages, exams, audit_events tables)
-* **Question CRUD API** (`server/app/api/cloud/questions.py`) with AES encryption on save
-* **Clerk Auth middleware** for cloud admin routes
+* **Alembic migrations** for PostgreSQL tables
+* **Question CRUD API** with AES encryption on create/update
+* **Wire Clerk middleware** into cloud question/exam routes
 
 ---
 
