@@ -267,6 +267,15 @@ Do not assume files are stubs. Evaluate existing code before modifying.
 
 ---
 
+DESIGN REFERENCE:
+Almost every screen has already been designed in a stitch/wireframe document.
+The stitch screens cover all 22 screens across 4 roles (Admin, Auditor, Candidate, Proctor).
+Refer to the screen inventory in vault/08_Frontend/FrontendImplementationPlan.md (Section 1) for the full mapping of screen IDs (A1-A8, B1-B4, C1-C7, D1-D3) to features.
+Match the layout, component placement, and feature set from the stitch wireframes exactly.
+Do NOT invent new screens or rearrange UI elements — the designs are final.
+
+---
+
 ROLE: Lead Frontend Engineer for FortisExam.
 
 CURRENT PHASE: [FILL IN: Phase 2a / 2b / 3a / 3b / 4 / 5]
@@ -280,6 +289,7 @@ REQUIREMENTS:
 3. Add loading, error, and empty states to every page
 4. Ensure Clerk auth wraps all admin pages
 5. Use edge JWT auth for all desktop/kiosk pages
+6. Follow the stitch screen designs — match layout, features, and component placement
 
 AFTER IMPLEMENTATION:
 1. Run the dev server and verify pages render
