@@ -1,8 +1,8 @@
 # FortisExam — Current State
 
-> **Last Updated:** 2026-06-10
-> **Sprint:** Sprint 1 (Backend & Crypto)
-> **Phase:** Implementation
+> **Last Updated:** 2026-06-11
+> **Sprint:** Sprint 2 (Frontend & Desktop)
+> **Phase:** Planning
 
 ---
 
@@ -45,6 +45,7 @@
 
 | Date | Change | Author |
 |---|---|---|
+| 2026-06-11 | Frontend Implementation Plan created — 22 screens across 4 roles, 5-phase plan, 6 API gaps identified, vault/08_Frontend/ created | AI Agent |
 | 2026-06-11 | Module 06 Anomaly Detection implemented — RuleEngine (5 detection rules, debounce), MonitoringService, SecurityEvent model, 3 edge API endpoints, 49 tests. Total tests: 415 | Harsh Bhavsar |
 | 2026-06-11 | Module 01 Question Pool implemented — Alembic migrations, Question CRUD APIs with AES encryption, 12 tests. Total tests: 366 | AI Agent |
 | 2026-06-10 | Module 02 & 03 test hardening: +11 tests (354 total), fixed TestBase pytest warning, added AES decrypt/distribution/Clerk JWKS coverage | ayaan-goel |
@@ -73,10 +74,13 @@
 
 ## Next Actions
 
-1. All 7 backend modules complete — begin frontend and desktop integration
-2. Electron scaffold + kiosk mode
-3. React exam UI components
-4. Docker Compose integration testing
+1. **Phase 1:** Frontend design system + shared components + API client (`web/src/`)
+2. **Phase 2a:** Admin Dashboard + Question Bank UI
+3. **Phase 2b:** Exam Config + Packages + Distribution + Centers UI
+4. **Phase 3a:** Electron kiosk auth flow (QR scan + face verify)
+5. **Phase 3b:** Exam taking UI + recovery flow
+6. **Phase 4:** Audit viewer + Proctor dashboard
+7. **Phase 5:** Demo seed/reset scripts + end-to-end rehearsal
 
 ---
 
