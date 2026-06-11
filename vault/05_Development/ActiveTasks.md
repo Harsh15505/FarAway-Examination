@@ -83,6 +83,20 @@
 
 ---
 
+## 🔴 Backend Gaps (Needed Before Phase 2b Frontend)
+
+> See full detail: [[BackendGaps]]
+
+| Gap | What's Missing | Files | Priority |
+|---|---|---|---|
+| GAP-1 | `ExamService` methods + `exams.py` route handlers (all `...` stubs) | `services/exam_service.py`, `api/cloud/exams.py` | 🔴 High |
+| GAP-2 | Centers CRUD endpoints — no router, no schema, no service | `schemas/center.py`, `services/center_service.py`, `api/cloud/centers.py`, `main.py` | 🔴 High |
+| GAP-3 | `GET /dashboard/stats` endpoint — Dashboard uses demo data without it | `api/cloud/dashboard.py`, `main.py` | 🟡 Medium |
+
+**Note:** DB models already exist for all gaps. Frontend `api.ts` is already wired — zero frontend changes needed once backend fills these in.
+
+---
+
 ## 📝 TODO (Immediate Next — Phase 2a)
 
 1. `web/src/pages/Questions.tsx` — Question Bank with table, search, filters, add/edit/delete modal (Stitch: Question Bank List + Question Editor screens)

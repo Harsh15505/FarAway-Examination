@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import {
-  BookOpen, ClipboardList, Building2, ShieldCheck,
+  ClipboardList, Building2,
   AlertTriangle, Users, Package, ArrowRight, Radio,
 } from 'lucide-react';
-import { StatCard, Card, LoadingState, ErrorState, Badge } from '../components/ui';
+import { StatCard, Card, LoadingState, Badge } from '../components/ui';
 import { dashboardApi, type DashboardStats, type ActivityItem } from '../services/api';
 import { Link } from 'react-router-dom';
 
@@ -88,7 +88,6 @@ export default function Dashboard() {
   const { getToken } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -108,7 +107,6 @@ export default function Dashboard() {
   }, [getToken]);
 
   if (loading) return <LoadingState message="Loading dashboard..." />;
-  if (error) return <ErrorState message={error} />;
   if (!stats) return null;
 
   return (
