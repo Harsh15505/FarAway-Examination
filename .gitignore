@@ -46,3 +46,12 @@ Thumbs.db
 
 # --- Logs ---
 *.log
+
+# --- Coverage ---
+.coverage
+htmlcov/
+coverage.xml
+
+# --- Alembic boilerplate ---
+server/alembic/README
+server/alembic/script.py.mako
