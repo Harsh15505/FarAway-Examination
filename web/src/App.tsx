@@ -1,8 +1,9 @@
-import { SignedIn, SignedOut, SignIn, UserButton } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, SignIn } from '@clerk/clerk-react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Questions from './pages/Questions';
+import QuestionEditor from './pages/QuestionEditor';
 import Exams from './pages/Exams';
 import Audit from './pages/Audit';
 
@@ -19,6 +20,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/questions" element={<Questions />} />
+            <Route path="/questions/new" element={<QuestionEditor />} />
+            <Route path="/questions/:id/edit" element={<QuestionEditor />} />
             <Route path="/exams" element={<Exams />} />
             <Route path="/audit" element={<Audit />} />
             <Route path="*" element={<Navigate to="/" />} />
