@@ -10,6 +10,7 @@ from server.app.models.session import ExamSession
 from server.app.models.answer import Answer
 from server.app.models.recovery_snapshot import RecoverySnapshot
 from server.app.models.audit_event import AuditEvent
+from server.app.models.security_event import SecurityEvent
 
 __all__ = [
     "User",
@@ -22,4 +23,6 @@ __all__ = [
     "Answer",
     "RecoverySnapshot",
     "AuditEvent",
+    "SecurityEvent",
 ]
+
