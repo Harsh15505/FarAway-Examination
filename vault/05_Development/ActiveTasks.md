@@ -1,6 +1,6 @@
 # FortisExam — Active Tasks
 
-> **Last Updated:** 2026-06-11
+> **Last Updated:** 2026-06-12
 > **Current Sprint:** Sprint 2 (Frontend & Desktop)
 
 ---
@@ -20,7 +20,8 @@
 | ~~Module 02 & 03 Test Hardening~~ | QA | ayaan-goel | ✅ 354 total tests |
 | ~~Module 01: Question Pool~~ | Backend | AI Agent | ✅ 12 tests, Alembic schema, CRUD |
 | ~~Module 06: Anomaly Detection~~ | Backend | Harsh Bhavsar | ✅ 49 tests, rule engine, 3 API endpoints |
-| ~~Frontend Phase 1: Foundation~~ | Frontend | AI Agent | ✅ Design system, components, API client, routing — see below |
+| ~~Frontend Phase 1: Foundation~~ | Frontend | AI Agent | ✅ Design system, components, API client, routing |
+| ~~Frontend Phase 2a: Question Bank~~ | Frontend | Harsh Bhavsar | ✅ Questions list, QuestionEditor, Dashboard — merged to main 2026-06-12 |
 
 ---
 
@@ -32,19 +33,10 @@
 |---|---|---|
 | `web/src/index.css` | ✅ Done | Full design system: CSS tokens, layout, all components |
 | `web/src/services/api.ts` | ✅ Done | Typed API client with all domain helpers + TypeScript types |
-| `web/src/components/Layout.tsx` | ✅ Done | Dark sidebar + topbar layout matching Stitch design |
-| `web/src/components/ui/index.tsx` | ✅ Done | Shared component library: Button, Card, StatCard, Badge, Modal, Table, Tabs, EmptyState, LoadingState, ErrorState, Alert, FormGroup, PageHeader, ConfirmDialog |
-| `web/src/App.tsx` | ✅ Done | Full routing for 10 pages (Admin + Security), Clerk auth gate |
-| `web/src/pages/Dashboard.tsx` | ✅ Done | Full dashboard matching Stitch A1 design |
-| `web/src/pages/Questions.tsx` | ✅ Phase 2a placeholder |
-| `web/src/pages/Exams.tsx` | ✅ Phase 2b placeholder |
-| `web/src/pages/Packages.tsx` | ✅ Phase 2b placeholder |
-| `web/src/pages/Distribution.tsx` | ✅ Phase 2b placeholder |
-| `web/src/pages/Centers.tsx` | ✅ Phase 2b placeholder |
-| `web/src/pages/Users.tsx` | ✅ Phase 2b placeholder |
-| `web/src/pages/Audit.tsx` | ✅ Phase 4 placeholder |
-| `web/src/pages/Monitoring.tsx` | ✅ Phase 4 placeholder |
-| `web/src/pages/TamperDemo.tsx` | ✅ Phase 5 placeholder |
+| `web/src/components/Layout.tsx` | ✅ Done | Dark sidebar + topbar layout |
+| `web/src/components/ui/index.tsx` | ✅ Done | Shared library: Button, Card, StatCard, Badge, Modal, Table, Tabs, EmptyState, LoadingState, ErrorState, Alert, FormGroup, PageHeader, ConfirmDialog |
+| `web/src/App.tsx` | ✅ Done | Full routing for 12 pages, Clerk auth gate |
+| `web/src/pages/Dashboard.tsx` | ✅ Done | Stats, Activity Feed, Center Risk Map, Package Distribution |
 
 ### Design System Summary
 
@@ -61,25 +53,41 @@
 | Sidebar width | 220px |
 | Topbar height | 56px |
 
-### Stitch Screen Inventory (39 screens, 7 projects)
+---
 
-| Project | Screens |
+## ✅ Frontend Phase 2a — COMPLETE (merged to main 2026-06-12)
+
+### Deliverables
+
+| File | Status | Description |
+|---|---|---|
+| `web/src/pages/Questions.tsx` | ✅ Done | Question Bank: table (id/subject/difficulty/status/created), search, filters, sidebar stats (donut chart, difficulty bar, encryption counts), delete confirm modal, wired to `questionsApi.list/delete` with Clerk auth |
+| `web/src/pages/QuestionEditor.tsx` | ✅ Done | Question Editor: content textarea with toolbar, A/B/C/D options with radio correct-answer, SHA-256 hash computed live via SubtleCrypto, AI normalizer panel, subject/difficulty metadata, preview card, Save Draft + Save & Encrypt buttons wired to `questionsApi.create/update` |
+| `web/src/App.tsx` | ✅ Updated | Added `/questions/new` and `/questions/:id/edit` routes |
+
+### Integration Notes
+
+| Item | Status |
 |---|---|
-| FortisExam Admin Dashboard | 9 screens (A1–A9) |
-| FortisExam Center Management Platform | 6 screens (A7 extended) |
-| FortisExam Secure Portal | 4 screens (Expert + Center Admin) |
-| FortisExam Security Operations Console | 7 screens (B1–B4, D2–D3) |
-| FortisExam Candidate Kiosk | 4 screens (C4 variants) |
-| FortisExam Kiosk Design System (1) | 5 screens (C1–C3, C6, C7) |
-| FortisExam Kiosk Design System (2) | 4 screens (C1–C3 alternates) |
+| Uses Phase 1's `index.css` CSS variables throughout (no Tailwind) | ✅ |
+| Uses Phase 1's `ui/index.tsx` components (Card, Table, Badge, Button, etc.) | ✅ |
+| `QuestionMeta.is_encrypted` (boolean) for status display | ✅ |
+| `QuestionCreateRequest.options` as `{A, B, C, D}` dict | ✅ |
+| `Dashboard.tsx` falls back to demo data with banner when backend GAP-3 missing | ✅ |
+| TypeScript: 0 errors | ✅ |
+| Build: passed (vite 2.16s) | ✅ |
+| Tests: 415 passed, 0 failures | ✅ |
 
 ---
 
-## 🟧 IN PROGRESS
+## 🟧 IN PROGRESS / UP NEXT
 
 | Task | Track | Assignee | Notes |
 |---|---|---|---|
-| Frontend Phase 2a: Dashboard + Question Bank | Frontend | AI Agent | Next — Questions, Exams screens |
+| Frontend Phase 2b: Exam Config, Packages, Centers, Users | Frontend | Harsh Bhavsar | Needs GAP-1/2 backend first |
+| Backend GAP-1: ExamService stubs | Backend | ayaan-goel | `exam_service.py` create/list/get/compile |
+| Backend GAP-2: Centers CRUD | Backend | ayaan-goel | schema + service + router + main.py |
+| Backend GAP-3: Dashboard stats endpoint | Backend | ayaan-goel | `GET /dashboard/stats` |
 
 ---
 
@@ -93,23 +101,7 @@
 | GAP-2 | Centers CRUD endpoints — no router, no schema, no service | `schemas/center.py`, `services/center_service.py`, `api/cloud/centers.py`, `main.py` | 🔴 High |
 | GAP-3 | `GET /dashboard/stats` endpoint — Dashboard uses demo data without it | `api/cloud/dashboard.py`, `main.py` | 🟡 Medium |
 
-**Note:** DB models already exist for all gaps. Frontend `api.ts` is already wired — zero frontend changes needed once backend fills these in.
-
----
-
-## 📝 TODO (Immediate Next — Phase 2a)
-
-1. `web/src/pages/Questions.tsx` — Question Bank with table, search, filters, add/edit/delete modal (Stitch: Question Bank List + Question Editor screens)
-2. `web/src/pages/Exams.tsx` — Exam Builder with blueprint configurator (Stitch: Exam Blueprint Configurator + Exam List Dashboard screens)
-3. `server/app/api/cloud/dashboard.py` — `GET /dashboard/stats` endpoint (GAP-6)
-
-**Commit for Phase 2a:** `feat(frontend): implement Admin Dashboard and Question Bank UI`
-
----
-
-## 🔵 Blocked
-
-None currently.
+**Note:** Frontend `api.ts` is already wired for all 3 gaps. Zero frontend changes needed once backend fills them in.
 
 ---
 
@@ -117,7 +109,7 @@ None currently.
 
 | Phase | Task |
 |---|---|
-| 2b | Packages, Distribution, Centers, Users pages |
+| 2b | Exams, Packages, Distribution, Centers, Users pages |
 | 2b | Backend: Center CRUD endpoints (GAP-1/2/3) |
 | 3a | Electron kiosk: QR scan, face verify, waiting room |
 | 3b | Exam taking, review, submission, crash recovery |
@@ -129,6 +121,5 @@ None currently.
 
 ## Related Documents
 
-- [[SprintBoard]] — Full sprint breakdown
-- [[FrontendImplementationPlan]] — Phase-by-phase plan
-- [[Blockers]] — Active blockers
+- [[BackendGaps]] — Active backend gaps
+- [[StitchScreenRegistry]] — Stitch screen → phase mapping

@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 // Pages — Admin
 import Dashboard from './pages/Dashboard';
 import Questions from './pages/Questions';
+import QuestionEditor from './pages/QuestionEditor';
 import Exams from './pages/Exams';
 import Packages from './pages/Packages';
 import Distribution from './pages/Distribution';
@@ -31,6 +32,8 @@ function App() {
             {/* Admin */}
             <Route path="/"            element={<Dashboard />} />
             <Route path="/questions"   element={<Questions />} />
+            <Route path="/questions/new"      element={<QuestionEditor />} />
+            <Route path="/questions/:id/edit" element={<QuestionEditor />} />
             <Route path="/exams"       element={<Exams />} />
             <Route path="/packages"    element={<Packages />} />
             <Route path="/distribution" element={<Distribution />} />
