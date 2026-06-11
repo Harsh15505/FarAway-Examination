@@ -1,12 +1,11 @@
-/** Questions page — CRUD for encrypted exam questions. */
-
-function Questions() {
+/** Questions page — Phase 2a implementation. */
+export default function Questions() {
   return (
-    <div className="page">
-      <h1>Question Management</h1>
-      {/* TODO: Question list table, create form, edit modal */}
+    <div>
+      <div className="page-header">
+        <h1>Question Bank</h1>
+        <p>Manage encrypted exam questions — implementation in Phase 2a.</p>
+      </div>
     </div>
   );
 }
-
-export default Questions;

@@ -1,12 +1,11 @@
-/** Audit page — hash chain viewer and integrity verification. */
-
-function Audit() {
+/** Audit page — Phase 4 implementation. */
+export default function Audit() {
   return (
-    <div className="page">
-      <h1>Audit Trail</h1>
-      {/* TODO: Event list, chain visualization, verify button, tamper detection display */}
+    <div>
+      <div className="page-header">
+        <h1>Audit Explorer</h1>
+        <p>Hash chain viewer, integrity verification, and tamper detection — implementation in Phase 4.</p>
+      </div>
     </div>
   );
 }
-
-export default Audit;

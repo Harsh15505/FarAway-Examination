@@ -12,9 +12,14 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.0.0",
+    "@radix-ui/react-dialog": "^1.1.16",
+    "@radix-ui/react-select": "^2.3.0",
+    "@radix-ui/react-toast": "^1.2.16",
+    "lucide-react": "^1.17.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "react-router-dom": "^6.26.0"
+    "react-router-dom": "^6.26.0",
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.0",

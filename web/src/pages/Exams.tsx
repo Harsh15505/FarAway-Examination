@@ -1,12 +1,11 @@
-/** Exams page — exam configuration, compilation, and key release. */
-
-function Exams() {
+/** Exams page — Phase 2b implementation. */
+export default function Exams() {
   return (
-    <div className="page">
-      <h1>Exam Management</h1>
-      {/* TODO: Exam list, create exam, compile button, release key button */}
+    <div>
+      <div className="page-header">
+        <h1>Exam Builder</h1>
+        <p>Configure exam blueprints, compile packages, and manage key release — implementation in Phase 2b.</p>
+      </div>
     </div>
   );
 }
-
-export default Exams;

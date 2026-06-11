@@ -2,7 +2,7 @@
 
 > **Last Updated:** 2026-06-11
 > **Sprint:** Sprint 2 (Frontend & Desktop)
-> **Phase:** Planning
+> **Phase:** Implementation — Phase 1 Complete, Phase 2a Next
 
 ---
 
@@ -45,6 +45,7 @@
 
 | Date | Change | Author |
 |---|---|---|
+| 2026-06-11 | **Frontend Phase 1 COMPLETE** — Design system (CSS tokens, components, API client), Layout (dark sidebar #1a237e + topbar), 10 routes wired with Clerk auth, Dashboard page full implementation, ScreenInventory.md created (39 screens, 7 Stitch projects) | AI Agent |
 | 2026-06-11 | Frontend Implementation Plan created — 22 screens across 4 roles, 5-phase plan, 6 API gaps identified, vault/08_Frontend/ created | AI Agent |
 | 2026-06-11 | Module 06 Anomaly Detection implemented — RuleEngine (5 detection rules, debounce), MonitoringService, SecurityEvent model, 3 edge API endpoints, 49 tests. Total tests: 415 | Harsh Bhavsar |
 | 2026-06-11 | Module 01 Question Pool implemented — Alembic migrations, Question CRUD APIs with AES encryption, 12 tests. Total tests: 366 | AI Agent |
@@ -74,13 +75,12 @@
 
 ## Next Actions
 
-1. **Phase 1:** Frontend design system + shared components + API client (`web/src/`)
-2. **Phase 2a:** Admin Dashboard + Question Bank UI
-3. **Phase 2b:** Exam Config + Packages + Distribution + Centers UI
-4. **Phase 3a:** Electron kiosk auth flow (QR scan + face verify)
-5. **Phase 3b:** Exam taking UI + recovery flow
-6. **Phase 4:** Audit viewer + Proctor dashboard
-7. **Phase 5:** Demo seed/reset scripts + end-to-end rehearsal
+1. **Phase 2a (NEXT):** `Questions.tsx` full table + CRUD, `Exams.tsx` blueprint builder + `GET /dashboard/stats` backend endpoint
+2. **Phase 2b:** Packages, Distribution, Centers, Users pages + Center CRUD backend (GAP-1/2/3)
+3. **Phase 3a:** Electron kiosk auth flow (QR scan + face verify + waiting room)
+4. **Phase 3b:** Exam taking UI + recovery flow
+5. **Phase 4:** Audit viewer + Proctor dashboard
+6. **Phase 5:** Demo seed/reset scripts + end-to-end rehearsal
 
 ---
 
