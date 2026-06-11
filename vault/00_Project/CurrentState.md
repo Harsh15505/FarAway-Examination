@@ -19,7 +19,7 @@
 | 03 — Authentication      | 🟢 Complete    | JWTHandler, QR verify, face embed, Clerk JWKS, RBAC, 69 tests |
 | 04 — Graph Randomization | 🟢 Complete    | layout-graph, coloring, variants   |
 | 05 — State Recovery      | 🟢 Complete    | SnapshotManager, RecoveryService, 5 API endpoints, 45 tests |
-| 06 — Anomaly Detection   | 🔴 Not Started | MediaPipe integration planned      |
+| 06 — Anomaly Detection   | 🟢 Complete    | Rule engine, MonitoringService, 3 API endpoints, 49 tests |
 | 07 — Audit Ledger        | 🟢 Complete    | 87 tests, 98% coverage, 8 API routes |
 
 ---
@@ -45,6 +45,7 @@
 
 | Date | Change | Author |
 |---|---|---|
+| 2026-06-11 | Module 06 Anomaly Detection implemented — RuleEngine (5 detection rules, debounce), MonitoringService, SecurityEvent model, 3 edge API endpoints, 49 tests. Total tests: 415 | Harsh Bhavsar |
 | 2026-06-11 | Module 01 Question Pool implemented — Alembic migrations, Question CRUD APIs with AES encryption, 12 tests. Total tests: 366 | AI Agent |
 | 2026-06-10 | Module 02 & 03 test hardening: +11 tests (354 total), fixed TestBase pytest warning, added AES decrypt/distribution/Clerk JWKS coverage | ayaan-goel |
 | 2026-06-10 | Module 03 Authentication implemented — JWTHandler RS256, QRTokenService, FaceVerificationService, AuthService, Clerk middleware, RBAC | AI Agent |
@@ -72,10 +73,10 @@
 
 ## Next Actions
 
-1. **COMMIT Module 03** — if not already committed
-2. Begin Module 01 (Question Pool) — PostgreSQL schema + Alembic migrations
-3. Implement Question CRUD API with auto-encryption
-4. Wire Clerk auth middleware into question routes
+1. All 7 backend modules complete — begin frontend and desktop integration
+2. Electron scaffold + kiosk mode
+3. React exam UI components
+4. Docker Compose integration testing
 
 ---
 

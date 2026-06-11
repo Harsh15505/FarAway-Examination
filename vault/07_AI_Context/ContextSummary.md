@@ -17,10 +17,11 @@ FortisExam is a Zero-Trust, Edge-First examination infrastructure for large-scal
 * **Module 03 (Authentication):** Fully implemented. JWTHandler (RS256), QRTokenService (RSA sig + anti-replay nonce), FaceVerificationService (cosine similarity), AuthService (8-step pipeline), Clerk JWKS middleware, RBAC, supervisor override. 63 new tests.
 * **Module 04 (Graph Randomization):** Core logic, deterministic seeding, graph coloring.
 * **Module 05 (State Recovery):** Auto-snapshots to SQLite on every answer, async API endpoints, hash integrity verification, session status restoration, 58/58 tests passing with 99% coverage.
+* **Module 06 (Anomaly Detection):** Fully implemented. RuleEngine with 5 detection rules (multiple faces, no face, gaze deviation, camera blocked, rapid answer changes), debounce cooldowns, MonitoringService with audit integration, SecurityEvent model, 3 edge API endpoints, 49 tests.
 * **Module 07 (Audit Ledger):** Chained hashing, generic `EventLogger`, PostgreSQL+SQLite support, 87 unit/integration/security tests passing with 98% coverage.
-- **Phase:** Sprint 1 — Backend & Crypto Implementation (Modules 01, 02, 03, 04, 05, and 07 complete)
-- **Next Step:** Edge server scaffold, QR token generation flow, and Exam execution endpoints.
-- **Code exists for:** Questions API (`server/app/api/cloud/questions.py`), Graph subsystem (`shared/graph/`), audit module (`server/app/api/common/audit.py`, `server/app/services/audit_service.py`, `shared/audit/`), crypto package (`shared/crypto/`), auth pipeline (`server/app/services/auth_service.py`, `server/app/middleware/`)
+- **Phase:** Sprint 1 — Backend & Crypto Implementation (ALL 7 MODULES COMPLETE)
+- **Next Step:** Electron scaffold + kiosk mode, React exam UI, Docker Compose integration.
+- **Code exists for:** Questions API (`server/app/api/cloud/questions.py`), Monitoring API (`server/app/api/edge/monitoring.py`), Graph subsystem (`shared/graph/`), audit module (`server/app/api/common/audit.py`, `server/app/services/audit_service.py`, `shared/audit/`), crypto package (`shared/crypto/`), auth pipeline (`server/app/services/auth_service.py`, `server/app/middleware/`), anomaly detection (`shared/monitoring/rule_engine.py`)
 
 ### Tech Stack
 - Backend: Python, FastAPI, PostgreSQL

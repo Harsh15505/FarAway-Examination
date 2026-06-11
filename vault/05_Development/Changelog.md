@@ -8,6 +8,20 @@
 
 ---
 
+### 2026-06-11 — Module 06: Anomaly Detection (Complete)
+- **Created** `shared/monitoring/rule_engine.py` — RuleEngine with 5 detection rules (multiple faces, no face, gaze deviation, camera blocked, rapid answer changes), configurable thresholds, debounce cooldowns, evidence hashing.
+- **Created** `server/app/models/security_event.py` — SecurityEvent SQLAlchemy model for edge SQLite.
+- **Created** `server/app/schemas/monitoring.py` — Pydantic schemas for detection frames and event responses.
+- **Implemented** `server/app/services/monitoring_service.py` — Full MonitoringService: process frames, persist alerts, audit logging, event queries, session summaries.
+- **Implemented** `server/app/api/edge/monitoring.py` — 3 edge API endpoints (POST /event, GET /events, GET /events/{session_id}/summary).
+- **Created** `tests/unit/test_monitoring.py` — 33 unit tests (all 5 rules, debounce, evidence hash, custom config).
+- **Created** `tests/integration/test_monitoring_api.py` — 7 integration tests (API endpoints with mocked auth).
+- **Created** `tests/security/test_monitoring_security.py` — 9 security tests (tamper detection, malformed input safety).
+- **Created** `vault/03_Modules/Module06_AnomalyDetection/ManualTestingChecklist.md`.
+- **Results:** 415 total tests passing (all modules). 49 new tests for Module 06.
+
+---
+
 ### 2026-06-11 — Module 01: Question Pool System (Complete)
 - **Initialized** Alembic migrations for PostgreSQL schema.
 - **Implemented** `server/alembic/versions/2a7179505022_initial_migration.py` — created `users` and `questions` tables.

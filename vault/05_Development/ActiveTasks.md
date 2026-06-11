@@ -19,6 +19,7 @@
 | ~~Module 03: Authentication~~ | Backend | AI Agent | ✅ 282 tests, 81% coverage |
 | ~~Module 02 & 03 Test Hardening~~ | QA | ayaan-goel | ✅ 354 total tests, fixed warnings, +11 new tests |
 | ~~Module 01: Question Pool~~ | Backend | AI Agent | ✅ Complete (12 tests, Alembic schema, CRUD) |
+| ~~Module 06: Anomaly Detection~~ | Backend | Harsh Bhavsar | ✅ Complete (49 tests, rule engine, 3 API endpoints) |
 
 ---
 
