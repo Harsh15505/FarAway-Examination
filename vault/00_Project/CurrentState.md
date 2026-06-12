@@ -1,8 +1,8 @@
 # FortisExam — Current State
 
-> **Last Updated:** 2026-06-11
+> **Last Updated:** 2026-06-12
 > **Sprint:** Sprint 2 (Frontend & Desktop)
-> **Phase:** Implementation — Phase 1 Complete, Phase 2a Next
+> **Phase:** Implementation — Phase 3 Complete, Phase 4 Next
 
 ---
 
@@ -21,6 +21,20 @@
 | 05 — State Recovery      | 🟢 Complete    | SnapshotManager, RecoveryService, 5 API endpoints, 45 tests |
 | 06 — Anomaly Detection   | 🟢 Complete    | Rule engine, MonitoringService, 3 API endpoints, 49 tests |
 | 07 — Audit Ledger        | 🟢 Complete    | 87 tests, 98% coverage, 8 API routes |
+
+---
+
+## Frontend Status
+
+| Phase | Status | Description |
+|---|---|---|
+| Phase 1 — Foundation | 🟢 Complete | Design system, CSS tokens, UI component library, API client, Layout (sidebar + topbar), Clerk auth gate, 12 routes |
+| Phase 2a — Dashboard + Question Bank | 🟢 Complete | Dashboard (stat cards, activity feed, center risk map), Questions.tsx (table, search, filters, delete), QuestionEditor.tsx (A/B/C/D options, SHA-256 hash, AI normalizer, save & encrypt) |
+| Phase 2b — Exam Config + Distribution | 🟢 Complete | Exams.tsx (blueprint builder, compile, status pipeline), Packages.tsx (generate, verify RSA, download), Distribution.tsx (key release D-012), Centers.tsx (CRUD, seating grid, risk scores), Users.tsx (Clerk profile, role matrix, sync) |
+| Phase 3a — Kiosk Auth Flow | 🟢 Complete | AuthPage.tsx (QR scan + face verify + webcam), edgeApi.ts (full edge HTTP client), index.css (premium dark kiosk design system) |
+| Phase 3b — Exam Execution + Recovery | 🟢 Complete | ExamPage.tsx (MCQ render, timer ring, question palette, answer save), SummaryPage.tsx (review + auto-submit), CompletePage.tsx (submission hash proof), App.tsx (ProtectedRoute guard) |
+| Phase 4 — Audit & Proctor Dashboard | 🟡 Next | Audit.tsx, Monitoring.tsx stubs need full implementation |
+| Phase 5 — Demo Polish | 🔴 Not Started | Seed/reset scripts, TamperDemo, end-to-end rehearsal |
 
 ---
 
@@ -45,42 +59,31 @@
 
 | Date | Change | Author |
 |---|---|---|
-| 2026-06-11 | **Frontend Phase 1 COMPLETE** — Design system (CSS tokens, components, API client), Layout (dark sidebar #1a237e + topbar), 10 routes wired with Clerk auth, Dashboard page full implementation, ScreenInventory.md created (39 screens, 7 Stitch projects) | AI Agent |
-| 2026-06-11 | Frontend Implementation Plan created — 22 screens across 4 roles, 5-phase plan, 6 API gaps identified, vault/08_Frontend/ created | AI Agent |
-| 2026-06-11 | Module 06 Anomaly Detection implemented — RuleEngine (5 detection rules, debounce), MonitoringService, SecurityEvent model, 3 edge API endpoints, 49 tests. Total tests: 415 | Harsh Bhavsar |
-| 2026-06-11 | Module 01 Question Pool implemented — Alembic migrations, Question CRUD APIs with AES encryption, 12 tests. Total tests: 366 | AI Agent |
-| 2026-06-10 | Module 02 & 03 test hardening: +11 tests (354 total), fixed TestBase pytest warning, added AES decrypt/distribution/Clerk JWKS coverage | ayaan-goel |
-| 2026-06-10 | Module 03 Authentication implemented — JWTHandler RS256, QRTokenService, FaceVerificationService, AuthService, Clerk middleware, RBAC | AI Agent |
-| 2026-06-10 | 63 new tests: 35 unit + 7 integration + 21 security. Total: 282 tests all passing | AI Agent |
-| 2026-06-10 | 81% coverage Module 03. Zero lint errors. 2 edge routes + 2 cloud routes mounted | AI Agent |
-| 2026-06-10 | 69 new tests: 33 unit crypto + 13 unit pkg service + 8 integration + 15 security. Total: 219 tests | AI Agent |
-| 2026-06-10 | 92% coverage on Module 02 files. Zero lint errors (ruff). Keys generated: keys/private.pem + keys/center_*.pem | AI Agent |
-| 2026-06-10 | Module 05 State Recovery status corrected in docs (was missing, now marked Complete) | AI Agent |
-| 2026-06-09 | Module 07 Audit Ledger fully implemented — ChainVerifier, AuditService, 8 API routes | AI Agent |
-| 2026-06-09 | 87 new tests: 45 unit + 27 integration + 15 security. Total: 120 tests | AI Agent |
-| 2026-06-09 | 98% coverage on all audit module files. Zero lint errors (ruff) | AI Agent |
-| 2026-06-08 | Module 04 Graph Randomization implemented (GraphBuilder, GraphColoring, VariantGenerator) | AI Agent |
-| 2026-06-08 | Module 05 State Recovery implemented by team member (Edge SQLite snapshot/restore, verified via tests) | Team Member |
-| 2026-06-08 | Audit dependencies implemented (hashing, hash_chain, event_logger) | AI Agent |
-| 2026-06-08 | Clerk adopted for admin auth (D-014, ADR-002) | User + AI Agent |
-| 2026-06-08 | Vault initialized with full structure | AI Agent |
+| 2026-06-12 | **Frontend Phase 3 COMPLETE** — Desktop Kiosk fully implemented: AuthPage.tsx (QR scan with barcode input + face verify via webcam + edge health check), ExamPage.tsx (MCQ question render, timer ring SVG countdown, question palette with answered/flagged/current states, answer auto-save via POST /exam/answer, focus-loss monitoring), SummaryPage.tsx (answered/unanswered counts, auto-submit on timer expiry, final submission with hash proof), CompletePage.tsx (submission hash display, session cleanup), edgeApi.ts (full typed edge API client: authenticate, getSession, submitAnswer, submitExam, recovery snapshot, monitoring events, health check), App.tsx (ProtectedRoute guard via localStorage session), index.css (662-line premium dark kiosk design system with glassmorphism, animations, QR/webcam frames). | Team Member |
+| 2026-06-12 | **Frontend Phase 2b COMPLETE** — Exams.tsx, Packages.tsx, Distribution.tsx, Centers.tsx, Users.tsx. TypeScript: 0 errors. Backend GAP-1, GAP-2, GAP-3 banners added. | AI Agent |
+| 2026-06-12 | **Frontend Phase 2a COMPLETE** — Questions.tsx, QuestionEditor.tsx, Dashboard — merged to main | Harsh Bhavsar |
+| 2026-06-11 | **Frontend Phase 1 COMPLETE** — Design system, components, API client, routing, Dashboard | AI Agent |
+| 2026-06-11 | Module 06 Anomaly Detection implemented — 49 tests | Harsh Bhavsar |
+| 2026-06-11 | Module 01 Question Pool implemented — 12 tests | AI Agent |
+| 2026-06-10 | Module 02 & 03 test hardening: +11 tests (354 total) | ayaan-goel |
+| 2026-06-10 | Module 03 Authentication implemented — 63 new tests | AI Agent |
+| 2026-06-10 | Module 02 Crypto Delivery implemented — 69 new tests, 92% coverage | AI Agent |
+| 2026-06-09 | Module 07 Audit Ledger implemented — 87 tests, 98% coverage | AI Agent |
+| 2026-06-08 | Module 04/05 + Vault + Clerk adopted | AI Agent + Team |
 
 ---
 
 ## Active Blockers
 
-- None at vault creation phase. See [[Blockers]] for tracked issues.
+- None at this time.
 
 ---
 
 ## Next Actions
 
-1. **Phase 2a (NEXT):** `Questions.tsx` full table + CRUD, `Exams.tsx` blueprint builder + `GET /dashboard/stats` backend endpoint
-2. **Phase 2b:** Packages, Distribution, Centers, Users pages + Center CRUD backend (GAP-1/2/3)
-3. **Phase 3a:** Electron kiosk auth flow (QR scan + face verify + waiting room)
-4. **Phase 3b:** Exam taking UI + recovery flow
-5. **Phase 4:** Audit viewer + Proctor dashboard
-6. **Phase 5:** Demo seed/reset scripts + end-to-end rehearsal
+1. **Phase 4 (NOW):** Audit Explorer (B1/B1b), Chain Verification visual, Audit Export (B4), Live Monitoring / Proctor Dashboard (D1/D2), Center Admin views
+2. **Backend (parallel):** GAP-4 (`GET /exam/sessions`) + GAP-5 (`PATCH /monitoring/events/{id}/acknowledge`)
+3. **Phase 5:** Demo seed/reset scripts, TamperDemo page, end-to-end rehearsal
 
 ---
 

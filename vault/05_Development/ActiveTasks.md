@@ -21,62 +21,38 @@
 | ~~Module 01: Question Pool~~ | Backend | AI Agent | ✅ 12 tests, Alembic schema, CRUD |
 | ~~Module 06: Anomaly Detection~~ | Backend | Harsh Bhavsar | ✅ 49 tests, rule engine, 3 API endpoints |
 | ~~Frontend Phase 1: Foundation~~ | Frontend | AI Agent | ✅ Design system, components, API client, routing |
-| ~~Frontend Phase 2a: Question Bank~~ | Frontend | Harsh Bhavsar | ✅ Questions list, QuestionEditor, Dashboard — merged to main 2026-06-12 |
+| ~~Frontend Phase 2a: Question Bank~~ | Frontend | Harsh Bhavsar | ✅ Questions list, QuestionEditor, Dashboard — merged 2026-06-12 |
+| ~~Frontend Phase 2b: Exam Config~~ | Frontend | AI Agent | ✅ Exams, Packages, Distribution, Centers, Users — merged 2026-06-12 |
+| ~~Frontend Phase 3a: Kiosk Auth~~ | Desktop | Team Member | ✅ QR scan, face verify, edge health check, webcam, ProtectedRoute |
+| ~~Frontend Phase 3b: Exam Execution~~ | Desktop | Team Member | ✅ ExamPage (MCQ, timer, palette, auto-save), SummaryPage (review, auto-submit), CompletePage (hash proof), edgeApi.ts (full typed client) |
 
 ---
 
-## ✅ Frontend Phase 1 — COMPLETE
+## ✅ Frontend Phase 3 — COMPLETE
 
-### Files Created / Modified
-
-| File | Status | Description |
-|---|---|---|
-| `web/src/index.css` | ✅ Done | Full design system: CSS tokens, layout, all components |
-| `web/src/services/api.ts` | ✅ Done | Typed API client with all domain helpers + TypeScript types |
-| `web/src/components/Layout.tsx` | ✅ Done | Dark sidebar + topbar layout |
-| `web/src/components/ui/index.tsx` | ✅ Done | Shared library: Button, Card, StatCard, Badge, Modal, Table, Tabs, EmptyState, LoadingState, ErrorState, Alert, FormGroup, PageHeader, ConfirmDialog |
-| `web/src/App.tsx` | ✅ Done | Full routing for 12 pages, Clerk auth gate |
-| `web/src/pages/Dashboard.tsx` | ✅ Done | Stats, Activity Feed, Center Risk Map, Package Distribution |
-
-### Design System Summary
-
-| Token | Value |
-|---|---|
-| Sidebar BG | `#1a237e` (Deep Navy Indigo) |
-| Primary Action | `#1565c0` (Bright Blue) |
-| Content BG | `#f0f2f5` (Light Grey-Blue) |
-| Surface/Cards | `#ffffff` |
-| Success | `#43a047` |
-| Warning | `#f59e0b` |
-| Danger | `#ef4444` |
-| Font | Inter (Google Fonts) |
-| Sidebar width | 220px |
-| Topbar height | 56px |
-
----
-
-## ✅ Frontend Phase 2a — COMPLETE (merged to main 2026-06-12)
-
-### Deliverables
+### Desktop Kiosk Deliverables
 
 | File | Status | Description |
 |---|---|---|
-| `web/src/pages/Questions.tsx` | ✅ Done | Question Bank: table (id/subject/difficulty/status/created), search, filters, sidebar stats (donut chart, difficulty bar, encryption counts), delete confirm modal, wired to `questionsApi.list/delete` with Clerk auth |
-| `web/src/pages/QuestionEditor.tsx` | ✅ Done | Question Editor: content textarea with toolbar, A/B/C/D options with radio correct-answer, SHA-256 hash computed live via SubtleCrypto, AI normalizer panel, subject/difficulty metadata, preview card, Save Draft + Save & Encrypt buttons wired to `questionsApi.create/update` |
-| `web/src/App.tsx` | ✅ Updated | Added `/questions/new` and `/questions/:id/edit` routes |
+| `desktop/src/App.tsx` | ✅ Done | Routes: `/` (Auth), `/exam` (Protected), `/summary` (Protected), `/complete`. ProtectedRoute guard via localStorage `exam_session`. |
+| `desktop/src/pages/AuthPage.tsx` | ✅ Done | 3-step auth: CONNECTING (edge health check) → SCAN_QR (barcode scanner input + simulate button) → FACE_VERIFY (webcam + face guide overlay + capture). Error/success states with retry. |
+| `desktop/src/pages/ExamPage.tsx` | ✅ Done | Full exam UI: question content, A/B/C/D options with selection glow, question palette (answered/flagged/current), SVG timer ring (orange < 5min), Previous/Next/Flag/Review buttons, focus-loss monitoring, auto-save via `submitAnswer()`. |
+| `desktop/src/pages/SummaryPage.tsx` | ✅ Done | Review panel: candidate name, exam, total/answered/unanswered counts. Auto-submit on timer expiry. "Confirm Submission" → POST `/exam/submit` → navigate `/complete`. |
+| `desktop/src/pages/CompletePage.tsx` | ✅ Done | Success screen: ✓ circle, submission hash in monospace, answers count. Clears localStorage session. "Return to Login" resets. |
+| `desktop/src/services/edgeApi.ts` | ✅ Done | Full typed HTTP client: `authenticate()`, `supervisorOverride()`, `getSession()`, `submitAnswer()`, `submitExam()`, `checkSnapshot()`, `restoreSession()`, `reportMonitoringEvent()`, `checkEdgeHealth()`. All types exported. |
+| `desktop/src/index.css` | ✅ Done | 662-line premium dark design system: glassmorphism cards, ambient gradients, QR scan frame + scan-line animation, webcam frame + face-guide oval pulse, MCQ option buttons with selection glow, question palette pills, SVG timer ring, progress bars, spinner, check-circle pop animation, utility classes. |
+| `desktop/electron/main.js` | ✅ Done | Kiosk config: fullscreen, frameless, no devtools, context isolation, keyboard shortcut blocking (Ctrl+Shift+I, F12, Ctrl+W). |
 
 ### Integration Notes
 
 | Item | Status |
 |---|---|
-| Uses Phase 1's `index.css` CSS variables throughout (no Tailwind) | ✅ |
-| Uses Phase 1's `ui/index.tsx` components (Card, Table, Badge, Button, etc.) | ✅ |
-| `QuestionMeta.is_encrypted` (boolean) for status display | ✅ |
-| `QuestionCreateRequest.options` as `{A, B, C, D}` dict | ✅ |
-| `Dashboard.tsx` falls back to demo data with banner when backend GAP-3 missing | ✅ |
-| TypeScript: 0 errors | ✅ |
-| Build: passed (vite 2.16s) | ✅ |
-| Tests: 415 passed, 0 failures | ✅ |
+| Edge API client uses `http://localhost:8001/api/v1` | ✅ |
+| Auth uses edge-local RS256 JWTs (no Clerk) | ✅ |
+| Monitoring events (focus loss) reported to `/monitoring/event` | ✅ |
+| Answer submission auto-saves with snapshot via `/exam/answer` | ✅ |
+| Recovery flow typed in `edgeApi.ts` (checkSnapshot, restoreSession) | ✅ |
+| ProtectedRoute prevents `/exam` and `/summary` access without session | ✅ |
 
 ---
 
@@ -84,38 +60,32 @@
 
 | Task | Track | Assignee | Notes |
 |---|---|---|---|
-| Frontend Phase 2b: Exam Config, Packages, Centers, Users | Frontend | Harsh Bhavsar | Needs GAP-1/2 backend first |
-| Backend GAP-1: ExamService stubs | Backend | ayaan-goel | `exam_service.py` create/list/get/compile |
-| Backend GAP-2: Centers CRUD | Backend | ayaan-goel | schema + service + router + main.py |
-| Backend GAP-3: Dashboard stats endpoint | Backend | ayaan-goel | `GET /dashboard/stats` |
+| Frontend Phase 4: Audit & Proctor Dashboard | Frontend | AI Agent | Audit Explorer, Chain Verification, Live Monitoring |
+| Backend GAP-4: List active sessions | Backend | ayaan-goel | `GET /exam/sessions` for proctor |
+| Backend GAP-5: Acknowledge alert | Backend | ayaan-goel | `PATCH /monitoring/events/{id}/acknowledge` |
 
 ---
 
-## 🔴 Backend Gaps (Needed Before Phase 2b Frontend)
-
-> See full detail: [[BackendGaps]]
+## 🔴 Backend Gaps
 
 | Gap | What's Missing | Files | Priority |
 |---|---|---|---|
-| GAP-1 | `ExamService` methods + `exams.py` route handlers (all `...` stubs) | `services/exam_service.py`, `api/cloud/exams.py` | 🔴 High |
-| GAP-2 | Centers CRUD endpoints — no router, no schema, no service | `schemas/center.py`, `services/center_service.py`, `api/cloud/centers.py`, `main.py` | 🔴 High |
-| GAP-3 | `GET /dashboard/stats` endpoint — Dashboard uses demo data without it | `api/cloud/dashboard.py`, `main.py` | 🟡 Medium |
+| GAP-4 | `GET /exam/sessions` — list active sessions for proctor dashboard | `server/app/api/edge/exam.py` | 🟡 Medium |
+| GAP-5 | `PATCH /monitoring/events/{id}/acknowledge` — mark alert as handled | `server/app/api/edge/monitoring.py` | 🟡 Medium |
 
-**Note:** Frontend `api.ts` is already wired for all 3 gaps. Zero frontend changes needed once backend fills them in.
+**Note:** GAP-1/2/3 (ExamService, Centers CRUD, Dashboard stats) may have been filled by team member during Phase 3. Frontend already handles these with demo data fallback.
 
 ---
 
-## 📋 Backlog (Phase 2b – 5)
+## 📋 Backlog (Phase 4–5)
 
 | Phase | Task |
 |---|---|
-| 2b | Exams, Packages, Distribution, Centers, Users pages |
-| 2b | Backend: Center CRUD endpoints (GAP-1/2/3) |
-| 3a | Electron kiosk: QR scan, face verify, waiting room |
-| 3b | Exam taking, review, submission, crash recovery |
-| 4  | Audit Explorer, Chain Verification, Proctor Dashboard, Live Monitoring |
-| 4  | Backend: Active sessions list + acknowledge alert endpoints (GAP-4/5) |
-| 5  | Demo seed/reset scripts, tamper demo page |
+| 4 | Audit Explorer (B1/B1b), Chain Verification visual, Audit Export (B4) |
+| 4 | Proctor Dashboard, Live Monitoring Feed (D1/D2), Center Admin views |
+| 4 | Backend: GAP-4 (sessions list) + GAP-5 (acknowledge alert) |
+| 5 | Demo seed/reset scripts, tamper demo page |
+| 5 | End-to-end walkthrough rehearsal |
 
 ---
 
