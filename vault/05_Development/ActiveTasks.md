@@ -60,9 +60,18 @@
 
 | Task | Track | Assignee | Notes |
 |---|---|---|---|
-| ~~Frontend Phase 4: Audit & Proctor Dashboard~~ | Frontend | AI Agent | ✅ Audit.tsx (event log, chain verify, hash diagram, JSON/CSV export), Monitoring.tsx (live feed, severity tabs, acknowledge, auto-refresh, session panel, alert breakdown), TamperDemo.tsx (interactive step-through), api.ts type fixes, CSS utilities. tsc: 0 errors, vite build: 2.63s |
-| Backend GAP-4: List active sessions | Backend | ayaan-goel | `GET /exam/sessions` for proctor |
-| Backend GAP-5: Acknowledge alert | Backend | ayaan-goel | `PATCH /monitoring/events/{id}/acknowledge` |
+| Phase 5: Demo Polish | Full Stack | AI Agent | Seed/reset scripts, end-to-end rehearsal, final testing. |
+
+---
+
+## 🟢 Recently Completed
+
+| Task | Track | Date |
+|---|---|---|
+| Frontend Phase 4: Audit & Proctor Dashboard | Frontend | 2026-06-12 |
+| Frontend Phase 4: A7f Anomaly Drawer & D3 Override | Frontend | 2026-06-12 |
+| Backend GAP-4: `GET /exam/sessions` | Backend | 2026-06-12 |
+| Backend GAP-5: `PATCH /monitoring/events/{id}/acknowledge` | Backend | 2026-06-12 |
 
 ---
 
@@ -70,8 +79,8 @@
 
 | Gap | What's Missing | Files | Priority |
 |---|---|---|---|
-| GAP-4 | `GET /exam/sessions` — list active sessions for proctor dashboard | `server/app/api/edge/exam.py` | 🟡 Medium |
-| GAP-5 | `PATCH /monitoring/events/{id}/acknowledge` — mark alert as handled | `server/app/api/edge/monitoring.py` | 🟡 Medium |
+| GAP-4 | `GET /exam/sessions` | `server/app/api/edge/exam.py` | ✅ Completed |
+| GAP-5 | `PATCH /monitoring/events/{id}/acknowledge` | `server/app/api/edge/monitoring.py` | ✅ Completed |
 
 **Note:** GAP-1/2/3 (ExamService, Centers CRUD, Dashboard stats) may have been filled by team member during Phase 3. Frontend already handles these with demo data fallback.
 

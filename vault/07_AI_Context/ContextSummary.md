@@ -24,8 +24,10 @@ FortisExam is a Zero-Trust, Edge-First examination infrastructure for large-scal
 * **Frontend Phase 2b:** Exam Builder (blueprint configurator, compile, status pipeline), Packages (generate, verify RSA, download), Distribution (key release D-012), Centers (CRUD, seating grid, risk scores), Users (Clerk profile, role permission matrix, sync).
 * **Frontend Phase 3a:** Desktop Kiosk Auth — AuthPage (QR scan + face verify + webcam + edge health check), edgeApi.ts (full typed edge API client), index.css (premium dark kiosk design system with glassmorphism).
 * **Frontend Phase 3b:** Desktop Kiosk Exam — ExamPage (MCQ render, timer ring, question palette, answer auto-save, focus-loss monitoring), SummaryPage (review + auto-submit), CompletePage (submission hash proof), ProtectedRoute guard.
-- **Phase:** Sprint 2 — Frontend & Desktop (Phases 1-3 COMPLETE)
-- **Next Step:** Phase 4 — Audit Explorer, Chain Verification visual, Proctor Dashboard, Live Monitoring Feed.
+* **Frontend Phase 4:** Audit Explorer (event log, chain verify, JSON/CSV export) and Proctor Dashboard (live monitoring feed, session panel, severity tabs, anomaly detail drawer, supervisor override modal).
+* **Backend Gaps Resolved:** GAP-4 (`GET /exam/sessions`), GAP-5 (`PATCH /monitoring/events/{id}/acknowledge`) implemented.
+- **Phase:** Sprint 2 — Frontend & Desktop (Phases 1-4 COMPLETE)
+- **Next Step:** Phase 5 — Demo Polish (seed/reset scripts, end-to-end rehearsal).
 - **Code exists for:** Questions API (`server/app/api/cloud/questions.py`), Monitoring API (`server/app/api/edge/monitoring.py`), Audit API (`server/app/api/common/audit.py` — 8 routes: log, chain, verify, events, export, stats), Graph subsystem (`shared/graph/`), crypto package (`shared/crypto/`), auth pipeline (`server/app/services/auth_service.py`, `server/app/middleware/`)
 
 ### Tech Stack

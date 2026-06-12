@@ -188,9 +188,16 @@ Most Phase 2b and Phase 4 pages show a **yellow banner** at the top when the bac
 | MO-09 | "Clear Session Filter" button appears | Click removes session filter, all events show |
 | MO-10 | Alert Breakdown by Severity card | 4 progress bars (CRITICAL/HIGH/MEDIUM/LOW) with percentages |
 | MO-11 | By Alert Type card | Icons + counts for each alert type (Multiple Faces, No Face, etc.) |
-| MO-12 | Auto-refresh toggle button | Toggle: "Auto (15s)" ↔ "Manual" — button style changes |
-| MO-13 | Last refresh timestamp visible | "Last refresh: HH:MM:SS" shown next to header |
-| MO-14 | Demo banner shows if no real events | Yellow "Demo Mode" banner at top |
+| MO-12 | Auto-refresh toggle button works | Toggle: "Auto (15s)" ↔ "Manual" — button appearance changes |
+| MO-13 | Last refresh timestamp visible | "HH:MM:SS" shown next to page header |
+| MO-14 | Demo banner shows when no real events | Yellow "Demo Mode" banner at top |
+| MO-15 | Click "Details" on any event card | Side drawer slides in from right with full event context |
+| MO-16 | Drawer: severity badge + acknowledged status visible | Correct color badge + "Acknowledged ✓" or "Unacknowledged" |
+| MO-17 | Drawer: Detection Details grid visible | Key-value pairs from event.details object shown |
+| MO-18 | Drawer: "Acknowledge Alert" button in drawer works | Button disappears, label changes to "Acknowledged ✓" |
+| MO-19 | Drawer: "Supervisor Override" button opens modal | Modal opens with Invigilator ID, Candidate, Reason fields |
+| MO-20 | Supervisor Override Modal: fill & submit | "Override Submitted" success screen appears with check icon |
+| MO-21 | "Supervisor Override" header button opens empty modal | Modal opens without pre-filled candidate or session |
 
 ---
 

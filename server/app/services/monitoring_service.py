@@ -100,11 +100,21 @@ class MonitoringService:
         session_id: str | None = None,
         severity: str | None = None,
         event_type: str | None = None,
+        acknowledged: bool | None = None,
         page: int = 1,
         page_size: int = 50,
     ) -> dict:
         """
         List security events with optional filtering and pagination.
+
+        Args:
+            session_id:   Filter to a single session (proctor drill-down).
+            severity:     Filter by severity level (LOW, MEDIUM, HIGH, CRITICAL).
+            event_type:   Filter by alert type (MULTIPLE_FACES, GAZE_DEVIATION, etc.)
+            acknowledged: If True/False, filter by acknowledged status.
+                          If None (default), returns all events.
+            page:         Page number (1-indexed).
+            page_size:    Events per page (max 200).
 
         Returns:
             Dict with events list, total count, and pagination info.
@@ -119,11 +129,14 @@ class MonitoringService:
             query = query.where(SecurityEvent.session_id == session_id)
             count_query = count_query.where(SecurityEvent.session_id == session_id)
         if severity is not None:
-            query = query.where(SecurityEvent.severity == severity)
-            count_query = count_query.where(SecurityEvent.severity == severity)
+            query = query.where(SecurityEvent.severity == severity.upper())
+            count_query = count_query.where(SecurityEvent.severity == severity.upper())
         if event_type is not None:
             query = query.where(SecurityEvent.event_type == event_type)
             count_query = count_query.where(SecurityEvent.event_type == event_type)
+        if acknowledged is not None:
+            query = query.where(SecurityEvent.acknowledged == acknowledged)
+            count_query = count_query.where(SecurityEvent.acknowledged == acknowledged)
 
         total_result = await self._db.execute(count_query)
         total = total_result.scalar() or 0
@@ -150,6 +163,7 @@ class MonitoringService:
             "page": page,
             "page_size": page_size,
         }
+
 
     async def get_session_summary(self, session_id: str) -> dict:
         """
@@ -185,3 +199,16 @@ class MonitoringService:
         event.acknowledged = True
         await self._db.commit()
         return True
+
+    async def get_event(self, event_id: str) -> SecurityEvent | None:
+        """
+        Fetch a single security event by ID.
+
+        Returns:
+            SecurityEvent ORM object or None if not found.
+        """
+        result = await self._db.execute(
+            select(SecurityEvent).where(SecurityEvent.id == event_id)
+        )
+        return result.scalar_one_or_none()
+

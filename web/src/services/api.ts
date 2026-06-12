@@ -260,30 +260,81 @@ export const auditApi = {
 //       Direct monitoring API calls go to the edge server (different base URL).
 //       Use VITE_EDGE_API_BASE_URL env var to point to the edge server.
 //
-// POST /monitoring/event                  — report security frame (from kiosk)
-// GET  /monitoring/events                 — list events (proctor dashboard)
-// GET  /monitoring/events/:session_id/summary — session anomaly summary
+// POST  /monitoring/event                            — report security frame (from kiosk)
+// GET   /monitoring/events                           — list events (proctor dashboard)
+// GET   /monitoring/events/detail/{id}               — single event detail (A7f drawer)    ← NEW
+// GET   /monitoring/events/:session_id/summary       — session anomaly summary
+// PATCH /monitoring/events/:id/acknowledge           — proctor acknowledge (GAP-5)          ← NEW
+// GET   /exam/sessions                               — list all sessions (GAP-4)            ← NEW
 // ─────────────────────────────────────────────────────────────
 
 const EDGE_BASE = import.meta.env.VITE_EDGE_API_BASE_URL ?? '/edge/api/v1';
 
+function edgeFetch<T>(token: string, path: string, init?: RequestInit): Promise<T> {
+  return fetch(`${EDGE_BASE}${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      ...(init?.headers ?? {}),
+    },
+  }).then(async r => {
+    if (!r.ok) throw new Error(`Edge API error ${r.status}: ${await r.text()}`);
+    return r.json() as Promise<T>;
+  });
+}
+
+/** Build a query string path for edge API calls (e.g. /monitoring/events?page=1&severity=HIGH) */
+function edgeQs(path: string, params?: Record<string, string | number | boolean | undefined>): string {
+  if (!params) return path;
+  const qs = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => { if (v !== undefined) qs.set(k, String(v)); });
+  const str = qs.toString();
+  return str ? `${path}?${str}` : path;
+}
+
 export const monitoringApi = {
-  /** GET /monitoring/events?session_id=&severity=&event_type=&page=&page_size= */
-  listEvents: (edgeToken: string, params?: { session_id?: string; severity?: string; event_type?: string; page?: number; page_size?: number }) => {
-    const url = buildUrl(`${EDGE_BASE}/monitoring/events`, params);
-    return fetch(url, {
-      headers: { Authorization: `Bearer ${edgeToken}`, 'Content-Type': 'application/json' },
-    }).then(r => r.json() as Promise<EventListResponse>);
-  },
+  /** GET /monitoring/events?session_id=&severity=&event_type=&acknowledged=&page=&page_size= */
+  listEvents: (edgeToken: string, params?: {
+    session_id?: string;
+    severity?: string;
+    event_type?: string;
+    acknowledged?: boolean;
+    page?: number;
+    page_size?: number;
+  }) =>
+    edgeFetch<EventListResponse>(edgeToken, edgeQs('/monitoring/events', params)),
+
+  /** GET /monitoring/events/detail/{id} — full event detail for A7f Anomaly Detail Drawer */
+  getEvent: (edgeToken: string, eventId: string) =>
+    edgeFetch<SecurityEventDetail>(edgeToken, `/monitoring/events/detail/${eventId}`),
 
   /** GET /monitoring/events/:session_id/summary */
-  getSessionSummary: (edgeToken: string, sessionId: string) => {
-    const url = buildUrl(`${EDGE_BASE}/monitoring/events/${sessionId}/summary`);
-    return fetch(url, {
-      headers: { Authorization: `Bearer ${edgeToken}`, 'Content-Type': 'application/json' },
-    }).then(r => r.json() as Promise<SessionSummaryResponse>);
-  },
+  getSessionSummary: (edgeToken: string, sessionId: string) =>
+    edgeFetch<SessionSummaryResponse>(edgeToken, `/monitoring/events/${sessionId}/summary`),
+
+  /**
+   * PATCH /monitoring/events/:id/acknowledge — GAP-5 (now implemented!)
+   * Marks a proctor alert as acknowledged. Returns { id, acknowledged, message }.
+   */
+  acknowledge: (edgeToken: string, eventId: string) =>
+    edgeFetch<AcknowledgeResponse>(edgeToken, `/monitoring/events/${eventId}/acknowledge`, {
+      method: 'PATCH',
+    }),
+
+  /**
+   * GET /exam/sessions — GAP-4 (now implemented!)
+   * List all exam sessions on the edge node for the Proctor Dashboard (D1).
+   */
+  listSessions: (edgeToken: string, params?: {
+    status?: 'active' | 'submitted' | 'recovered';
+    exam_id?: string;
+    page?: number;
+    page_size?: number;
+  }) =>
+    edgeFetch<SessionListResponse>(edgeToken, edgeQs('/exam/sessions', params)),
 };
+
 
 // ─────────────────────────────────────────────────────────────
 // DASHBOARD  (NOT YET IMPLEMENTED — GAP-6)
@@ -551,19 +602,54 @@ export interface SecurityEvent {
   id: string;
   session_id: string;
   candidate_id: string;
-  alert_type: string;
+  event_type: string;           // backend field name: event_type (not alert_type)
   severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-  details: Record<string, unknown>;
+  details: string;              // JSON string from backend
   evidence_hash: string;
+  acknowledged: boolean;
   created_at: string;
 }
+
+/** Full event detail — same shape as SecurityEvent (alias for A7f drawer) */
+export type SecurityEventDetail = SecurityEvent;
 
 /** Matches edge/monitoring.py SessionSummaryResponse */
 export interface SessionSummaryResponse {
   session_id: string;
   total_events: number;
-  by_severity: Record<string, number>;
-  by_type: Record<string, number>;
+  high_count: number;           // backend uses high_count (not by_severity)
+  medium_count: number;
+  low_count: number;
+  event_types: Record<string, number>;  // { MULTIPLE_FACES: 3, ... }
+}
+
+/** Matches edge/monitoring.py AcknowledgeResponse (GAP-5) */
+export interface AcknowledgeResponse {
+  id: string;
+  acknowledged: boolean;
+  message: string;
+}
+
+/** Matches server/app/schemas/session.py SessionResponse (GAP-4) */
+export interface SessionResponse {
+  id: string;
+  candidate_id: string;
+  exam_id: string;
+  variant_id: number;
+  status: 'active' | 'submitted' | 'recovered';
+  current_question_index: number;
+  started_at: string;
+  submitted_at: string | null;
+}
+
+/** Matches server/app/schemas/session.py SessionListResponse (GAP-4) */
+export interface SessionListResponse {
+  sessions: SessionResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+  filter_status: string | null;
+  filter_exam_id: string | null;
 }
 
 // ── Dashboard (GAP-6, not yet in backend) ──────────────────

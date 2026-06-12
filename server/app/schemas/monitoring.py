@@ -77,3 +77,21 @@ class SessionSummaryResponse(BaseModel):
     medium_count: int
     low_count: int
     event_types: dict[str, int]  # {MULTIPLE_FACES: 3, NO_FACE: 1, ...}
+
+
+# ---------------------------------------------------------------------------
+# GAP-5: Acknowledge + single-event detail (Phase 4)
+# ---------------------------------------------------------------------------
+
+class AcknowledgeResponse(BaseModel):
+    """Response for PATCH /monitoring/events/{id}/acknowledge."""
+
+    id: str
+    acknowledged: bool
+    message: str
+
+
+class EventDetailResponse(SecurityEventResponse):
+    """Full security event detail (superset of SecurityEventResponse)."""
+    # Inherits all fields — type alias for semantic clarity at route level
+

@@ -2,7 +2,7 @@
 
 > **Last Updated:** 2026-06-12
 > **Sprint:** Sprint 2 (Frontend & Desktop)
-> **Phase:** Implementation — Phase 3 Complete, Phase 4 Next
+> **Phase:** Implementation — Phase 4 Complete, Phase 5 Next
 
 ---
 
@@ -33,8 +33,8 @@
 | Phase 2b — Exam Config + Distribution | 🟢 Complete | Exams.tsx (blueprint builder, compile, status pipeline), Packages.tsx (generate, verify RSA, download), Distribution.tsx (key release D-012), Centers.tsx (CRUD, seating grid, risk scores), Users.tsx (Clerk profile, role matrix, sync) |
 | Phase 3a — Kiosk Auth Flow | 🟢 Complete | AuthPage.tsx (QR scan + face verify + webcam), edgeApi.ts (full edge HTTP client), index.css (premium dark kiosk design system) |
 | Phase 3b — Exam Execution + Recovery | 🟢 Complete | ExamPage.tsx (MCQ render, timer ring, question palette, answer save), SummaryPage.tsx (review + auto-submit), CompletePage.tsx (submission hash proof), App.tsx (ProtectedRoute guard) |
-| Phase 4 — Audit & Proctor Dashboard | 🟢 Complete | Audit.tsx (event log, chain verify, hash chain diagram, JSON/CSV export), Monitoring.tsx (live feed, severity tabs, acknowledge, auto-refresh, session panel), TamperDemo.tsx (step-through interactive demo) |
-| Phase 5 — Demo Polish | 😀 Next | Seed/reset scripts, TESTING_CHECKLIST update, end-to-end rehearsal |
+| Phase 4 — Audit & Proctor Dashboard | 🟢 Complete | Audit.tsx (event log, chain verify, hash chain diagram, JSON/CSV export), Monitoring.tsx (live feed, A7f Anomaly Detail Drawer, D3 Supervisor Override Modal, severity tabs, real GAP-4/5 wiring), TamperDemo.tsx. Backend: GAP-4 GET /exam/sessions, GAP-5 PATCH /monitoring/events/{id}/acknowledge, GET /monitoring/events/detail/{id}, acknowledged filter on list_events, new session.py schemas |
+| Phase 5 — Demo Polish | 😀 Next | Seed/reset scripts, end-to-end rehearsal, ContextSummary.md update |
 
 ---
 
@@ -59,7 +59,7 @@
 
 | Date | Change | Author |
 |---|---|---|
-| 2026-06-12 | **Frontend Phase 4 COMPLETE** — Audit Explorer (Audit.tsx): 3 tabs (Event Log with expandable hash rows, Chain Verification with visual result card + hash chain diagram, Export JSON/CSV). Live Monitoring (Monitoring.tsx): real-time event feed with severity tabs (All/Critical/High/Medium/Low), acknowledge with optimistic UI (calls GAP-5 when available), auto-refresh every 15s, active sessions sidebar, alert breakdown charts. TamperDemo.tsx: interactive step-through tamper scenario (log → tamper → verify → broken chain). api.ts: fixed AuditEvent.id type (number→string), ChainVerificationResult field names (is_valid, verified_events, first_broken_at_sequence). CSS: added --danger-bg/--warning-bg/--success-bg/--primary-bg variables, gap-8 through gap-24, text-xs, text-primary, text-secondary, flex-wrap utilities. Build: tsc 0 errors, vite build 2.63s. | AI Agent |
+| 2026-06-12 | **Phase 4 Backend Gaps + Frontend Screens COMPLETE** — GAP-4: `GET /exam/sessions` (edge/exam.py, new SessionListResponse schema), GAP-5: `PATCH /monitoring/events/{id}/acknowledge` (edge/monitoring.py, service method already existed), `GET /monitoring/events/detail/{id}` (new single-event route for A7f drawer). MonitoringService: added `get_event()`, `acknowledged` filter on `list_events()`. Frontend: Monitoring.tsx rewritten with A7f Anomaly Detail Drawer (slide-in panel, evidence hash, Detection Details grid, contextual Acknowledge/Override buttons), D3 Supervisor Override Modal (audited form, permanent chain log). api.ts: new `edgeQs` helper, `monitoringApi.acknowledge()`, `monitoringApi.getEvent()`, `monitoringApi.listSessions()`. Types: SecurityEvent corrected (event_type, acknowledged, details as string), new SessionResponse/SessionListResponse/AcknowledgeResponse. tsc: 0 errors, vite build: 2.28s. | AI Agent |
 | 2026-06-12 | **Frontend Phase 3 COMPLETE** — Desktop Kiosk fully implemented | Team Member |
 | 2026-06-12 | **Frontend Phase 2b COMPLETE** — Exams.tsx, Packages.tsx, Distribution.tsx, Centers.tsx, Users.tsx. TypeScript: 0 errors. Backend GAP-1, GAP-2, GAP-3 banners added. | AI Agent |
 | 2026-06-12 | **Frontend Phase 2a COMPLETE** — Questions.tsx, QuestionEditor.tsx, Dashboard — merged to main | Harsh Bhavsar |

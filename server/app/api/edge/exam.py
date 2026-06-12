@@ -5,13 +5,14 @@ Variant loading, answer submission, exam completion.
 Protected by edge-local RSA-signed JWT.
 
 Endpoints:
+  GET  /exam/sessions              — List all active sessions (GAP-4 proctor dashboard)  ← NEW
   GET  /exam/session/{session_id}  — Load exam session with variant
   POST /exam/answer                — Submit/update answer + auto-snapshot
   POST /exam/submit                — Final exam submission
 """
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.app.db.database import get_db
@@ -23,10 +24,92 @@ from server.app.schemas.recovery import (
     SubmitExamRequest,
     SubmitExamResponse,
 )
+from server.app.schemas.session import SessionListResponse, SessionResponse
 from server.app.services.recovery_service import RecoveryService
 
 router = APIRouter(prefix="/exam")
 
+
+# ---------------------------------------------------------------------------
+# GAP-4: List all active sessions (needed by proctor dashboard D1)
+# ---------------------------------------------------------------------------
+
+@router.get(
+    "/sessions",
+    response_model=SessionListResponse,
+    summary="List all exam sessions",
+    description=(
+        "Returns a paginated list of exam sessions on this edge node. "
+        "Supports filtering by status and exam_id. "
+        "Used by the Proctor Dashboard (D1) to show who is currently in exam."
+    ),
+)
+async def list_sessions(
+    status: str | None = Query(
+        default=None,
+        description="Filter by status: active | submitted | recovered",
+        pattern="^(active|submitted|recovered)$",
+    ),
+    exam_id: str | None = Query(
+        default=None,
+        description="Filter by exam UUID",
+    ),
+    page: int = Query(default=1, ge=1, description="Page number (1-indexed)"),
+    page_size: int = Query(default=50, ge=1, le=200, description="Sessions per page"),
+    db: AsyncSession = Depends(get_db),
+) -> SessionListResponse:
+    """
+    List exam sessions with optional filters.
+
+    This endpoint implements GAP-4 from the frontend implementation plan.
+    Returns all sessions on this edge node ordered by start time (newest first).
+    """
+    page_size = min(page_size, 200)
+    offset = (page - 1) * page_size
+
+    query = select(ExamSession).order_by(ExamSession.started_at.desc())
+    count_query = select(func.count(ExamSession.id))
+
+    if status is not None:
+        query = query.where(ExamSession.status == status)
+        count_query = count_query.where(ExamSession.status == status)
+    if exam_id is not None:
+        query = query.where(ExamSession.exam_id == exam_id)
+        count_query = count_query.where(ExamSession.exam_id == exam_id)
+
+    total_result = await db.execute(count_query)
+    total = total_result.scalar() or 0
+
+    result = await db.execute(query.offset(offset).limit(page_size))
+    sessions = result.scalars().all()
+
+    session_list = [
+        SessionResponse(
+            id=s.id,
+            candidate_id=s.candidate_id,
+            exam_id=s.exam_id,
+            variant_id=s.variant_id,
+            status=s.status,
+            current_question_index=s.current_question_index,
+            started_at=s.started_at.isoformat() if s.started_at else "",
+            submitted_at=s.submitted_at.isoformat() if s.submitted_at else None,
+        )
+        for s in sessions
+    ]
+
+    return SessionListResponse(
+        sessions=session_list,
+        total=total,
+        page=page,
+        page_size=page_size,
+        filter_status=status,
+        filter_exam_id=exam_id,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Existing endpoints — NOT MODIFIED (as per requirement)
+# ---------------------------------------------------------------------------
 
 @router.get("/session/{session_id}", response_model=ExamSessionResponse)
 async def get_session(

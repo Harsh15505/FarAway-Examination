@@ -1,10 +1,18 @@
 # FortisExam — Changelog
 
-> **Last Updated:** 2026-06-10
+> **Last Updated:** 2026-06-12
 
 ---
 
 ## [Unreleased]
+
+### 2026-06-12 — Phase 4 Backend Gaps & Frontend Screens (Complete)
+- **Implemented Backend Gaps:** GAP-4 (`GET /exam/sessions` edge endpoint) and GAP-5 (`PATCH /monitoring/events/{id}/acknowledge` edge endpoint).
+- **Added Detail Endpoint:** `GET /monitoring/events/detail/{id}` to fetch full details for a single security event.
+- **Updated Monitoring Service:** Added `get_event()` and an `acknowledged` filter on `list_events()`.
+- **Created Frontend Screens:** A7f Anomaly Detail Drawer (slide-in panel with evidence hash, detection details grid, and actions) and D3 Supervisor Override Modal (audited form with permanent chain logging).
+- **Updated API Client:** Added `edgeQs` helper, `monitoringApi.acknowledge()`, `monitoringApi.getEvent()`, and `monitoringApi.listSessions()`. Corrected `SecurityEvent` typing.
+- **Updated Documentation:** Updated `ActiveTasks.md`, `CurrentState.md`, `ContextSummary.md`, `ManualTestingChecklist.md`, and `TESTING_CHECKLIST.HTML`.
 
 ---
 
