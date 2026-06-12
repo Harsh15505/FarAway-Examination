@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FortisExam — Testing Checklist (Phase 1 + 2a + 2b)</title>
+  <title>FortisExam — Testing Checklist (Phase 1 + 2a + 2b + 3)</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
 
@@ -261,11 +261,11 @@
     <div class="logo-icon">🛡️</div>
     <div>
       <div class="logo-text">FortisExam — QA Checklist</div>
-      <div class="logo-sub">Phase 1 + Phase 2a + Phase 2b — Cloud Admin Portal</div>
+      <div class="logo-sub">Phase 1 + Phase 2a + Phase 2b + Phase 3 — Cloud Admin Portal + Desktop Kiosk</div>
     </div>
   </div>
   <div style="display:flex;gap:12px;align-items:center">
-    <div class="phase-badge">✅ Phase 1 · 2a · 2b Complete</div>
+    <div class="phase-badge">✅ Phase 1 · 2a · 2b · 3 Complete</div>
     <div class="header-stats">
       <div class="stat-pill"><span class="stat-dot pulse pulse-green"></span><span id="p-pass">0</span> Pass</div>
       <div class="stat-pill"><span class="stat-dot" style="background:var(--danger)"></span><span id="p-fail">0</span> Fail</div>
@@ -294,7 +294,9 @@
   <div class="scope-sep">|</div>
   <div class="scope-item"><span class="scope-check">✓</span> Phase 2b – Exams, Packages, Distribution, Centers, Users</div>
   <div class="scope-sep">|</div>
-  <div class="scope-item"><span class="scope-x">✗</span> Phase 3–5 – Desktop/Audit/Proctor (not built yet)</div>
+  <div class="scope-item"><span class="scope-check">✓</span> Phase 3 — Desktop Kiosk (Auth, Exam, Submit)</div>
+  <div class="scope-sep">|</div>
+  <div class="scope-item"><span class="scope-x">✗</span> Phase 4–5 — Audit/Proctor (not built yet)</div>
 </div>
 
 <!-- Service links -->
@@ -305,6 +307,12 @@
   <a href="http://localhost:8000/docs" target="_blank" class="chip chip-cloud">📄 Swagger Docs</a>
   <a href="http://localhost:5173" target="_blank" class="chip chip-web">
     <span class="stat-dot pulse" style="background:#fbbf24"></span> Admin Portal :5173
+  </a>
+  <a href="http://localhost:8001/health" target="_blank" class="chip chip-cloud">
+    <span class="stat-dot pulse pulse-green"></span> Edge API :8001
+  </a>
+  <a href="http://localhost:5174" target="_blank" class="chip chip-web">
+    <span class="stat-dot pulse" style="background:#06b6d4"></span> Desktop Kiosk :5174
   </a>
 </div>
 
@@ -573,13 +581,72 @@ const CATS = [
       { id:'U-11', name:'Fill sync form and submit', exp:'POST /api/v1/users/sync fires (check Network tab)' },
     ]
   },
+  {
+    id:'kiosk-infra', icon:'🖥️', title:'Desktop Kiosk Infra — Phase 3', color:'#06b6d4',
+    sub:'Edge server + desktop app must both be running before kiosk tests',
+    tests:[
+      { id:'KI-01', name:'Edge server starts on port 8001', exp:'$env:SERVER_MODE="edge"; uvicorn ... --port 8001 → "Application startup complete"', note:'Run with SERVER_MODE=edge' },
+      { id:'KI-02', name:'Edge health check responds', exp:'GET http://localhost:8001/health → {"status":"ok","mode":"edge"}' },
+      { id:'KI-03', name:'Desktop Vite dev server starts on 5174', exp:'cd desktop; npm run dev → "ready in Xms" on port 5174' },
+      { id:'KI-04', name:'Desktop app loads in browser', exp:'http://localhost:5174 → FortisExam Kiosk auth page (not blank)' },
+      { id:'KI-05', name:'Edge Swagger docs accessible', exp:'http://localhost:8001/docs → shows Auth, Exam, Recovery, Monitoring routes' },
+    ]
+  },
+  {
+    id:'kiosk-auth', icon:'🔐', title:'Kiosk Auth Flow (QR + Face) — Phase 3', color:'#8b5cf6',
+    sub:'Dual-factor candidate authentication via edge server',
+    tests:[
+      { id:'KA-01', name:'Auth page shows "Connecting to Edge Server..." initially', exp:'Spinner + text while health check runs' },
+      { id:'KA-02', name:'If edge server is DOWN, error state shows', exp:'"Cannot connect to Edge Server" error with alert' },
+      { id:'KA-03', name:'If edge server is UP, QR scan step appears', exp:'Step 1 of 2 badge, QR frame with scanning animation' },
+      { id:'KA-04', name:'QR frame has animated scan line', exp:'Blue gradient line sweeps vertically inside the QR box' },
+      { id:'KA-05', name:'"[Simulate Scan]" button works', exp:'Clicking it fills QR data and advances to face verify step' },
+      { id:'KA-06', name:'Face verification step shows webcam feed', exp:'Step 2 of 2 badge, live video from webcam, face guide overlay' },
+      { id:'KA-07', name:'Face guide oval is visible over webcam', exp:'Dashed purple oval animation over the video feed' },
+      { id:'KA-08', name:'"Capture & Authenticate" button fires API call', exp:'POST /api/v1/auth/authenticate fires (check Network tab)', note:'Will likely 500 without real RSA keys — that is expected' },
+      { id:'KA-09', name:'"Go Back" returns to QR scan step', exp:'Webcam stops, QR scanner step reappears' },
+      { id:'KA-10', name:'Error state shows on auth failure', exp:'Red ✗ circle, error message, "Try Again" button' },
+    ]
+  },
+  {
+    id:'kiosk-exam', icon:'📝', title:'Kiosk Exam Execution — Phase 3', color:'#22c55e',
+    sub:'Question display, MCQ selection, timer, navigation palette, auto-save',
+    tests:[
+      { id:'KE-01', name:'Exam page loads after successful auth', exp:'Header with exam title, timer ring, question content area', note:'Requires a valid edge session — use mock data if needed' },
+      { id:'KE-02', name:'Question palette visible on left sidebar', exp:'Grid of numbered pills (1, 2, 3...) with color legend' },
+      { id:'KE-03', name:'Clicking a pill jumps to that question', exp:'Question content updates to match selected number' },
+      { id:'KE-04', name:'4 MCQ option buttons (A/B/C/D) visible', exp:'Each option has a letter circle and text content' },
+      { id:'KE-05', name:'Clicking an option highlights it (purple)', exp:'Selected option gets purple border + glow, letter circle fills' },
+      { id:'KE-06', name:'Answered questions turn green in palette', exp:'Pill changes to green after selecting an option' },
+      { id:'KE-07', name:'Flag for Review button works', exp:'Clicking "🏁 Flag" changes pill to yellow, button text toggles' },
+      { id:'KE-08', name:'Previous / Next buttons navigate questions', exp:'Clicking Next advances index, Previous goes back' },
+      { id:'KE-09', name:'Timer countdown is visible', exp:'SVG ring with MM:SS countdown, changes to orange under 5 min' },
+      { id:'KE-10', name:'"Review & Submit Exam" button navigates to summary', exp:'Clicking it goes to /summary page' },
+      { id:'KE-11', name:'Subject and Difficulty badges shown per question', exp:'Small tags like "PHYSICS" and "MEDIUM" above the question' },
+      { id:'KE-12', name:'Answer selection fires POST /exam/answer', exp:'Check Network tab — auto-save fires on each click' },
+    ]
+  },
+  {
+    id:'kiosk-submit', icon:'✅', title:'Kiosk Summary & Submission — Phase 3', color:'#f59e0b',
+    sub:'Review panel, final submit, completion hash display',
+    tests:[
+      { id:'KS-01', name:'Summary page shows answered/unanswered counts', exp:'Table with Candidate Name, Exam, Total, Answered, Unanswered' },
+      { id:'KS-02', name:'"Return to Exam" button goes back to /exam', exp:'Navigates back without losing answers' },
+      { id:'KS-03', name:'Unanswered warning shows if count > 0', exp:'Orange text: "Warning: You have X unanswered questions"' },
+      { id:'KS-04', name:'"Confirm Submission" button fires POST /exam/submit', exp:'Spinner shows, then navigates to /complete' },
+      { id:'KS-05', name:'Complete page shows success check circle', exp:'Green ✓ circle with "Exam Completed" heading' },
+      { id:'KS-06', name:'Submission hash is displayed on complete page', exp:'Long hex string in monospace font under "Submission Hash (Proof)"' },
+      { id:'KS-07', name:'"Return to Login" resets to auth page', exp:'Navigates to / and localStorage session is cleared' },
+      { id:'KS-08', name:'After completion, going to /exam redirects to /', exp:'ProtectedRoute guard kicks in — no exam access without session' },
+    ]
+  },
 ];
 
 let state = {};
 let filter = 'all';
 
-function load() { try { const s = localStorage.getItem('fqa-v3'); if(s) state = JSON.parse(s); } catch(e){} }
-function save() { localStorage.setItem('fqa-v3', JSON.stringify(state)); }
+function load() { try { const s = localStorage.getItem('fqa-v4'); if(s) state = JSON.parse(s); } catch(e){} }
+function save() { localStorage.setItem('fqa-v4', JSON.stringify(state)); }
 function get(id) { return state[id] || 'pending'; }
 function set(id, s) {
   if (get(id) === s) delete state[id]; else state[id] = s;

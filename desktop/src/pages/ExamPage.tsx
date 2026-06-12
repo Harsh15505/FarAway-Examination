@@ -84,12 +84,12 @@ export default function ExamPage() {
   // 3. Security Monitoring (Focus loss)
   useEffect(() => {
     const onBlur = () => {
-      if (authData) {
+      if (authData && session) {
         reportMonitoringEvent({
           event_type: 'FOCUS_LOST',
           severity: 'WARNING',
           details: { timestamp: new Date().toISOString() }
-        }, authData.token);
+        }, authData.token, session.session_id, session.candidate_id);
       }
     };
     window.addEventListener('blur', onBlur);

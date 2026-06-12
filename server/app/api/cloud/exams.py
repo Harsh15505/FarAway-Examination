@@ -18,41 +18,77 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.app.db.database import get_db
+from server.app.middleware.clerk_auth import require_role
+from server.app.schemas.exam import ExamCreate, ExamResponse
 from server.app.schemas.packages import ReleaseKeyRequest, ReleaseKeyResponse
 from server.app.services.distribution_service import DistributionService
+from server.app.services.exam_service import ExamService
 
 router = APIRouter(prefix="/exams")
 
 
-@router.post("/")
-async def create_exam():
+def _get_exam_service(db: AsyncSession = Depends(get_db)) -> ExamService:
+    return ExamService(db)
+
+
+@router.post("/", status_code=201)
+async def create_exam(
+    data: ExamCreate,
+    auth: dict = Depends(require_role("admin")),
+    svc: ExamService = Depends(_get_exam_service),
+):
     """Create a new exam definition with blueprint."""
-    # TODO: Validate blueprint, store exam, log audit event (Module 01)
-    ...
+    exam = await svc.create(
+        name=data.name,
+        subject=data.subject,
+        duration_minutes=data.duration_minutes,
+        blueprint=data.blueprint,
+        author_id=auth["clerk_user_id"],
+    )
+    await svc.db.commit()
+    return {"id": str(exam.id), "status": "created"}
 
 
 @router.get("/")
-async def list_exams():
+async def list_exams(
+    page: int = 1,
+    page_size: int = 50,
+    auth: dict = Depends(require_role("admin", "expert")),
+    svc: ExamService = Depends(_get_exam_service),
+):
     """List all exams with status."""
-    # TODO: Query DB (Module 01)
-    ...
+    return await svc.list_all(page=page, page_size=page_size)
 
 
 @router.get("/{exam_id}")
-async def get_exam(exam_id: str):
+async def get_exam(
+    exam_id: str,
+    auth: dict = Depends(require_role("admin", "expert")),
+    svc: ExamService = Depends(_get_exam_service),
+):
     """Get exam details."""
-    # TODO: Query DB (Module 01)
-    ...
+    try:
+        return await svc.get(exam_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
 @router.post("/{exam_id}/compile")
-async def compile_exam(exam_id: str):
+async def compile_exam(
+    exam_id: str,
+    auth: dict = Depends(require_role("admin")),
+    svc: ExamService = Depends(_get_exam_service),
+):
     """
     Compile exam: select questions per blueprint, generate variants via
     graph coloring, create signed+encrypted package.
     """
-    # TODO: Select questions, run graph coloring, call PackageService.generate() (Module 01)
-    ...
+    try:
+        result = await svc.compile(exam_id)
+        await svc.db.commit()
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/{exam_id}/release-key", response_model=ReleaseKeyResponse)
@@ -70,12 +106,6 @@ async def release_key(
 
     This is the hackathon simplification of "time-locked keys". In production,
     this would use TEE-enforced time verification (AWS Nitro Enclaves / HSM).
-
-    Demo flow:
-    1. Admin calls this endpoint with center's public key
-    2. Server returns wrapped_key_b64
-    3. Edge node unwraps with center private key → gets AES key
-    4. Edge node decrypts package → exam content is live
     """
     svc = DistributionService(db)
 

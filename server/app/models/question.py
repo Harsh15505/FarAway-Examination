@@ -1,7 +1,6 @@
 """Question model — content stored encrypted (AES-256-GCM)."""
 
 from sqlalchemy import Column, String, Text, DateTime, Boolean, func
-from sqlalchemy.dialects.postgresql import UUID
 
 from server.app.db.database import Base
 
@@ -11,7 +10,7 @@ class Question(Base):
 
     __tablename__ = "questions"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    id = Column(String(36), primary_key=True)  # UUID as string for SQLite compat
     subject = Column(String(100), nullable=False)
     difficulty = Column(String(20), nullable=False)  # easy, medium, hard
     encrypted_content = Column(Text, nullable=False)  # AES-256-GCM ciphertext

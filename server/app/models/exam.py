@@ -1,7 +1,6 @@
 """Exam model — exam definition with blueprint and compilation status."""
 
 from sqlalchemy import Column, String, DateTime, JSON, func
-from sqlalchemy.dialects.postgresql import UUID
 
 from server.app.db.database import Base
 
@@ -11,7 +10,7 @@ class Exam(Base):
 
     __tablename__ = "exams"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    id = Column(String(36), primary_key=True)  # UUID as string for SQLite compat
     name = Column(String(255), nullable=False)
     subject = Column(String(100), nullable=False)
     blueprint = Column(JSON, nullable=False)  # { difficulty_distribution, question_count, etc. }

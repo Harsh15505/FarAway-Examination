@@ -166,7 +166,7 @@ export async function submitExam(sessionId: string, token: string): Promise<Subm
 /** Check if there's a recoverable snapshot for this candidate */
 export async function checkSnapshot(candidateId: string): Promise<RecoverySnapshot | null> {
   try {
-    return await edgeRequest<RecoverySnapshot>(`/recovery/check/${candidateId}`);
+    return await edgeRequest<RecoverySnapshot>(`/recovery/${candidateId}`);
   } catch {
     return null;
   }
@@ -174,9 +174,8 @@ export async function checkSnapshot(candidateId: string): Promise<RecoverySnapsh
 
 /** Restore session from snapshot — returns session with answers pre-filled */
 export async function restoreSession(sessionId: string): Promise<ExamSession> {
-  return edgeRequest<ExamSession>('/recovery/restore', {
+  return edgeRequest<ExamSession>(`/recovery/restore/${sessionId}`, {
     method: 'POST',
-    body: JSON.stringify({ session_id: sessionId }),
   });
 }
 
@@ -186,11 +185,24 @@ export async function restoreSession(sessionId: string): Promise<ExamSession> {
 export async function reportMonitoringEvent(
   event: MonitoringEvent,
   token: string,
+  sessionId?: string,
+  candidateId?: string,
 ): Promise<void> {
   try {
-    await edgeRequest<void>('/monitoring/event', {
+    // The backend /monitoring/event expects a DetectionFrameRequest
+    // We map our simple event into that format
+    await edgeRequest<unknown>('/monitoring/event', {
       method: 'POST',
-      body: JSON.stringify(event),
+      body: JSON.stringify({
+        session_id: sessionId ?? 'unknown',
+        candidate_id: candidateId ?? 'unknown',
+        face_count: event.event_type === 'FOCUS_LOST' ? 0 : 1,
+        gaze_yaw: 0.0,
+        gaze_pitch: 0.0,
+        camera_active: event.event_type !== 'CAMERA_OFF',
+        answer_changes_last_30s: 0,
+        timestamp: new Date().toISOString(),
+      }),
     }, token);
   } catch {
     // Monitoring failures must never crash the exam

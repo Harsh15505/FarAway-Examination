@@ -6,6 +6,8 @@
 
 ## Active Bugs
 
+> **All major backend gaps resolved.** Only BUG-003 (seed script) remains.
+
 ### BUG-001: Exam Create/List/Compile — Backend stubs return None
 
 | Field | Value |
@@ -13,7 +15,7 @@
 | **ID** | BUG-001 |
 | **Severity** | Medium |
 | **Module** | Backend — `server/app/api/cloud/exams.py` |
-| **Status** | Known — Pending backend implementation |
+| **Status** | ✅ Fixed — 2026-06-12 |
 | **Reported By** | AI QA / Phase 2b audit |
 | **Reported On** | 2026-06-12 |
 
@@ -49,7 +51,7 @@ Add to `tests/integration/test_exams_api.py` after fix.
 | **ID** | BUG-002 |
 | **Severity** | Medium |
 | **Module** | Backend — `server/app/api/cloud/centers.py` (missing file) |
-| **Status** | Known — GAP pending |
+| **Status** | ✅ Fixed — 2026-06-12 |
 | **Reported By** | API Gap Analysis — Phase 2b |
 | **Reported On** | 2026-06-12 |
 

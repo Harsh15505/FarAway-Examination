@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     face_similarity_threshold: float = 0.6
 
     # --- CORS ---
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
+    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"]
 
     # --- General ---
     debug: bool = False

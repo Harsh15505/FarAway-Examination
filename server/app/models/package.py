@@ -1,7 +1,6 @@
 """Package model — encrypted, signed exam package for distribution."""
 
-from sqlalchemy import Column, String, Text, DateTime, ForeignKey, func
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, Text, DateTime, func
 
 from server.app.db.database import Base
 
@@ -11,8 +10,8 @@ class Package(Base):
 
     __tablename__ = "packages"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
-    exam_id = Column(UUID(as_uuid=True), ForeignKey("exams.id"), nullable=False)
+    id = Column(String(36), primary_key=True)  # UUID as string for SQLite compat
+    exam_id = Column(String(36), nullable=False)  # FK to exams.id (string UUID)
     encrypted_payload = Column(Text, nullable=False)  # AES-256-GCM encrypted content
     encryption_iv = Column(String(64), nullable=False)
     package_hash = Column(String(64), nullable=False)  # SHA-256 of encrypted payload
