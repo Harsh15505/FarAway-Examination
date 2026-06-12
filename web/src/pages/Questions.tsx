@@ -4,13 +4,22 @@
  */
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@clerk/clerk-react';
-import { Plus, Edit2, Trash2, Lock, FileText, Search } from 'lucide-react';
+import { Plus, Edit2, Trash2, Lock, FileText, Search, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   Button, Badge, Card, Table, LoadingState, ErrorState,
   PageHeader, EmptyState, ConfirmDialog,
 } from '../components/ui';
 import { questionsApi, type QuestionMeta } from '../services/api';
+
+// ─── Demo Fallback (while backend DB is down) ────────────────
+
+const DEMO_QUESTIONS: QuestionMeta[] = [
+  { id: 'q-1a2b3c', subject: 'Physics', difficulty: 'hard', is_encrypted: true, created_at: new Date(Date.now() - 86400000).toISOString(), updated_at: '' },
+  { id: 'q-4d5e6f', subject: 'Chemistry', difficulty: 'medium', is_encrypted: false, created_at: new Date(Date.now() - 172800000).toISOString(), updated_at: '' },
+  { id: 'q-7g8h9i', subject: 'Biology', difficulty: 'easy', is_encrypted: true, created_at: new Date(Date.now() - 259200000).toISOString(), updated_at: '' },
+  { id: 'q-0j1k2l', subject: 'Physics', difficulty: 'medium', is_encrypted: true, created_at: new Date(Date.now() - 345600000).toISOString(), updated_at: '' },
+];
 
 // ─── Helpers ─────────────────────────────────────────────────
 
@@ -134,6 +143,7 @@ export default function Questions() {
   const [difficulty, setDifficulty] = useState('');
   const [deleteId, setDeleteId]   = useState<string | null>(null);
   const [deleting, setDeleting]   = useState(false);
+  const [usingDemo, setUsingDemo] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
@@ -145,7 +155,9 @@ export default function Questions() {
       });
       setQuestions(res.items ?? []);
     } catch (e: any) {
-      setError(e.message);
+      console.warn('Backend /questions endpoint failed or DB not running. Using demo data.');
+      setQuestions(DEMO_QUESTIONS);
+      setUsingDemo(true);
     } finally {
       setLoading(false);
     }
@@ -246,6 +258,17 @@ export default function Questions() {
             </Button>
           }
         />
+
+        {usingDemo && (
+          <div style={{
+            background: 'var(--warning-light)', border: '1px solid var(--warning)',
+            borderRadius: 8, padding: '10px 16px', fontSize: 13, color: 'var(--warning-text)',
+            display: 'flex', alignItems: 'center', gap: 8, marginTop: -8
+          }}>
+            <AlertCircle size={15} />
+            Showing demo data — Database is not running or backend failed to fetch.
+          </div>
+        )}
 
         {/* Filter Bar */}
         <Card style={{ padding: '12px 16px' }}>

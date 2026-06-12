@@ -68,12 +68,15 @@ def _mount_cloud_routes(app: FastAPI) -> None:
     from server.app.api.cloud.packages import router as packages_router
     from server.app.api.cloud.distribution import router as distribution_router
     from server.app.api.cloud.users import router as users_router
+    from server.app.api.cloud.dashboard import router as dashboard_router
 
     app.include_router(questions_router, prefix="/api/v1", tags=["Questions"])
     app.include_router(exams_router, prefix="/api/v1", tags=["Exams"])
     app.include_router(packages_router, prefix="/api/v1", tags=["Packages"])
     app.include_router(distribution_router, prefix="/api/v1", tags=["Distribution"])
     app.include_router(users_router, prefix="/api/v1", tags=["Users"])
+    app.include_router(dashboard_router, prefix="/api/v1", tags=["Dashboard"])
+
 
 
 def _mount_edge_routes(app: FastAPI) -> None:
