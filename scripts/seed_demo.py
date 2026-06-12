@@ -105,11 +105,13 @@ def _encrypt_question(content: str, options: list[str], correct_idx: int) -> dic
         "correct_option": correct_idx,
     })
     import base64
-    ciphertext_bytes, nonce_bytes, _tag = AESCipher.encrypt(plaintext.encode(), DEMO_AES_KEY)
+    ciphertext_bytes, nonce_bytes, tag_bytes = AESCipher.encrypt(plaintext.encode(), DEMO_AES_KEY)
     ct_b64 = base64.b64encode(ciphertext_bytes).decode()
+    tag_b64 = base64.b64encode(tag_bytes).decode()
+    combined_content = f"{ct_b64}:{tag_b64}"
     iv_b64 = base64.b64encode(nonce_bytes).decode()
     content_hash = hashlib.sha256(plaintext.encode()).hexdigest()
-    return {"ciphertext": ct_b64, "iv": iv_b64, "hash": content_hash}
+    return {"ciphertext": combined_content, "iv": iv_b64, "hash": content_hash}
 
 
 def _make_fake_embedding() -> bytes:
@@ -126,8 +128,9 @@ async def seed_all():
     """Create all tables and seed demo data."""
     # 1. Create tables
     async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
-    print("✅ Tables created / verified")
+    print("✅ Tables dropped and recreated / verified")
 
     async with async_session() as db:
         # ── 2. Seed Questions ────────────────────────────────────
@@ -179,7 +182,7 @@ async def seed_all():
             status="compiled",
             duration_minutes="180",
             created_by="admin@fortisexam.gov.in",
-            compiled_at=datetime.now(timezone.utc) - timedelta(days=2),
+            compiled_at=datetime.utcnow() - timedelta(days=2),
         )
         db.add(exam)
         await db.flush()
@@ -261,7 +264,7 @@ async def seed_all():
             payload_json = json.dumps(payload_dict, sort_keys=True)
             payload_hash_str = hashlib.sha256(payload_json.encode()).hexdigest()
             event_hash = hashlib.sha256(f"{i+1}{payload_hash_str}{prior_hash}".encode()).hexdigest()
-            ts = datetime.now(timezone.utc) - timedelta(hours=len(audit_events_data) - i)
+            ts = datetime.utcnow() - timedelta(hours=len(audit_events_data) - i)
             ae = AuditEvent(
                 id=str(uuid.uuid4()),
                 sequence=i + 1,

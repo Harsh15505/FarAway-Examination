@@ -706,6 +706,21 @@ const CATS = [
       { id:'TD-09', name:'"How Hash Chaining Works" sidebar', exp:'4 explanation cards with icons: Event Logged / Chain Linked / Verification / Tamper Alert' },
     ]
   },
+  {
+    id:'phase3_kiosk', icon:'💻', title:'Phase 3: Edge Kiosk App', color:'#ef4444',
+    sub:'Offline-first Electron-based Kiosk for candidates',
+    tests:[
+      { id:'K-01', name:'Kiosk loads without crashing', exp:'React app runs on localhost:5174 or Desktop build' },
+      { id:'K-02', name:'QR Verification via Supervisor Override', exp:'Auth succeeds with Edge Server and session is created' },
+      { id:'K-03', name:'Exam loads successfully', exp:'Candidate name, Exam title, and all questions load without error' },
+      { id:'K-04', name:'Questions are decrypted', exp:'Questions display text and options correctly (no Corrupted Data errors)' },
+      { id:'K-05', name:'Can select options', exp:'Selecting options A, B, C, D visually highlights them' },
+      { id:'K-06', name:'Answer is autosaved to Edge', exp:'Edge API logs `POST /exam/answer` with 200 OK' },
+      { id:'K-07', name:'Next / Previous navigation', exp:'Can cycle through all questions' },
+      { id:'K-08', name:'Final Exam Submission', exp:'Submitting completes the exam, creates a final submission hash, and redirects to Summary' },
+      { id:'K-09', name:'Summary View', exp:'Shows candidate info, completion time, and verified hash' }
+    ]
+  },
 ];
 
 let state = {};

@@ -17,6 +17,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.app.db.database import get_db
 from server.app.models.session import ExamSession
+from server.app.models.candidate import Candidate
+from server.app.models.exam import Exam
+from server.app.models.question import Question
+from server.app.services.question_service import QuestionService
 from server.app.schemas.recovery import (
     ExamSessionResponse,
     SubmitAnswerRequest,
@@ -124,14 +128,53 @@ async def get_session(
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
 
+    candidate = await db.scalar(select(Candidate).where(Candidate.id == session.candidate_id))
+    exam = await db.scalar(select(Exam).where(Exam.id == session.exam_id))
+
+    if not candidate or not exam:
+        raise HTTPException(status_code=500, detail="Incomplete session data")
+
+    # Fetch 30 questions for this exam (in real life, fetch variant mapping)
+    q_result = await db.execute(select(Question).limit(30))
+    db_questions = q_result.scalars().all()
+
+    # Decrypt questions
+    aes_key = b"12345678901234567890123456789012"
+    q_service = QuestionService(db, aes_key)
+    
+    decrypted_questions = []
+    for i, q in enumerate(db_questions):
+        try:
+            q_data = await q_service.get(str(q.id))
+            decrypted_questions.append({
+                "id": str(q.id),
+                "index": i,
+                "content": q_data["content"],
+                "options": q_data["options"],
+                "subject": q.subject,
+                "difficulty": q.difficulty,
+            })
+        except Exception as e:
+            print(f"Failed to decrypt question {q.id}: {e}")
+
+    # Calculate remaining time
+    # This is a demo, we assume 180 min duration = 10800s
+    dur_secs = int(exam.duration_minutes) * 60
+    
     return ExamSessionResponse(
         session_id=session.id,
         candidate_id=session.candidate_id,
+        candidate_name=candidate.name,
         exam_id=session.exam_id,
+        exam_title=exam.name,
         variant_id=session.variant_id,
         status=session.status,
         current_question_index=session.current_question_index,
+        total_questions=len(decrypted_questions),
+        duration_seconds=dur_secs,
+        remaining_seconds=dur_secs,  # In real life, calculate based on started_at
         started_at=session.started_at.isoformat() if session.started_at else "",
+        questions=decrypted_questions
     )
 
 

@@ -62,11 +62,17 @@ class ExamSessionResponse(BaseModel):
 
     session_id: str
     candidate_id: str
+    candidate_name: str
     exam_id: str
+    exam_title: str
     variant_id: int
     status: str
     current_question_index: int
+    total_questions: int
+    duration_seconds: int
+    remaining_seconds: int
     started_at: str
+    questions: list[dict]
 
 
 # ---------------------------------------------------------------------------

@@ -76,7 +76,7 @@ class QuestionService:
 
     async def get(self, question_id: str) -> dict:
         """Get question metadata and decrypt content."""
-        q = await self.db.scalar(select(Question).where(Question.id == UUID(question_id), Question.is_deleted == False))
+        q = await self.db.scalar(select(Question).where(Question.id == question_id, Question.is_deleted == False))
         if not q:
             raise ValueError("Question not found")
             
@@ -121,7 +121,7 @@ class QuestionService:
 
     async def update(self, question_id: str, subject: str, difficulty: str, content: str, options: list, correct_option: int, editor_id: str) -> dict:
         """Update and re-encrypt question content."""
-        q = await self.db.scalar(select(Question).where(Question.id == UUID(question_id), Question.is_deleted == False))
+        q = await self.db.scalar(select(Question).where(Question.id == question_id, Question.is_deleted == False))
         if not q:
             raise ValueError("Question not found")
             
@@ -159,7 +159,7 @@ class QuestionService:
 
     async def delete(self, question_id: str, deleter_id: str) -> bool:
         """Soft-delete a question."""
-        q = await self.db.scalar(select(Question).where(Question.id == UUID(question_id), Question.is_deleted == False))
+        q = await self.db.scalar(select(Question).where(Question.id == question_id, Question.is_deleted == False))
         if not q:
             raise ValueError("Question not found")
             
