@@ -3,11 +3,11 @@
   "private": true,
   "version": "0.1.0",
   "description": "FortisExam Candidate Kiosk — Electron + React",
-  "main": "electron/main.js",
+  "main": "electron/main.cjs",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:electron": "electron .",
+    "dev:electron": "cross-env NODE_ENV=development electron .",
     "build": "tsc && vite build",
     "electron:build": "electron-builder",
     "lint": "eslint . --ext ts,tsx"
@@ -21,6 +21,7 @@
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
+    "cross-env": "^10.1.0",
     "electron": "^41.7.1",
     "electron-builder": "^26.15.2",
     "typescript": "^5.5.0",

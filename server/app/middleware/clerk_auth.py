@@ -21,9 +21,31 @@ logger = logging.getLogger(__name__)
 
 security = HTTPBearer(auto_error=False)
 
-# Clerk JWKS URL template — replace with your Clerk frontend API URL
-# Format: https://<your-clerk-frontend-api>/.well-known/jwks.json
-CLERK_JWKS_URL = "https://api.clerk.dev/.well-known/jwks.json"
+# Clerk JWKS URL — derived from the publishable key instance hostname.
+# The publishable key (pk_test_<base64>) decodes to the Clerk frontend API host.
+# Override via CLERK_JWKS_URL env var, or it falls back to the instance URL.
+import os as _os, base64 as _b64
+
+def _jwks_url_from_settings() -> str:
+    """Derive JWKS URL from CLERK_PUBLISHABLE_KEY, or fall back to env override."""
+    override = _os.getenv("CLERK_JWKS_URL")
+    if override:
+        return override
+    pub_key = _os.getenv("CLERK_PUBLISHABLE_KEY", "")
+    # pk_test_<base64> or pk_live_<base64> — strip prefix and decode
+    try:
+        if "_" in pub_key:
+            b64_part = pub_key.split("_", 2)[-1]  # everything after pk_test_
+            # Pad to multiple of 4
+            padded = b64_part + "=" * (-len(b64_part) % 4)
+            host = _b64.b64decode(padded).decode().rstrip("$")
+            return f"https://{host}/.well-known/jwks.json"
+    except Exception:
+        pass
+    # Hard fallback for this project
+    return "https://profound-chow-40.clerk.accounts.dev/.well-known/jwks.json"
+
+CLERK_JWKS_URL = _jwks_url_from_settings()
 
 
 def _extract_role_from_claims(claims: dict) -> str:
