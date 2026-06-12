@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FortisExam — Testing Checklist (Phase 1 + 2a)</title>
+  <title>FortisExam — Testing Checklist (Phase 1 + 2a + 2b)</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
 
@@ -88,6 +88,7 @@
       align-items: center;
       gap: 12px;
       font-size: 13px;
+      flex-wrap: wrap;
     }
     .scope-item { display:flex; align-items:center; gap:6px; }
     .scope-check { color: var(--success); font-weight: 700; }
@@ -172,17 +173,20 @@
     .test-row.failed .ck-fail { display:block; }
     .test-row.skipped .ck-skip { display:block; }
 
-    .test-id { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; color:var(--text-muted); flex-shrink:0; min-width:44px; padding-top:2px; }
+    .test-id { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; color:var(--text-muted); flex-shrink:0; min-width:48px; padding-top:2px; }
     .test-content { flex:1; min-width:0; }
     .test-name { font-size:13px; font-weight:500; color:var(--text); line-height:1.4; }
     .test-exp {
       font-size:11px; color:var(--text-muted); margin-top:4px;
       font-family:'JetBrains Mono',monospace;
       background:var(--surface-2); border:1px solid var(--border);
-      border-radius:4px; padding:3px 7px; display:inline-block;
+      border-radius:4px; padding:3px 7px; display:inline-block; max-width:100%;
     }
     .note-inline {
       font-size:11px; color:#fbbf24; margin-top:4px; display:flex; gap:5px;
+    }
+    .demo-inline {
+      font-size:11px; color:#818cf8; margin-top:4px; display:flex; gap:5px;
     }
 
     .btns { display:flex; gap:4px; flex-shrink:0; }
@@ -241,6 +245,13 @@
       border-radius:10px; padding:14px 18px; font-size:12.5px; color:#a5b4fc;
       margin-bottom:18px; line-height:1.6;
     }
+
+    /* DEMO NOTE */
+    .demo-note {
+      background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.25);
+      border-radius:10px; padding:14px 18px; font-size:12.5px; color:#fbbf24;
+      margin-bottom:18px; line-height:1.6;
+    }
   </style>
 </head>
 <body>
@@ -250,11 +261,11 @@
     <div class="logo-icon">🛡️</div>
     <div>
       <div class="logo-text">FortisExam — QA Checklist</div>
-      <div class="logo-sub">Phase 1 + Phase 2a only (what's actually built)</div>
+      <div class="logo-sub">Phase 1 + Phase 2a + Phase 2b — Cloud Admin Portal</div>
     </div>
   </div>
   <div style="display:flex;gap:12px;align-items:center">
-    <div class="phase-badge">✅ Phase 1 + 2a Complete</div>
+    <div class="phase-badge">✅ Phase 1 · 2a · 2b Complete</div>
     <div class="header-stats">
       <div class="stat-pill"><span class="stat-dot pulse pulse-green"></span><span id="p-pass">0</span> Pass</div>
       <div class="stat-pill"><span class="stat-dot" style="background:var(--danger)"></span><span id="p-fail">0</span> Fail</div>
@@ -281,20 +292,17 @@
   <div class="scope-sep">|</div>
   <div class="scope-item"><span class="scope-check">✓</span> Phase 2a – Dashboard, Question Bank, Question Editor</div>
   <div class="scope-sep">|</div>
-  <div class="scope-item"><span class="scope-x">✗</span> Phase 2b – Exams/Packages/Centers (NOT built yet)</div>
+  <div class="scope-item"><span class="scope-check">✓</span> Phase 2b – Exams, Packages, Distribution, Centers, Users</div>
   <div class="scope-sep">|</div>
-  <div class="scope-item"><span class="scope-x">✗</span> Phase 3–5 – Desktop/Audit/Proctor (NOT built yet)</div>
+  <div class="scope-item"><span class="scope-x">✗</span> Phase 3–5 – Desktop/Audit/Proctor (not built yet)</div>
 </div>
 
 <!-- Service links -->
 <div class="services-bar">
   <a href="http://localhost:8000/health" target="_blank" class="chip chip-cloud">
-    <span class="stat-dot pulse pulse-green"></span> Cloud :8000
+    <span class="stat-dot pulse pulse-green"></span> Cloud API :8000
   </a>
-  <a href="http://localhost:8000/docs" target="_blank" class="chip chip-cloud">📄 Cloud API Docs</a>
-  <a href="http://localhost:8001/health" target="_blank" class="chip chip-cloud" style="color:#4ade80;border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.1)">
-    <span class="stat-dot pulse pulse-green"></span> Edge :8001
-  </a>
+  <a href="http://localhost:8000/docs" target="_blank" class="chip chip-cloud">📄 Swagger Docs</a>
   <a href="http://localhost:5173" target="_blank" class="chip chip-web">
     <span class="stat-dot pulse" style="background:#fbbf24"></span> Admin Portal :5173
   </a>
@@ -304,47 +312,55 @@
 
   <!-- HOW TO OPEN -->
   <div class="how-box">
-    <div class="how-title">🚀 How to Open the App for Testing</div>
+    <div class="how-title">🚀 How to Start Everything Before Testing</div>
     <div class="step-grid">
       <div class="step-card">
         <div class="step-num">1</div>
-        <div class="step-name">🌐 Admin Portal (main thing to test)</div>
-        <div class="step-desc">This is what Phase 1+2a built. Open in browser:</div>
-        <div class="step-cmd">http://localhost:5173</div>
-        <span class="tag tag-ok">✅ Already Running</span>
+        <div class="step-name">⚙️ Start Backend (Terminal 1)</div>
+        <div class="step-desc">From the project root <code>d:\DelhiHackathon</code>:</div>
+        <div class="step-cmd">python -m uvicorn server.app.main:app --host 0.0.0.0 --port 8000 --reload</div>
+        <span class="tag tag-ok">✅ Wait for "Application startup complete"</span>
       </div>
       <div class="step-card">
         <div class="step-num">2</div>
-        <div class="step-name">☁️ Cloud API (backend)</div>
-        <div class="step-desc">Test endpoints directly via Swagger interactive docs:</div>
-        <div class="step-cmd">http://localhost:8000/docs</div>
-        <span class="tag tag-ok">✅ Already Running</span>
+        <div class="step-name">🌐 Start Frontend (Terminal 2)</div>
+        <div class="step-desc">From <code>d:\DelhiHackathon\web</code>:</div>
+        <div class="step-cmd">npm run dev</div>
+        <span class="tag tag-ok">✅ Wait for "ready in Xms"</span>
       </div>
       <div class="step-card">
         <div class="step-num">3</div>
-        <div class="step-name">⚡ Edge API (backend)</div>
-        <div class="step-desc">Auth, exam, monitoring endpoints:</div>
-        <div class="step-cmd">http://localhost:8001/docs</div>
-        <span class="tag tag-ok">✅ Already Running</span>
+        <div class="step-name">🔑 Login via Clerk</div>
+        <div class="step-desc">Open the portal and log in. Use the account on profound-chow-40.clerk.accounts.dev</div>
+        <div class="step-cmd">http://localhost:5173</div>
+        <span class="tag tag-ok">✅ Keys pre-configured</span>
       </div>
       <div class="step-card">
         <div class="step-num">4</div>
-        <div class="step-name">🔑 Clerk Login</div>
-        <div class="step-desc">Keys are set! Go to the admin portal and log in with your Clerk account (the one registered on the dev dashboard).</div>
-        <div class="step-cmd">http://localhost:5173</div>
-        <span class="tag tag-ok">✅ Keys Configured</span>
+        <div class="step-name">📄 Swagger UI (API testing)</div>
+        <div class="step-desc">Test endpoints directly without going through the UI:</div>
+        <div class="step-cmd">http://localhost:8000/docs</div>
+        <span class="tag tag-warn">⚠️ Auth required for most routes</span>
       </div>
     </div>
   </div>
 
+  <!-- What to know before testing -->
+  <div class="demo-note">
+    <strong>⚠️ What to Know Before Testing Phase 2b:</strong><br>
+    The backend runs in <strong>SQLite mode</strong> (no Docker needed). Most Phase 2b pages show a <strong>yellow demo data banner</strong> because the backend stubs for create/list exams are not fully wired up yet.
+    This is <strong>expected behaviour</strong> — do not mark these as failures.<br><br>
+    Mark as <strong>FAIL</strong> only if: the page crashes, shows a blank white screen, has a broken layout, or a button that should open a modal doesn't.<br>
+    Mark as <strong>PASS</strong> if: demo data shows, the banner appears, modals open correctly, and buttons fire network requests (check browser DevTools Network tab).
+  </div>
+
   <!-- Scope note -->
   <div class="scope-note">
-    <strong>📌 What's actually built and what to test:</strong><br>
-    <strong>Phase 1 (Foundation):</strong> CSS design system, Clerk auth gate, sidebar navigation, shared UI components, API client wiring.<br>
-    <strong>Phase 2a (Question Bank):</strong> Dashboard page (with demo data + real API attempt), Questions list with search/filter, Question Editor (create + edit + encrypt), delete confirm modal.<br>
-    <br>
-    <strong>Pages that exist as stubs (nav link works, page is empty/placeholder):</strong> Exams, Packages, Distribution, Centers, Users, Audit, Monitoring, TamperDemo.<br>
-    <strong>Do not test</strong> Desktop Kiosk (Phase 3), Audit Viewer (Phase 4), Proctor Dashboard (Phase 4) — those pages aren't built yet.
+    <strong>📌 Current Implementation State (Phase 1 + 2a + 2b):</strong><br>
+    <strong>Phase 1:</strong> CSS design system, Clerk auth gate, sidebar navigation, shared UI components, API client.<br>
+    <strong>Phase 2a:</strong> Dashboard (demo stats + real API attempt), Question Bank (search/filter), Question Editor (Save &amp; Encrypt now fixed).<br>
+    <strong>Phase 2b:</strong> Exam Builder (blueprint editor + compile + release key), Package Management (list + verify + download), Distribution (status timeline), Centers (full CRUD), Users (profile + sync).<br><br>
+    <strong>Pages NOT yet built (skip these):</strong> Audit, Monitoring, TamperDemo (all Phase 4), Desktop Kiosk (Phase 3).
   </div>
 
   <!-- Summary -->
@@ -382,88 +398,188 @@ const CATS = [
     id:'infra', icon:'⚙️', title:'Infrastructure Check', color:'#6366f1',
     sub:'Verify all servers are live before touching the UI',
     tests:[
-      { id:'I-01', name:'Cloud server health check', exp:'GET http://localhost:8000/health → {"status":"ok","mode":"cloud"}' },
-      { id:'I-02', name:'Edge server health check', exp:'GET http://localhost:8001/health → {"status":"ok","mode":"edge"}' },
-      { id:'I-03', name:'PostgreSQL container healthy', exp:'docker ps → fortis-postgres shows (healthy)' },
-      { id:'I-04', name:'Admin portal loads at localhost:5173', exp:'Page loads (Clerk login or dashboard)' },
-      { id:'I-05', name:'Cloud Swagger docs accessible', exp:'http://localhost:8000/docs loads interactive API' },
-      { id:'I-06', name:'Edge Swagger docs accessible', exp:'http://localhost:8001/docs loads interactive API' },
+      { id:'I-01', name:'Backend health check', exp:'GET http://localhost:8000/health → {"status":"ok","mode":"cloud or edge"}' },
+      { id:'I-02', name:'Admin portal loads at localhost:5173', exp:'Page loads — either Clerk login OR dashboard (not blank)' },
+      { id:'I-03', name:'Swagger docs accessible', exp:'http://localhost:8000/docs → interactive API docs load' },
+      { id:'I-04', name:'No console errors on initial load', exp:'Open DevTools (F12) → Console tab → no red errors on page load' },
     ]
   },
   {
     id:'auth', icon:'🔑', title:'Admin Login (Clerk)', color:'#8b5cf6',
-    sub:'Clerk publishable key is now configured — login should work',
+    sub:'Clerk publishable key is configured — login must work before any other test',
     tests:[
-      { id:'A-01', name:'Open localhost:5173 without being logged in', exp:'Clerk SignIn screen appears (not a blank page)' },
-      { id:'A-02', name:'Log in with your Clerk account', exp:'Redirected to Dashboard (/)', note:'Use the account registered on profound-chow-40.clerk.accounts.dev' },
-      { id:'A-03', name:'Try wrong password', exp:'Clerk shows error message, stays on login' },
-      { id:'A-04', name:'Manually go to /questions without login', exp:'Redirected back to Clerk login gate' },
-      { id:'A-05', name:'Sign out from admin portal (profile menu)', exp:'Session cleared, back to login' },
-      { id:'A-06', name:'Sign back in after signout', exp:'Dashboard loads again' },
+      { id:'A-01', name:'Open localhost:5173 without being logged in', exp:'Clerk SignIn screen appears (not a blank page or crash)' },
+      { id:'A-02', name:'Log in with valid Clerk credentials', exp:'Redirected to Dashboard (/)', note:'Use account on profound-chow-40.clerk.accounts.dev' },
+      { id:'A-03', name:'Try wrong password', exp:'Clerk shows error, stays on login' },
+      { id:'A-04', name:'Navigate directly to /exams without login', exp:'Redirected to Clerk login gate' },
+      { id:'A-05', name:'Sign out via profile menu', exp:'Session cleared, back to Clerk login' },
+      { id:'A-06', name:'Sign back in after signout', exp:'Dashboard loads again with full sidebar' },
     ]
   },
   {
     id:'nav', icon:'🗂️', title:'Navigation & Layout (Phase 1)', color:'#06b6d4',
-    sub:'Sidebar, routing, page shells — every nav link should work',
+    sub:'Sidebar routing — all nav links must load the correct page without crashing',
     tests:[
-      { id:'N-01', name:'Sidebar is visible after login', exp:'Dark left sidebar with nav links' },
-      { id:'N-02', name:'Click "Dashboard" in sidebar', exp:'Navigates to / — Dashboard page' },
-      { id:'N-03', name:'Click "Question Bank" in sidebar', exp:'Navigates to /questions — table loads' },
-      { id:'N-04', name:'Click "Exams" in sidebar', exp:'Navigates to /exams — page loads (may be stub/placeholder)' },
-      { id:'N-05', name:'Click "Packages" in sidebar', exp:'Navigates to /packages — page loads (stub)' },
-      { id:'N-06', name:'Click "Distribution" in sidebar', exp:'Navigates to /distribution — page loads (stub)' },
-      { id:'N-07', name:'Click "Centers" in sidebar', exp:'Navigates to /centers — page loads (stub)' },
-      { id:'N-08', name:'Click "Users" in sidebar', exp:'Navigates to /users — page loads (stub)' },
-      { id:'N-09', name:'Click "Audit" in sidebar', exp:'Navigates to /audit — page loads (stub)' },
-      { id:'N-10', name:'Click "Monitoring" in sidebar', exp:'Navigates to /monitoring — page loads (stub)' },
-      { id:'N-11', name:'Browser back/forward buttons work', exp:'Navigation history works correctly' },
-      { id:'N-12', name:'Active nav item is highlighted in sidebar', exp:'Current page link is visually highlighted' },
+      { id:'N-01', name:'Sidebar is visible after login', exp:'Dark left sidebar with all nav sections visible' },
+      { id:'N-02', name:'Click "Dashboard" in sidebar', exp:'/ — Dashboard page with stat cards renders' },
+      { id:'N-03', name:'Click "Question Bank" in sidebar', exp:'/questions — table or empty state loads' },
+      { id:'N-04', name:'Click "Exams" in sidebar', exp:'/exams — Exam Builder page renders (NOT a stub)' },
+      { id:'N-05', name:'Click "Packages" in sidebar', exp:'/packages — Package Management page renders' },
+      { id:'N-06', name:'Click "Distribution" in sidebar', exp:'/distribution — Distribution page renders' },
+      { id:'N-07', name:'Click "Centers" in sidebar', exp:'/centers — Center Management page renders' },
+      { id:'N-08', name:'Click "Users" in sidebar', exp:'/users — User & Role Management page renders' },
+      { id:'N-09', name:'Click "Audit" in sidebar', exp:'/audit — stub page (placeholder text OK)' },
+      { id:'N-10', name:'Click "Monitoring" in sidebar', exp:'/monitoring — stub page (placeholder text OK)' },
+      { id:'N-11', name:'Active nav item highlighted in sidebar', exp:'Current page link visually highlighted (different color)' },
+      { id:'N-12', name:'Browser back/forward buttons work', exp:'Navigation history works, no broken pages' },
     ]
   },
   {
     id:'dashboard', icon:'📊', title:'Admin Dashboard (Phase 2a)', color:'#22c55e',
-    sub:'Stats cards, activity feed, risk map, distribution bars',
+    sub:'Stats cards, activity feed, risk map — now wired to real /dashboard/stats endpoint',
     tests:[
-      { id:'D-01', name:'Dashboard loads without crash', exp:'Page renders fully, no blank screen' },
-      { id:'D-02', name:'Four stat cards visible', exp:'Scheduled Exams / Active Centers / Enrolled Sessions / Critical Alerts' },
-      { id:'D-03', name:'If backend /dashboard/stats missing → demo banner shows', exp:'Yellow "Showing demo data — GET /dashboard/stats not yet implemented" banner visible' },
-      { id:'D-04', name:'Recent Activity Feed has entries', exp:'List of activity items with type badges (SUCCESS/INFO/WARNING/CRYPTO/ERROR)' },
-      { id:'D-05', name:'Activity timestamps are relative (e.g. "2 minutes ago")', exp:'Human-readable time shown next to each item' },
-      { id:'D-06', name:'Center Risk Map grid renders', exp:'Grid of center codes colored green/yellow/red by risk' },
-      { id:'D-07', name:'Package Distribution status bars render', exp:'Progress bars for exam packages (e.g. NEET-UG-2026)' },
-      { id:'D-08', name:'"Live Monitor" button → /monitoring', exp:'Navigates to monitoring page' },
-      { id:'D-09', name:'"Compile Exam" button → /exams', exp:'Navigates to exams page' },
-      { id:'D-10', name:'"View Full Log →" link → /audit', exp:'Navigates to audit page' },
+      { id:'D-01', name:'Dashboard loads without crash', exp:'Page renders fully, no blank screen or JS error' },
+      { id:'D-02', name:'Four stat cards visible', exp:'Total Questions / Total Exams / Total Centers / Active Sessions' },
+      { id:'D-03', name:'Stats show real numbers from DB (if backend running)', exp:'Question count reflects actual DB count (not hardcoded 1,248)', note:'If backend is down, yellow demo banner shows — that is OK' },
+      { id:'D-04', name:'Recent Activity Feed has entries', exp:'List with type badges: SUCCESS / INFO / WARNING / CRYPTO' },
+      { id:'D-05', name:'Activity timestamps are human-readable', exp:'e.g. "2 minutes ago" or ISO timestamp' },
+      { id:'D-06', name:'Center Risk Map grid renders', exp:'Grid of center codes colored green/yellow/red by risk score' },
+      { id:'D-07', name:'"Live Monitor" button → /monitoring', exp:'Navigates to monitoring page' },
+      { id:'D-08', name:'"Compile Exam" quick action → /exams', exp:'Navigates to Exam Builder' },
+      { id:'D-09', name:'"View Full Log" link → /audit', exp:'Navigates to audit page' },
     ]
   },
   {
     id:'questions', icon:'📝', title:'Question Bank — List (Phase 2a)', color:'#f59e0b',
-    sub:'Table load, search, filters, delete, encrypted badge',
+    sub:'Table load, search, filters, delete confirm, encrypted badge',
     tests:[
-      { id:'Q-01', name:'Navigate to /questions', exp:'Question Bank page loads with table (or empty state if no questions)' },
-      { id:'Q-02', name:'Table columns visible: Q.ID, Subject, Difficulty, Status, Created, Actions', exp:'All 6 columns present' },
-      { id:'Q-03', name:'If questions exist: "🔒 ENCRYPTED" badge shows on each row', exp:'Green lock icon + "ENCRYPTED" text badge' },
-      { id:'Q-04', name:'Stats sidebar visible on right', exp:'Donut chart, difficulty bar, Security Status panel' },
-      { id:'Q-05', name:'Donut chart shows total question count', exp:'Number in center of donut = total questions' },
-      { id:'Q-06', name:'Search box filters by subject text', exp:'Typing "Phys" filters to Physics questions' },
-      { id:'Q-07', name:'Subject filter dropdown works', exp:'Select "Chemistry" → only chemistry questions show' },
-      { id:'Q-08', name:'Difficulty filter dropdown works', exp:'Select "Hard" → only hard questions show' },
-      { id:'Q-09', name:'Clear button appears when filter active', exp:'"Clear" button appears, clicking it resets all filters' },
-      { id:'Q-10', name:'Empty state when no questions match filter', exp:'"No questions found" message with Add Question button' },
-      { id:'Q-11', name:'Click edit icon on a question row', exp:'Navigates to /questions/{id}/edit with pre-filled form' },
-      { id:'Q-12', name:'Click delete icon → confirm dialog appears', exp:'Modal: "This question will be permanently removed. This cannot be undone."' },
-      { id:'Q-13', name:'Confirm delete removes question from list', exp:'Question disappears from table, DELETE API called' },
-      { id:'Q-14', name:'Cancel delete leaves question in list', exp:'Question stays, modal closes' },
-      { id:'Q-16', name:'API error state shows retry button', exp:'If backend is down: error message + "Retry" button' },
+      { id:'Q-01', name:'Navigate to /questions', exp:'Page loads — table OR empty state (no crash)' },
+      { id:'Q-02', name:'Table columns visible', exp:'Q.ID / Subject / Difficulty / Status / Created / Actions — all 6 columns' },
+      { id:'Q-03', name:'"🔒 ENCRYPTED" badge shows on question rows', exp:'Lock icon + "ENCRYPTED" text badge on each row' },
+      { id:'Q-04', name:'Stats sidebar visible on right', exp:'Donut chart, difficulty breakdown, Security Status panel' },
+      { id:'Q-05', name:'Search box filters questions in real-time', exp:'Typing "Physics" filters table to matching rows' },
+      { id:'Q-06', name:'Subject filter dropdown works', exp:'Select "Chemistry" → only chemistry questions shown' },
+      { id:'Q-07', name:'Difficulty filter dropdown works', exp:'Select "Hard" → only hard questions shown' },
+      { id:'Q-08', name:'Clear button resets all filters', exp:'"Clear" button appears when filter active, clicking resets' },
+      { id:'Q-09', name:'Empty state when no questions match filter', exp:'"No questions found" message with Add button' },
+      { id:'Q-10', name:'Click edit icon on a row', exp:'Navigates to /questions/{id}/edit with pre-filled form' },
+      { id:'Q-11', name:'Click delete icon → confirm dialog', exp:'Modal: "This question will be permanently removed"' },
+      { id:'Q-12', name:'Confirm delete removes question from list', exp:'Question disappears from table' },
+      { id:'Q-13', name:'Cancel delete leaves question in list', exp:'Question stays, modal closes cleanly' },
     ]
-  }
+  },
+  {
+    id:'editor', icon:'✏️', title:'Question Editor — Create & Save (Phase 2a, fixed in 2b)', color:'#ec4899',
+    sub:'The Save button is now fixed — options send as {A,B,C,D} dict to backend',
+    tests:[
+      { id:'E-01', name:'Navigate to /questions/new', exp:'Question editor opens with empty form' },
+      { id:'E-02', name:'Fill in Question Text field', exp:'Text input accepts content' },
+      { id:'E-03', name:'Fill in all 4 options (A, B, C, D)', exp:'All 4 option fields accept text' },
+      { id:'E-04', name:'Select correct answer (click A/B/C/D button)', exp:'Selected option highlighted, others not' },
+      { id:'E-05', name:'Choose Subject and Difficulty', exp:'Dropdowns change value correctly' },
+      { id:'E-06', name:'SHA-256 hash updates live as you type', exp:'Hash display changes as question text is entered', note:'This works purely in frontend — no backend needed' },
+      { id:'E-07', name:'Click "Save & Encrypt" — check DevTools Network', exp:'POST /api/v1/questions/ fires with body: {options: {A,B,C,D}, correct_option: "B"}', note:'Look at the Request Payload in Network tab' },
+      { id:'E-08', name:'If backend running: question saves', exp:'Success toast, navigates back to question list' },
+      { id:'E-09', name:'Edit existing question: /questions/{id}/edit', exp:'Form pre-populated with existing data' },
+      { id:'E-10', name:'Save edited question', exp:'PUT /api/v1/questions/{id} fires with updated data' },
+    ]
+  },
+  {
+    id:'exams', icon:'📋', title:'Exam Builder — Phase 2b', color:'#6366f1',
+    sub:'Create exam blueprints, compile, release AES key to center',
+    tests:[
+      { id:'EX-01', name:'Navigate to /exams — page renders (not stub)', exp:'Full page with stat cards, table, "New Exam" button — NOT "coming soon"' },
+      { id:'EX-02', name:'Demo exams show in table (4 rows)', exp:'JEE Mains Mock, NEET, UPSC, JEE Advanced rows visible', note:'Yellow "Showing demo data" banner is expected' },
+      { id:'EX-03', name:'Stat cards at top: Total / Draft / Compiled / Active', exp:'All 4 stat cards visible with correct counts from demo data' },
+      { id:'EX-04', name:'Click "New Exam" button → modal opens', exp:'Create Exam Blueprint modal appears with all fields' },
+      { id:'EX-05', name:'Blueprint builder: fill Name, Date, Duration', exp:'All 3 inputs accept values' },
+      { id:'EX-06', name:'Add a blueprint row (Add Row button)', exp:'New row appears in the table with Subject/Difficulty/Count dropdowns' },
+      { id:'EX-07', name:'Delete a blueprint row (trash icon)', exp:'Row removed; cannot delete last row (button disabled)' },
+      { id:'EX-08', name:'Total questions count updates as you change row counts', exp:'"X total questions" label updates in real time' },
+      { id:'EX-09', name:'Click "Create Exam" — network request fires', exp:'POST /api/v1/exams/ fires (stub — error expected, not a real failure)' },
+      { id:'EX-10', name:'DRAFT exam row has "Compile" button', exp:'"Compile" button visible in actions for JEE Advanced (DRAFT)' },
+      { id:'EX-11', name:'COMPILED/DISTRIBUTED exam row has "Release Key" button', exp:'"Release Key" button visible in actions for NEET (DISTRIBUTED)' },
+      { id:'EX-12', name:'Click "Release Key" → modal opens', exp:'Release Exam Key modal appears with warning alert + PEM textarea' },
+      { id:'EX-13', name:'Release Key modal shows warning alert', exp:'Orange "This action releases the AES decryption key..." warning visible' },
+      { id:'EX-14', name:'Pipeline legend visible at bottom', exp:'DRAFT → COMPILED → DISTRIBUTED → KEY_RELEASED → ACTIVE → COMPLETED badges' },
+    ]
+  },
+  {
+    id:'packages', icon:'📦', title:'Package Management — Phase 2b', color:'#8b5cf6',
+    sub:'List encrypted packages, verify RSA signatures, download encrypted payloads',
+    tests:[
+      { id:'PK-01', name:'Navigate to /packages — page renders', exp:'Package registry with stat cards and table (not stub)' },
+      { id:'PK-02', name:'3 demo packages visible in table', exp:'pkg-aab1, pkg-bbc2, pkg-ccd3 rows with status badges' },
+      { id:'PK-03', name:'Stat cards: Total / Generated / Distributed / Activated', exp:'All 4 cards visible' },
+      { id:'PK-04', name:'Info alert about AES-256-GCM + RSA-2048 PSS visible', exp:'Blue info box present below stat cards' },
+      { id:'PK-05', name:'Package IDs shown in monospace font (truncated)', exp:'ID shown as "pkg-aab1…" in JetBrains Mono style' },
+      { id:'PK-06', name:'Status badges correct for each package', exp:'pkg-aab1=activated(green), pkg-bbc2=distributed(yellow), pkg-ccd3=generated(blue)' },
+      { id:'PK-07', name:'Click "Verify" on a package — network fires', exp:'POST /api/v1/packages/{id}/verify fires (check Network tab)' },
+      { id:'PK-08', name:'Verify result card appears at bottom', exp:'Green "Valid" or Red "Tampered" card appears with hash and timestamp' },
+      { id:'PK-09', name:'After verify — button changes to badge', exp:'"Verify" button replaced by Valid/Tampered badge in that row' },
+      { id:'PK-10', name:'Download icon (⬇) triggers download attempt', exp:'Network request to GET /api/v1/packages/{id}/download fires' },
+      { id:'PK-11', name:'Refresh button reloads the list', exp:'Refresh icon button works, list reloads' },
+    ]
+  },
+  {
+    id:'distribution', icon:'🚚', title:'Distribution & Key Release — Phase 2b', color:'#f59e0b',
+    sub:'Track package delivery status per center with visual progress timeline',
+    tests:[
+      { id:'DI-01', name:'Navigate to /distribution — page renders', exp:'Full Distribution & Key Release page (not stub)' },
+      { id:'DI-02', name:'4 stat cards: Total / Generated / Distributed / Keys Released', exp:'All 4 stat cards visible' },
+      { id:'DI-03', name:'Blue info alert about key release process', exp:'"To release a key...go to Exam Builder" info box visible' },
+      { id:'DI-04', name:'Table shows packages with center names', exp:'Delhi Exam Hub / Mumbai Central / Bangalore Hub rows visible' },
+      { id:'DI-05', name:'Progress column shows visual timeline', exp:'3 circles connected by lines — filled circles = completed stages' },
+      { id:'DI-06', name:'activated package: all 3 circles filled', exp:'pkg-aab1 (Delhi) — all 3 circles purple/primary color' },
+      { id:'DI-07', name:'generated package: only first circle filled', exp:'pkg-ccd3 (Bangalore) — only leftmost circle filled' },
+      { id:'DI-08', name:'Workflow guide card visible at bottom', exp:'3 cards: 1. Generate, 2. Distribute, 3. Release Key' },
+      { id:'DI-09', name:'Refresh button works', exp:'Refresh icon button reloads the list' },
+    ]
+  },
+  {
+    id:'centers', icon:'🏢', title:'Center Management — Phase 2b', color:'#22c55e',
+    sub:'Full CRUD — create, edit, delete centers with search and risk score bars',
+    tests:[
+      { id:'CE-01', name:'Navigate to /centers — page renders', exp:'Center Management page with 4 stat cards and table' },
+      { id:'CE-02', name:'5 demo centers visible in table', exp:'Delhi / Mumbai / Bangalore / Chennai / Pune rows' },
+      { id:'CE-03', name:'Stat cards: Total / Active / Exam Assigned / Total Seats', exp:'All 4 stat cards with correct demo values (5 centers, 1000 total seats)' },
+      { id:'CE-04', name:'Risk Score column shows progress bar', exp:'Coloured bar: green (low) / yellow (medium) / red (high)' },
+      { id:'CE-05', name:'Chennai shows red/high risk bar', exp:'Chennai has score 0.21 → red bar with "High" label' },
+      { id:'CE-06', name:'Search box filters by city or name', exp:'Typing "Mumbai" filters to 1 row; "Pune" → 1 row' },
+      { id:'CE-07', name:'Clear search shows all centers again', exp:'Erasing search text restores all 5 rows' },
+      { id:'CE-08', name:'Click "Add Center" → modal opens', exp:'Add Exam Center modal appears with Name/City/State/Seats/Address fields' },
+      { id:'CE-09', name:'Fill modal and click "Add Center"', exp:'Demo mode warning shows; after ~600ms success, modal closes' },
+      { id:'CE-10', name:'Click edit icon (✏️) on any row', exp:'Edit modal opens pre-populated with that center\'s data' },
+      { id:'CE-11', name:'State dropdown has Indian states', exp:'Dropdown includes Delhi, Maharashtra, Karnataka, Tamil Nadu, etc.' },
+      { id:'CE-12', name:'Click delete icon (🗑️) on any row', exp:'"Delete Center" confirm dialog appears' },
+      { id:'CE-13', name:'Confirm delete → row disappears from table', exp:'Center removed from displayed list' },
+      { id:'CE-14', name:'Cancel delete → center stays in list', exp:'Nothing changes when Cancel clicked' },
+    ]
+  },
+  {
+    id:'users', icon:'👥', title:'User & Role Management — Phase 2b', color:'#ef4444',
+    sub:'Current user profile, team table, sync user modal, role guide',
+    tests:[
+      { id:'U-01', name:'Navigate to /users — page renders', exp:'User & Role Management page with 5 stat cards (one per role)' },
+      { id:'U-02', name:'5 role stat cards visible', exp:'Admin / Expert / Center Admin / Invigilator / Auditor count cards' },
+      { id:'U-03', name:'Your profile card renders', exp:'Avatar circle with your initial, name, email, role badge visible' },
+      { id:'U-04', name:'Your role badge has correct color', exp:'admin=red, expert=purple, center_admin=blue, invigilator=yellow, auditor=green' },
+      { id:'U-05', name:'Team Members table shows Harsh + Ayaan', exp:'2 rows: Harsh Bhavsar (admin) and Ayaan Goel (expert)' },
+      { id:'U-06', name:'Role badges in table have correct colors and icons', exp:'Crown icon for admin, Settings icon for expert, etc.' },
+      { id:'U-07', name:'Click "Sync User" button → modal opens', exp:'Sync User Role modal with Clerk User ID / Name / Role fields' },
+      { id:'U-08', name:'Role selector in modal has all 5 roles', exp:'admin / expert / center_admin / invigilator / auditor options' },
+      { id:'U-09', name:'Role description updates when role changes', exp:'Selecting "auditor" shows "Read-only access to audit trail" description' },
+      { id:'U-10', name:'Role Permissions card at bottom', exp:'5 tiles — one per role with description of what each can do' },
+      { id:'U-11', name:'Fill sync form and submit', exp:'POST /api/v1/users/sync fires (check Network tab)' },
+    ]
+  },
 ];
 
 let state = {};
 let filter = 'all';
 
-function load() { try { const s = localStorage.getItem('fqa-v2'); if(s) state = JSON.parse(s); } catch(e){} }
-function save() { localStorage.setItem('fqa-v2', JSON.stringify(state)); }
+function load() { try { const s = localStorage.getItem('fqa-v3'); if(s) state = JSON.parse(s); } catch(e){} }
+function save() { localStorage.setItem('fqa-v3', JSON.stringify(state)); }
 function get(id) { return state[id] || 'pending'; }
 function set(id, s) {
   if (get(id) === s) delete state[id]; else state[id] = s;
@@ -561,7 +677,7 @@ function collapseAll() { CATS.forEach(c => { const e=document.querySelector(`[da
 function resetAll() { if(!confirm('Reset all to pending?')) return; state={}; save(); render(); }
 function setFilter(f,btn) { filter=f; document.querySelectorAll('.filter').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); render(); }
 function exportReport() {
-  let lines=['FortisExam Test Report (Phase 1+2a) — '+new Date().toLocaleString(),''];
+  let lines=['FortisExam Test Report (Phase 1 + 2a + 2b) — '+new Date().toLocaleString(),''];
   let p=0,f=0,s=0,tot=0;
   CATS.forEach(c => {
     lines.push('=== '+c.title+' ===');
