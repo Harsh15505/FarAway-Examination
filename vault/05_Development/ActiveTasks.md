@@ -60,7 +60,7 @@
 
 | Task | Track | Assignee | Notes |
 |---|---|---|---|
-| Frontend Phase 4: Audit & Proctor Dashboard | Frontend | AI Agent | Audit Explorer, Chain Verification, Live Monitoring |
+| ~~Frontend Phase 4: Audit & Proctor Dashboard~~ | Frontend | AI Agent | ✅ Audit.tsx (event log, chain verify, hash diagram, JSON/CSV export), Monitoring.tsx (live feed, severity tabs, acknowledge, auto-refresh, session panel, alert breakdown), TamperDemo.tsx (interactive step-through), api.ts type fixes, CSS utilities. tsc: 0 errors, vite build: 2.63s |
 | Backend GAP-4: List active sessions | Backend | ayaan-goel | `GET /exam/sessions` for proctor |
 | Backend GAP-5: Acknowledge alert | Backend | ayaan-goel | `PATCH /monitoring/events/{id}/acknowledge` |
 

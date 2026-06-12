@@ -478,18 +478,19 @@ export interface AuditChainResponse {
 }
 
 export interface AuditEvent {
-  id: number;
+  id: string;                   // UUID string from backend
   sequence: number;
   event_type: string;
   actor_id: string;
   actor_role?: string;
   target_id?: string;
   exam_id?: string;
-  payload: Record<string, unknown>;
+  payload: string;              // JSON string from backend (serialized)
   payload_hash: string;
   previous_hash: string;
   event_hash: string;
   created_at: string;
+  synced?: boolean;
 }
 
 /** Matches common/audit.py AuditListResponse */
@@ -498,13 +499,18 @@ export interface AuditListResponse {
   total: number;
   page: number;
   page_size: number;
+  filter_event_type?: string;
+  filter_exam_id?: string;
 }
 
-/** Matches common/audit.py ChainVerificationResult */
+/** Matches common/audit.py ChainVerificationResult exactly */
 export interface ChainVerificationResult {
-  valid: boolean;
+  is_valid: boolean;            // backend field is is_valid (not valid)
   total_events: number;
-  broken_at?: number;
+  verified_events: number;
+  first_broken_at_sequence?: number | null;
+  broken_event_id?: string | null;
+  failure_reason?: string | null;
   message: string;
 }
 

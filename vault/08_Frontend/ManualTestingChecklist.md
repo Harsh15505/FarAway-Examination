@@ -1,7 +1,7 @@
 # FortisExam — Manual Testing Status & Bug Report
 
 > **Last Updated:** 2026-06-12
-> **Tested Phases:** Phase 1 (Foundation), Phase 2a (Question Bank), Phase 2b (Exams / Packages / Distribution / Centers / Users)
+> **Tested Phases:** Phase 1–4 (Foundation → Question Bank → Exams/Packages/Distribution/Centers/Users → Desktop Kiosk → Audit/Monitoring/TamperDemo)
 > **Testers:** QA Team
 
 ---
@@ -11,16 +11,16 @@
 Before running any test:
 
 ```bash
-# Terminal 1 — Backend (from d:\DelhiHackathon)
+# Terminal 1 — Backend (from project root)
 python -m uvicorn server.app.main:app --host 0.0.0.0 --port 8000 --reload
 
-# Terminal 2 — Frontend (from d:\DelhiHackathon\web)
+# Terminal 2 — Frontend (from web/)
 npm run dev
 ```
 
 Then open the **interactive checklist** in your browser:
 ```
-d:\DelhiHackathon\vault\06_Testing\TESTING_CHECKLIST.html
+vault\06_Testing\TESTING_CHECKLIST.html
 ```
 > The HTML checklist has Pass / Fail / Skip buttons with progress tracking, filters, and a copy-report feature. Use it to log results.
 
@@ -35,10 +35,8 @@ d:\DelhiHackathon\vault\06_Testing\TESTING_CHECKLIST.html
 ## ⚠️ Important Context for Testers
 
 ### Demo Data vs. Real Data
-Most Phase 2b pages show a **yellow banner** at the top:
-> "Showing demo data — backend DB not running."
 
-This is **expected** and is NOT a bug. The pages fall back to pre-defined demo data when the backend API returns an error. When the backend is running and the DB has data, the yellow banner disappears and real data loads.
+Most Phase 2b and Phase 4 pages show a **yellow banner** at the top when the backend API is not available.
 
 **Rule for testers:**
 - ✅ PASS: Page renders with demo data + yellow banner, modals open, buttons work
@@ -52,8 +50,6 @@ This is **expected** and is NOT a bug. The pages fall back to pre-defined demo d
 **Status:** ✅ Working (GAP-6 now implemented)
 **Frontend File:** `web/src/pages/Dashboard.tsx`
 **Wired Endpoints:** `GET /api/v1/dashboard/stats`
-
-**What changed:** Backend `GET /dashboard/stats` endpoint was added in Phase 2b — Dashboard now loads real question/exam counts from the DB instead of hardcoded demo numbers.
 
 **Test checklist:** D-01 through D-09 in `TESTING_CHECKLIST.html`
 
@@ -78,8 +74,6 @@ This is **expected** and is NOT a bug. The pages fall back to pre-defined demo d
 - `GET /api/v1/questions/{id}` — load for edit
 - `PUT /api/v1/questions/{id}` — update
 
-**What was fixed:** The backend schema mismatch is resolved. Frontend sends `options: {A,B,C,D}` dict and `correct_option: "B"` (letter). Backend now correctly accepts and converts these formats.
-
 **Test checklist:** E-01 through E-10 in `TESTING_CHECKLIST.html`
 
 ---
@@ -93,12 +87,6 @@ This is **expected** and is NOT a bug. The pages fall back to pre-defined demo d
 - `POST /api/v1/exams/{id}/compile` — compile (backend stub)
 - `POST /api/v1/exams/{id}/release-key` — ✅ **FULLY IMPLEMENTED** (RSA key wrapping works)
 
-**What to test:**
-- Blueprint builder UI (Add Row, remove row, counts update)
-- Create exam modal opens and fires a network request
-- Release Key modal opens correctly with RSA PEM textarea and warning alert
-- Demo exam table renders with correct status badges
-
 **Test checklist:** EX-01 through EX-14 in `TESTING_CHECKLIST.html`
 
 ---
@@ -111,12 +99,6 @@ This is **expected** and is NOT a bug. The pages fall back to pre-defined demo d
 - `POST /api/v1/packages/{id}/verify` — ✅ **REAL** (RSA signature verification)
 - `GET /api/v1/packages/{id}/download` — ✅ **REAL** (encrypted payload download)
 
-**What to test:**
-- Package list loads with demo data
-- Click "Verify" — network request fires, result card appears at bottom
-- Download icon triggers file save
-- After verify, row button changes to Valid/Tampered badge
-
 **Test checklist:** PK-01 through PK-11 in `TESTING_CHECKLIST.html`
 
 ---
@@ -126,11 +108,6 @@ This is **expected** and is NOT a bug. The pages fall back to pre-defined demo d
 **Frontend File:** `web/src/pages/Distribution.tsx`
 **Wired Endpoints:**
 - `GET /api/v1/distribution/packages` — list packages with status (demo fallback)
-
-**What to test:**
-- 3 demo packages with center names show in table
-- Progress timeline circles render correctly (filled = completed stage)
-- Workflow guide card visible at bottom (3 steps)
 
 **Test checklist:** DI-01 through DI-09 in `TESTING_CHECKLIST.html`
 
@@ -144,14 +121,6 @@ This is **expected** and is NOT a bug. The pages fall back to pre-defined demo d
 - `POST /api/v1/centers` — ⚠️ GAP-2 (not yet built, demo simulates)
 - `PUT /api/v1/centers/{id}` — ⚠️ GAP-3 (not yet built)
 
-**What to test:**
-- 5 demo centers load with search, risk bars, seat counts
-- Search box filters live by name or city
-- Add Center modal opens with all fields (Indian states dropdown)
-- Edit modal opens pre-populated
-- Delete confirm dialog works
-- Demo mode badge shows in modal
-
 **Test checklist:** CE-01 through CE-14 in `TESTING_CHECKLIST.html`
 
 ---
@@ -163,36 +132,111 @@ This is **expected** and is NOT a bug. The pages fall back to pre-defined demo d
 - `GET /api/v1/users/me` — ✅ **REAL** (returns from Clerk JWT claims)
 - `POST /api/v1/users/sync` — ✅ **REAL** (syncs Clerk user to local DB)
 
-**What to test:**
-- Your Clerk profile card renders with correct name and role
-- Team members table shows Harsh + Ayaan with role badges
-- Sync User modal opens with Clerk ID / Name / Role fields
-- Role description updates when role selector changes
-- Role Permissions guide card at bottom has all 5 roles
-
 **Test checklist:** U-01 through U-11 in `TESTING_CHECKLIST.html`
 
 ---
 
-## 📋 Known Issues & Notes
+## 9. Audit Explorer (`/audit`) — Phase 4 ✅ NEW
+**Status:** ✅ Complete — Real API wired with demo fallback
+**Frontend File:** `web/src/pages/Audit.tsx`
+**Wired Endpoints:**
+- `GET /api/v1/audit/events?event_type=&exam_id=&actor_id=&page=&page_size=` — list audit events
+- `POST /api/v1/audit/verify?exam_id=` — verify full chain integrity
+- `GET /api/v1/audit/export/{exam_id}?fmt=json|csv` — download audit chain export
+- `GET /api/v1/audit/stats?exam_id=` — chain statistics
+
+**What to test:**
+
+| Test ID | Test | Expected |
+|---|---|---|
+| AU-01 | Navigate to `/audit` | Page loads — 4 stat cards + event table visible (no white screen) |
+| AU-02 | Events table has data | 7 demo events visible (or real events if backend running) |
+| AU-03 | Click a table row | Row expands showing full hash values, payload JSON, and timestamp |
+| AU-04 | Click again to collapse row | Row collapses back |
+| AU-05 | Event Type filter dropdown | Select "ANOMALY_DETECTED" → table filters to only those events |
+| AU-06 | Search box works | Type "CANDIDATE" → matching rows shown |
+| AU-07 | Clear button resets filters | All events show again |
+| AU-08 | Switch to "Chain Verification" tab | Verification panel renders with description |
+| AU-09 | Click "Verify Chain" button | Result card appears: green ✅ Valid OR red ❌ Broken with details |
+| AU-10 | Verification shows: total events, verified count | Two/three stat boxes inside result card |
+| AU-11 | Hash chain visualization below verify | Last 5 events shown as chain nodes connected by vertical line |
+| AU-12 | Switch to "Export" tab | Export form renders with Exam ID field + format radios |
+| AU-13 | Enter exam ID + click Download | File download triggers (.json or .csv) |
+| AU-14 | Demo banner shows if backend down | Yellow "Demo Mode" banner at top of page |
+
+---
+
+## 10. Live Monitoring (`/monitoring`) — Phase 4 ✅ NEW
+**Status:** ✅ Complete — Reads from audit chain (cloud-accessible) with demo fallback
+**Frontend File:** `web/src/pages/Monitoring.tsx`
+**Wired Endpoints:**
+- `GET /api/v1/audit/events?event_type=ANOMALY_DETECTED` — security events feed (via cloud audit chain)
+- `PATCH /api/v1/monitoring/events/{id}/acknowledge` — ⚠️ GAP-5 (optimistic UI only — backend route not yet built)
+
+**What to test:**
+
+| Test ID | Test | Expected |
+|---|---|---|
+| MO-01 | Navigate to `/monitoring` | Page loads — 4 stat cards + event feed visible (no white screen) |
+| MO-02 | Stat cards show counts | Active Sessions / Total Alerts / Unacknowledged / Critical+High |
+| MO-03 | Event feed shows demo events | Cards with severity badge (colored), alert type icon, candidate info |
+| MO-04 | Severity tabs visible | All / Critical / High / Medium / Low with counts in badges |
+| MO-05 | Click "Critical" tab | Feed filters to only CRITICAL severity events |
+| MO-06 | Click "Acknowledge" on an event | Button disappears, "Acknowledged ✓" label appears instantly |
+| MO-07 | Active Sessions panel on right | 5 session buttons with initial avatar circles, red alert count badges |
+| MO-08 | Click a session button | Event feed filters to only that session's events |
+| MO-09 | "Clear Session Filter" button appears | Click removes session filter, all events show |
+| MO-10 | Alert Breakdown by Severity card | 4 progress bars (CRITICAL/HIGH/MEDIUM/LOW) with percentages |
+| MO-11 | By Alert Type card | Icons + counts for each alert type (Multiple Faces, No Face, etc.) |
+| MO-12 | Auto-refresh toggle button | Toggle: "Auto (15s)" ↔ "Manual" — button style changes |
+| MO-13 | Last refresh timestamp visible | "Last refresh: HH:MM:SS" shown next to header |
+| MO-14 | Demo banner shows if no real events | Yellow "Demo Mode" banner at top |
+
+---
+
+## 11. Tamper Detection Demo (`/tamper`) — Phase 4 ✅ NEW
+**Status:** ✅ Complete — Real API + demo fallback (step-through interactive demo)
+**Frontend File:** `web/src/pages/TamperDemo.tsx`
+**Wired Endpoints:**
+- `POST /api/v1/audit/log` — log a real event to chain
+- `POST /api/v1/audit/verify` — verify chain integrity
+
+**What to test:**
+
+| Test ID | Test | Expected |
+|---|---|---|
+| TD-01 | Navigate to `/tamper` | Page loads — 4 stat cards + 4-step visual stepper visible |
+| TD-02 | Stat cards: Security Property / SHA-256 / Detection Rate / Alert Breakdown | All 4 visible |
+| TD-03 | Step 1: Configure Event form visible | Actor ID / Exam ID / Question Content fields |
+| TD-04 | Click "Log Event to Chain" | Step advances to 2 — success alert shows "Event logged! Sequence #X" |
+| TD-05 | Step 2: Tampering scenario visible | Red "Adversary Attack Simulation" box with diff (old/new payload) |
+| TD-06 | Click "Verify Chain Integrity" | Loading spinner, then result appears |
+| TD-07 | Result shows broken chain (demo) | ❌ Red "Tampering Detected!" card with sequence number, verified count, failure reason |
+| TD-08 | "Reset Demo" button works | All steps reset to Step 1 |
+| TD-09 | "How Hash Chaining Works" sidebar | 4 explanation cards: 📝 Event Logged / 🔗 Chain Linked / 🔍 Verification / 🚨 Tamper Alert |
+
+---
+
+## 📋 Known Issues & Notes (Phase 4)
 
 | # | Page | Issue | Severity | Status |
 |---|---|---|---|---|
-| KI-1 | Exams | `POST /exams/` returns `None` (stub) — create fires but shows error | Medium | Known — backend stub |
-| KI-2 | Packages | Verify fires but may 404 for demo package IDs that don't exist in DB | Low | Expected (demo IDs) |
+| KI-1 | Exams | `POST /exams/` returns `None` (stub) | Medium | Known — backend stub |
+| KI-2 | Packages | Verify fires but may 404 for demo package IDs | Low | Expected (demo IDs) |
 | KI-3 | Centers | All CRUD fires to GAP-1/2/3 endpoints that don't exist yet | Medium | Known — GAP pending |
-| KI-4 | Dashboard | Stats show real counts only when backend DB has data | Low | By design |
-| KI-5 | All Phase 2b | Yellow "Showing demo data" banner appears when backend returns error | Info | Expected behaviour |
+| KI-4 | Monitoring | Acknowledge button calls GAP-5 (not yet in backend) — optimistic only | Low | By design — UI updates correctly |
+| KI-5 | Monitoring | Active Sessions list is demo (GAP-4 `GET /exam/sessions` not built) | Medium | By design |
+| KI-6 | All Phase 4 | Yellow "Demo Mode" banner when backend is down | Info | Expected behaviour |
 
 ---
 
 ## 📋 Teammate Action Items
 
-### Tester 1 — Focus: Phase 1 + 2a regression
-Test categories: **Infra (I-xx), Auth (A-xx), Navigation (N-xx), Dashboard (D-xx), Question Bank (Q-xx), Question Editor (E-xx)**
+### Tester 1 — Focus: Phase 1 + 2a + 2b regression
+Test categories: **Infra (I-xx), Auth (A-xx), Navigation (N-xx), Dashboard (D-xx), Question Bank (Q-xx), Question Editor (E-xx), Exams (EX-xx), Packages (PK-xx), Distribution (DI-xx), Centers (CE-xx), Users (U-xx)**
 
-### Tester 2 — Focus: Phase 2b new pages
-Test categories: **Exam Builder (EX-xx), Packages (PK-xx), Distribution (DI-xx), Centers (CE-xx), Users (U-xx)**
+### Tester 2 — Focus: Phase 4 new security pages
+Test categories: **Audit Explorer (AU-xx), Live Monitoring (MO-xx), Tamper Demo (TD-xx)**
 
 After each session, use the **📋 Copy Report** button in the HTML checklist to copy results and paste into the team chat.
 

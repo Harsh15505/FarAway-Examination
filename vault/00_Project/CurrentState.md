@@ -33,8 +33,8 @@
 | Phase 2b — Exam Config + Distribution | 🟢 Complete | Exams.tsx (blueprint builder, compile, status pipeline), Packages.tsx (generate, verify RSA, download), Distribution.tsx (key release D-012), Centers.tsx (CRUD, seating grid, risk scores), Users.tsx (Clerk profile, role matrix, sync) |
 | Phase 3a — Kiosk Auth Flow | 🟢 Complete | AuthPage.tsx (QR scan + face verify + webcam), edgeApi.ts (full edge HTTP client), index.css (premium dark kiosk design system) |
 | Phase 3b — Exam Execution + Recovery | 🟢 Complete | ExamPage.tsx (MCQ render, timer ring, question palette, answer save), SummaryPage.tsx (review + auto-submit), CompletePage.tsx (submission hash proof), App.tsx (ProtectedRoute guard) |
-| Phase 4 — Audit & Proctor Dashboard | 🟡 Next | Audit.tsx, Monitoring.tsx stubs need full implementation |
-| Phase 5 — Demo Polish | 🔴 Not Started | Seed/reset scripts, TamperDemo, end-to-end rehearsal |
+| Phase 4 — Audit & Proctor Dashboard | 🟢 Complete | Audit.tsx (event log, chain verify, hash chain diagram, JSON/CSV export), Monitoring.tsx (live feed, severity tabs, acknowledge, auto-refresh, session panel), TamperDemo.tsx (step-through interactive demo) |
+| Phase 5 — Demo Polish | 😀 Next | Seed/reset scripts, TESTING_CHECKLIST update, end-to-end rehearsal |
 
 ---
 
@@ -59,7 +59,8 @@
 
 | Date | Change | Author |
 |---|---|---|
-| 2026-06-12 | **Frontend Phase 3 COMPLETE** — Desktop Kiosk fully implemented: AuthPage.tsx (QR scan with barcode input + face verify via webcam + edge health check), ExamPage.tsx (MCQ question render, timer ring SVG countdown, question palette with answered/flagged/current states, answer auto-save via POST /exam/answer, focus-loss monitoring), SummaryPage.tsx (answered/unanswered counts, auto-submit on timer expiry, final submission with hash proof), CompletePage.tsx (submission hash display, session cleanup), edgeApi.ts (full typed edge API client: authenticate, getSession, submitAnswer, submitExam, recovery snapshot, monitoring events, health check), App.tsx (ProtectedRoute guard via localStorage session), index.css (662-line premium dark kiosk design system with glassmorphism, animations, QR/webcam frames). | Team Member |
+| 2026-06-12 | **Frontend Phase 4 COMPLETE** — Audit Explorer (Audit.tsx): 3 tabs (Event Log with expandable hash rows, Chain Verification with visual result card + hash chain diagram, Export JSON/CSV). Live Monitoring (Monitoring.tsx): real-time event feed with severity tabs (All/Critical/High/Medium/Low), acknowledge with optimistic UI (calls GAP-5 when available), auto-refresh every 15s, active sessions sidebar, alert breakdown charts. TamperDemo.tsx: interactive step-through tamper scenario (log → tamper → verify → broken chain). api.ts: fixed AuditEvent.id type (number→string), ChainVerificationResult field names (is_valid, verified_events, first_broken_at_sequence). CSS: added --danger-bg/--warning-bg/--success-bg/--primary-bg variables, gap-8 through gap-24, text-xs, text-primary, text-secondary, flex-wrap utilities. Build: tsc 0 errors, vite build 2.63s. | AI Agent |
+| 2026-06-12 | **Frontend Phase 3 COMPLETE** — Desktop Kiosk fully implemented | Team Member |
 | 2026-06-12 | **Frontend Phase 2b COMPLETE** — Exams.tsx, Packages.tsx, Distribution.tsx, Centers.tsx, Users.tsx. TypeScript: 0 errors. Backend GAP-1, GAP-2, GAP-3 banners added. | AI Agent |
 | 2026-06-12 | **Frontend Phase 2a COMPLETE** — Questions.tsx, QuestionEditor.tsx, Dashboard — merged to main | Harsh Bhavsar |
 | 2026-06-11 | **Frontend Phase 1 COMPLETE** — Design system, components, API client, routing, Dashboard | AI Agent |
@@ -81,9 +82,9 @@
 
 ## Next Actions
 
-1. **Phase 4 (NOW):** Audit Explorer (B1/B1b), Chain Verification visual, Audit Export (B4), Live Monitoring / Proctor Dashboard (D1/D2), Center Admin views
+1. **Phase 5 (NOW):** Demo seed/reset scripts, end-to-end rehearsal, update ManualTestingChecklist for Phase 4
 2. **Backend (parallel):** GAP-4 (`GET /exam/sessions`) + GAP-5 (`PATCH /monitoring/events/{id}/acknowledge`)
-3. **Phase 5:** Demo seed/reset scripts, TamperDemo page, end-to-end rehearsal
+3. **Backend GAP-6:** `GET /dashboard/stats` for real Dashboard numbers
 
 ---
 

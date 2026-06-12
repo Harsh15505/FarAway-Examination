@@ -265,7 +265,7 @@
     </div>
   </div>
   <div style="display:flex;gap:12px;align-items:center">
-    <div class="phase-badge">✅ Phase 1 · 2a · 2b · 3 Complete</div>
+    <div class="phase-badge">✅ Phase 1 · 2a · 2b · 3 · 4 Complete</div>
     <div class="header-stats">
       <div class="stat-pill"><span class="stat-dot pulse pulse-green"></span><span id="p-pass">0</span> Pass</div>
       <div class="stat-pill"><span class="stat-dot" style="background:var(--danger)"></span><span id="p-fail">0</span> Fail</div>
@@ -296,7 +296,9 @@
   <div class="scope-sep">|</div>
   <div class="scope-item"><span class="scope-check">✓</span> Phase 3 — Desktop Kiosk (Auth, Exam, Submit)</div>
   <div class="scope-sep">|</div>
-  <div class="scope-item"><span class="scope-x">✗</span> Phase 4–5 — Audit/Proctor (not built yet)</div>
+  <div class="scope-item"><span class="scope-check">✓</span> Phase 4 — Audit Explorer, Live Monitoring, Tamper Demo</div>
+  <div class="scope-sep">|</div>
+  <div class="scope-item"><span class="scope-x">✗</span> Phase 5 — Demo Polish (seed scripts, rehearsal)</div>
 </div>
 
 <!-- Service links -->
@@ -638,6 +640,61 @@ const CATS = [
       { id:'KS-06', name:'Submission hash is displayed on complete page', exp:'Long hex string in monospace font under "Submission Hash (Proof)"' },
       { id:'KS-07', name:'"Return to Login" resets to auth page', exp:'Navigates to / and localStorage session is cleared' },
       { id:'KS-08', name:'After completion, going to /exam redirects to /', exp:'ProtectedRoute guard kicks in — no exam access without session' },
+    ]
+  },
+  {
+    id:'audit', icon:'🔗', title:'Audit Explorer — Phase 4', color:'#6366f1',
+    sub:'Hash-chained event log, chain verification, JSON/CSV export',
+    tests:[
+      { id:'AU-01', name:'Navigate to /audit — page renders', exp:'4 stat cards (Total Events, Sequence, Chain Status, Latest Hash) + event table visible' },
+      { id:'AU-02', name:'Events table has data', exp:'7 demo events visible (or real events if backend running)' },
+      { id:'AU-03', name:'Click a table row — expands', exp:'Row expands showing full hash, payload JSON, event ID, and timestamp' },
+      { id:'AU-04', name:'Click again to collapse row', exp:'Row collapses back to single line' },
+      { id:'AU-05', name:'Event Type filter dropdown works', exp:'Select "ANOMALY_DETECTED" → table filters to only those events' },
+      { id:'AU-06', name:'Search box filters events', exp:'Type "CANDIDATE" → matching rows shown' },
+      { id:'AU-07', name:'Clear button resets filters', exp:'All events show again after click' },
+      { id:'AU-08', name:'Switch to "Chain Verification" tab', exp:'Verification panel renders with description and Verify Chain button' },
+      { id:'AU-09', name:'Click "Verify Chain" button', exp:'Result card appears: green ✅ Valid OR red ❌ Broken with details' },
+      { id:'AU-10', name:'Verification result shows total + verified count', exp:'Stat boxes inside result card (total events, verified events)' },
+      { id:'AU-11', name:'Hash chain visualization below verify', exp:'Last 5 events shown as chain nodes connected by vertical line' },
+      { id:'AU-12', name:'Switch to "Export" tab', exp:'Export form renders with Exam ID input + JSON/CSV format radios' },
+      { id:'AU-13', name:'Enter exam ID + click Download', exp:'File download triggers (.json or .csv)' },
+      { id:'AU-14', name:'Demo banner shows if backend down', exp:'Yellow "Demo Mode" banner at top of page' },
+    ]
+  },
+  {
+    id:'monitoring', icon:'📡', title:'Live Monitoring — Phase 4', color:'#ef4444',
+    sub:'Real-time security event feed — severity tabs, acknowledge, session panel',
+    tests:[
+      { id:'MO-01', name:'Navigate to /monitoring — page renders', exp:'4 stat cards + event feed cards visible (no white screen)' },
+      { id:'MO-02', name:'Stat cards show counts', exp:'Active Sessions / Total Alerts / Unacknowledged / Critical+High — all 4 visible' },
+      { id:'MO-03', name:'Event feed shows demo events', exp:'Cards with colored severity badge, alert type icon, candidate info, timestamp' },
+      { id:'MO-04', name:'Severity tabs visible with counts', exp:'All / Critical / High / Medium / Low — tabs with count badges' },
+      { id:'MO-05', name:'Click "Critical" tab filters feed', exp:'Feed shows only CRITICAL severity events' },
+      { id:'MO-06', name:'Click "Acknowledge" on an event', exp:'Button disappears instantly, "Acknowledged ✓" label appears' },
+      { id:'MO-07', name:'Active Sessions panel on right', exp:'5 session buttons with initial avatar circles and red alert count badges' },
+      { id:'MO-08', name:'Click a session button filters feed', exp:'Event feed filters to only that session events; button highlights' },
+      { id:'MO-09', name:'"Clear Session Filter" button works', exp:'Click removes filter, all events show again' },
+      { id:'MO-10', name:'Alert Breakdown by Severity card', exp:'4 progress bars (CRITICAL/HIGH/MEDIUM/LOW) with percentages' },
+      { id:'MO-11', name:'By Alert Type card visible', exp:'Icons + counts for Multiple Faces, No Face, Gaze Deviation etc.' },
+      { id:'MO-12', name:'Auto-refresh toggle button works', exp:'Toggle: "Auto (15s)" ↔ "Manual" — button appearance changes' },
+      { id:'MO-13', name:'Last refresh timestamp visible', exp:'"Last refresh: HH:MM:SS" shown next to page header' },
+      { id:'MO-14', name:'Demo banner shows when no real events', exp:'Yellow "Demo Mode" banner at top' },
+    ]
+  },
+  {
+    id:'tamper', icon:'🔒', title:'Tamper Detection Demo — Phase 4', color:'#8b5cf6',
+    sub:'Interactive step-through: log → tamper → verify → broken chain proof',
+    tests:[
+      { id:'TD-01', name:'Navigate to /tamper — page renders', exp:'4 stat cards + 4-step visual stepper visible' },
+      { id:'TD-02', name:'4-step visual stepper visible', exp:'Steps 1-4 shown with circles and connecting lines' },
+      { id:'TD-03', name:'Step 1: Configure Event form visible', exp:'Actor ID / Exam ID / Question Content inputs' },
+      { id:'TD-04', name:'Click "Log Event to Chain"', exp:'Step 2 advances, success alert shows "Event logged! Sequence #X hash: ..."' },
+      { id:'TD-05', name:'Step 2: Tampering scenario visible', exp:'Red "Adversary Attack" box with diff showing old/new payload' },
+      { id:'TD-06', name:'Click "Verify Chain Integrity"', exp:'Spinner shows briefly, then result card appears' },
+      { id:'TD-07', name:'Result shows Tampering Detected (demo)', exp:'❌ Red card: "Tampering Detected!" with sequence number, verified count, failure reason' },
+      { id:'TD-08', name:'"Reset Demo" button works', exp:'All steps reset to Step 1 configuration' },
+      { id:'TD-09', name:'"How Hash Chaining Works" sidebar', exp:'4 explanation cards with icons: Event Logged / Chain Linked / Verification / Tamper Alert' },
     ]
   },
 ];
