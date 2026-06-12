@@ -15,6 +15,7 @@ import {
   Radio,
   ChevronRight,
   AlertTriangle,
+  Sparkles,
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -35,6 +36,7 @@ const securityNav = [
   { path: '/audit', label: 'Audit Explorer', icon: ShieldCheck },
   { path: '/monitoring', label: 'Live Monitoring', icon: Activity },
   { path: '/tamper', label: 'Leak Monitor', icon: AlertTriangle },
+  { path: '/demo', label: 'Hackathon Demo', icon: Sparkles },
 ];
 
 function Layout({ children }: LayoutProps) {

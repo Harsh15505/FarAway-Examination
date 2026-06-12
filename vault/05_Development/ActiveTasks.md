@@ -54,6 +54,19 @@
 | Recovery flow typed in `edgeApi.ts` (checkSnapshot, restoreSession) | ✅ |
 | ProtectedRoute prevents `/exam` and `/summary` access without session | ✅ |
 
+## Current Task: Phase 5 - Demo Polish (COMPLETE)
+**Goal:** Deliver a polished, unified demo experience for hackathon judges with a single-click reset capability.
+**Status:** COMPLETE 🟢
+
+### Subtasks:
+- [x] Create `seed_demo.py` script to populate Edge SQLite DB (30 questions, 1 exam, 3 centers, 9 candidates, 8 chain events).
+- [x] Implement robust AES-GCM encryption within the seed script to accurately mock Question payload.
+- [x] Create `reset_demo.py` script for instant DB wiping and reseeding.
+- [x] Fix `GET /dashboard/stats` in backend to display live statistics properly.
+- [x] Build `DemoLanding.tsx` (Premium animated UI mapping out 8 key Security Guarantees).
+- [x] Wire up the new `/demo` route in the sidebar layout.
+- [x] Run full end-to-end integration and frontend compilation pass (0 Errors).
+
 ---
 
 ## 🟧 IN PROGRESS / UP NEXT

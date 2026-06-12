@@ -16,6 +16,7 @@ import Users from './pages/Users';
 import Audit from './pages/Audit';
 import Monitoring from './pages/Monitoring';
 import TamperDemo from './pages/TamperDemo';
+import DemoLanding from './pages/DemoLanding';
 
 function App() {
   return (
@@ -43,6 +44,8 @@ function App() {
             <Route path="/audit"       element={<Audit />} />
             <Route path="/monitoring"  element={<Monitoring />} />
             <Route path="/tamper"      element={<TamperDemo />} />
+            {/* Demo */}
+            <Route path="/demo"        element={<DemoLanding />} />
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

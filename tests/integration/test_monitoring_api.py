@@ -53,7 +53,7 @@ class MockMonitoringService:
             ))
         return alerts
 
-    async def list_events(self, session_id=None, severity=None, event_type=None, page=1, page_size=50):
+    async def list_events(self, session_id=None, severity=None, event_type=None, acknowledged=None, page=1, page_size=50):
         events = [
             {
                 "id": "evt-1",
@@ -69,6 +69,8 @@ class MockMonitoringService:
         ]
         if severity:
             events = [e for e in events if e["severity"] == severity]
+        if acknowledged is not None:
+            events = [e for e in events if e["acknowledged"] == acknowledged]
         return {"events": events, "total": len(events), "page": page, "page_size": page_size}
 
     async def get_session_summary(self, session_id):

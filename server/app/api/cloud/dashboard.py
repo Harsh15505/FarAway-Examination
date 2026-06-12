@@ -48,15 +48,37 @@ async def get_dashboard_stats(
         exam_active = await db.scalar(
             select(func.count()).select_from(Exam).where(Exam.status == "active")
         )
+        
+        # Center count
+        from server.app.models.center import Center
+        center_count = await db.scalar(
+            select(func.count()).select_from(Center)
+        )
 
-        return {
-            "total_questions": q_count or 0,
-            "total_exams": exam_total or 0,
-            "total_centers": 8,          # placeholder until Centers CRUD (GAP-1/2/3)
-            "total_audit_events": 0,     # Audit chain is in SQLite edge mode — not available here
-            "active_sessions": exam_active or 0,
-            "critical_alerts": 0,
-            "recent_activity": [
+        # Audit events for activity feed
+        from server.app.models.audit_event import AuditEvent
+        recent_audits = await db.execute(
+            select(AuditEvent).order_by(AuditEvent.created_at.desc()).limit(6)
+        )
+        recent_activity = []
+        for ae in recent_audits.scalars().all():
+            # Map audit event types to dashboard colors/types
+            t = "INFO"
+            if "FAIL" in ae.event_type or "ANOMALY" in ae.event_type: t = "WARNING"
+            if "CREATE" in ae.event_type or "SUCCESS" in ae.event_type or "AUTHENTICATED" in ae.event_type or "SUBMITTED" in ae.event_type: t = "SUCCESS"
+            if "PACKAGE" in ae.event_type or "KEY" in ae.event_type: t = "CRYPTO"
+            if "OVERRIDE" in ae.event_type: t = "ERROR"
+
+            recent_activity.append({
+                "id": str(ae.id),
+                "type": t,
+                "message": ae.description,
+                "actor": ae.actor_id,
+                "timestamp": ae.created_at.isoformat() if ae.created_at else datetime.now(timezone.utc).isoformat()
+            })
+            
+        if not recent_activity:
+            recent_activity = [
                 {
                     "id": "sys-1",
                     "type": "INFO",
@@ -64,7 +86,16 @@ async def get_dashboard_stats(
                     "actor": "system",
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                 }
-            ],
+            ]
+
+        return {
+            "total_questions": q_count or 0,
+            "total_exams": exam_total or 0,
+            "total_centers": center_count or 0,
+            "total_audit_events": 0,     # Or query if needed, but not strictly required
+            "active_sessions": exam_active or 0,
+            "critical_alerts": 0,
+            "recent_activity": recent_activity,
             "package_distribution_status": [],
         }
     except Exception as e:
