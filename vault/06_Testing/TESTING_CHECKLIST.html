@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FortisExam — Testing Checklist (Phase 1 + 2a)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    :root {
+      --bg: #0d0f14;
+      --surface: #151820;
+      --surface-2: #1c2030;
+      --border: #252a3a;
+      --primary: #6366f1;
+      --primary-glow: rgba(99,102,241,0.15);
+      --success: #22c55e;
+      --success-bg: rgba(34,197,94,0.1);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245,158,11,0.1);
+      --danger: #ef4444;
+      --danger-bg: rgba(239,68,68,0.1);
+      --text: #e2e8f0;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    header {
+      background: linear-gradient(135deg, #151820 0%, #1a1f30 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--primary), #8b5cf6);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+    .logo-text { font-size: 17px; font-weight: 700; }
+    .logo-sub { font-size: 11px; color: var(--text-muted); }
+
+    .phase-badge {
+      background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2));
+      border: 1px solid var(--primary);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #a5b4fc;
+    }
+
+    .header-stats { display: flex; gap: 16px; align-items: center; }
+    .stat-pill {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 13px;
+      font-size: 12px;
+      display: flex; align-items: center; gap: 6px;
+      font-weight: 600;
+    }
+    .stat-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .pulse { animation: pulse 2s infinite; }
+    .pulse-green { background: var(--success); box-shadow: 0 0 5px var(--success); }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    .ring-wrap { display:flex; align-items:center; gap:8px; background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:5px 14px 5px 7px; }
+    .ring-label { font-size:13px; font-weight:700; }
+
+    /* SCOPE BANNER */
+    .scope-banner {
+      background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.08));
+      border-bottom: 1px solid rgba(99,102,241,0.3);
+      padding: 12px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .scope-item { display:flex; align-items:center; gap:6px; }
+    .scope-check { color: var(--success); font-weight: 700; }
+    .scope-x { color: var(--text-muted); font-weight: 700; }
+    .scope-sep { color: var(--border); }
+
+    /* services bar */
+    .services-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 32px;
+      display: flex; gap: 10px; overflow-x: auto;
+    }
+    .chip {
+      display:flex; align-items:center; gap:6px;
+      padding:5px 11px; border-radius:6px; font-size:12px; font-weight:600;
+      white-space:nowrap; text-decoration:none; border:1px solid transparent; cursor:pointer;
+      transition:filter 0.15s;
+    }
+    .chip:hover { filter:brightness(1.15); }
+    .chip-cloud { background:rgba(99,102,241,0.12); color:#818cf8; border-color:rgba(99,102,241,0.3); }
+    .chip-web   { background:rgba(245,158,11,0.1);  color:#fbbf24; border-color:rgba(245,158,11,0.3); }
+
+    .container { max-width: 1060px; margin: 0 auto; padding: 24px 20px; }
+
+    /* CATEGORIES */
+    .category {
+      margin-bottom: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .cat-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 15px 18px; cursor: pointer; user-select: none;
+      transition: background 0.15s;
+    }
+    .cat-header:hover { background: var(--surface-2); }
+    .cat-left { display:flex; align-items:center; gap:11px; }
+    .cat-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+    .cat-title { font-size:14px; font-weight:700; }
+    .cat-sub { font-size:11px; color:var(--text-muted); margin-top:1px; }
+    .cat-right { display:flex; align-items:center; gap:10px; }
+    .cat-pbar { width:100px; height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+    .cat-pfill { height:100%; border-radius:2px; transition:width 0.4s ease; }
+    .cat-count { font-size:11px; color:var(--text-muted); font-weight:600; min-width:36px; text-align:right; }
+    .chevron { font-size:12px; color:var(--text-muted); transition:transform 0.2s; }
+    .category.collapsed .chevron { transform:rotate(-90deg); }
+
+    .test-list { border-top:1px solid var(--border); }
+    .category.collapsed .test-list { display:none; }
+
+    /* ROWS */
+    .test-row {
+      display:flex; align-items:flex-start; gap:12px;
+      padding:12px 18px;
+      border-bottom:1px solid rgba(37,42,58,0.5);
+      cursor:default;
+      transition:background 0.12s;
+    }
+    .test-row:last-child { border-bottom:none; }
+    .test-row:hover { background:var(--surface-2); }
+    .test-row.done { opacity:0.68; }
+    .test-row.done .test-name { text-decoration:line-through; color:var(--text-muted); }
+
+    .checkbox {
+      width:20px; height:20px; border:2px solid var(--border); border-radius:5px;
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0; margin-top:1px; transition:all 0.15s; background:var(--surface);
+    }
+    .test-row:hover .checkbox { border-color:var(--primary); }
+    .test-row.done .checkbox { background:var(--success); border-color:var(--success); }
+    .test-row.failed .checkbox { background:var(--danger-bg); border-color:var(--danger); }
+    .test-row.skipped .checkbox { background:var(--warning-bg); border-color:var(--warning); }
+
+    .ck-pass { font-size:11px; color:#fff; display:none; }
+    .ck-fail { font-size:11px; color:var(--danger); display:none; }
+    .ck-skip { font-size:11px; color:var(--warning); display:none; }
+    .test-row.done .ck-pass { display:block; }
+    .test-row.failed .ck-fail { display:block; }
+    .test-row.skipped .ck-skip { display:block; }
+
+    .test-id { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; color:var(--text-muted); flex-shrink:0; min-width:44px; padding-top:2px; }
+    .test-content { flex:1; min-width:0; }
+    .test-name { font-size:13px; font-weight:500; color:var(--text); line-height:1.4; }
+    .test-exp {
+      font-size:11px; color:var(--text-muted); margin-top:4px;
+      font-family:'JetBrains Mono',monospace;
+      background:var(--surface-2); border:1px solid var(--border);
+      border-radius:4px; padding:3px 7px; display:inline-block;
+    }
+    .note-inline {
+      font-size:11px; color:#fbbf24; margin-top:4px; display:flex; gap:5px;
+    }
+
+    .btns { display:flex; gap:4px; flex-shrink:0; }
+    .btn {
+      padding:3px 9px; border-radius:5px; font-size:11px; font-weight:700;
+      border:1px solid; cursor:pointer; font-family:'Inter',sans-serif;
+      transition:all 0.12s;
+    }
+    .btn-p { background:var(--success-bg); border-color:var(--success); color:var(--success); }
+    .btn-p:hover { background:var(--success); color:#000; }
+    .btn-f { background:var(--danger-bg); border-color:var(--danger); color:var(--danger); }
+    .btn-f:hover { background:var(--danger); color:#fff; }
+    .btn-s { background:var(--warning-bg); border-color:var(--warning); color:var(--warning); }
+    .btn-s:hover { background:var(--warning); color:#000; }
+
+    /* SUMMARY */
+    .summary-strip {
+      background:var(--surface-2); border:1px solid var(--border); border-radius:10px;
+      padding:14px 18px; display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:20px; gap:12px; flex-wrap:wrap;
+    }
+    .sum-num { font-size:22px; font-weight:800; }
+    .sum-lbl { font-size:11px; color:var(--text-muted); }
+    .prog-wrap { flex:1; min-width:180px; }
+    .prog-bar { height:7px; background:var(--border); border-radius:4px; overflow:hidden; margin-top:5px; }
+    .prog-fill { height:100%; background:linear-gradient(90deg,var(--primary),#8b5cf6); border-radius:4px; transition:width 0.5s ease; }
+    .prog-lbl { font-size:11px; color:var(--text-muted); display:flex; justify-content:space-between; }
+
+    /* CONTROLS */
+    .controls { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; align-items:center; }
+    .ctrl { padding:7px 14px; border-radius:7px; font-size:12px; font-weight:600; border:1px solid var(--border); cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.12s; }
+    .ctrl-pri { background:var(--primary); color:white; border-color:var(--primary); }
+    .ctrl-pri:hover { opacity:0.85; }
+    .ctrl-ghost { background:transparent; color:var(--text-dim); }
+    .ctrl-ghost:hover { background:var(--surface-2); color:var(--text); }
+    .filter-grp { display:flex; gap:5px; margin-left:auto; }
+    .filter { padding:5px 11px; border-radius:5px; font-size:11px; font-weight:600; border:1px solid var(--border); cursor:pointer; background:transparent; color:var(--text-muted); font-family:'Inter',sans-serif; transition:all 0.12s; }
+    .filter.active { background:var(--primary); border-color:var(--primary); color:white; }
+
+    /* HOW TO OPEN */
+    .how-box { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:20px; }
+    .how-title { font-size:13px; font-weight:700; margin-bottom:14px; }
+    .step-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; }
+    .step-card { background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:12px; }
+    .step-num { width:20px; height:20px; border-radius:50%; background:var(--primary); color:white; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-bottom:7px; }
+    .step-name { font-size:12px; font-weight:700; margin-bottom:3px; }
+    .step-desc { font-size:11px; color:var(--text-muted); line-height:1.5; }
+    .step-cmd { font-family:'JetBrains Mono',monospace; font-size:10px; background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:4px 7px; margin-top:7px; color:#4ade80; }
+    .tag { display:inline-block; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; margin-top:5px; }
+    .tag-ok { background:var(--success-bg); color:var(--success); }
+    .tag-warn { background:var(--warning-bg); color:var(--warning); }
+
+    /* SCOPE NOTE */
+    .scope-note {
+      background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.25);
+      border-radius:10px; padding:14px 18px; font-size:12.5px; color:#a5b4fc;
+      margin-bottom:18px; line-height:1.6;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    <div>
+      <div class="logo-text">FortisExam — QA Checklist</div>
+      <div class="logo-sub">Phase 1 + Phase 2a only (what's actually built)</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:12px;align-items:center">
+    <div class="phase-badge">✅ Phase 1 + 2a Complete</div>
+    <div class="header-stats">
+      <div class="stat-pill"><span class="stat-dot pulse pulse-green"></span><span id="p-pass">0</span> Pass</div>
+      <div class="stat-pill"><span class="stat-dot" style="background:var(--danger)"></span><span id="p-fail">0</span> Fail</div>
+      <div class="stat-pill"><span class="stat-dot" style="background:var(--text-muted)"></span><span id="p-pend">0</span> Pending</div>
+      <div class="ring-wrap">
+        <svg width="26" height="26" viewBox="0 0 26 26">
+          <circle cx="13" cy="13" r="10" fill="none" stroke="#252a3a" stroke-width="3"/>
+          <circle id="ring" cx="13" cy="13" r="10" fill="none" stroke="#6366f1"
+            stroke-width="3" stroke-linecap="round"
+            stroke-dasharray="0 62.83" transform="rotate(-90 13 13)"
+            style="transition:stroke-dasharray 0.5s ease"/>
+        </svg>
+        <span class="ring-label" id="pct">0%</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Scope banner -->
+<div class="scope-banner">
+  <span style="font-size:15px">📋</span>
+  <strong>Testing Scope:</strong>
+  <div class="scope-item"><span class="scope-check">✓</span> Phase 1 – Design System &amp; Routing</div>
+  <div class="scope-sep">|</div>
+  <div class="scope-item"><span class="scope-check">✓</span> Phase 2a – Dashboard, Question Bank, Question Editor</div>
+  <div class="scope-sep">|</div>
+  <div class="scope-item"><span class="scope-x">✗</span> Phase 2b – Exams/Packages/Centers (NOT built yet)</div>
+  <div class="scope-sep">|</div>
+  <div class="scope-item"><span class="scope-x">✗</span> Phase 3–5 – Desktop/Audit/Proctor (NOT built yet)</div>
+</div>
+
+<!-- Service links -->
+<div class="services-bar">
+  <a href="http://localhost:8000/health" target="_blank" class="chip chip-cloud">
+    <span class="stat-dot pulse pulse-green"></span> Cloud :8000
+  </a>
+  <a href="http://localhost:8000/docs" target="_blank" class="chip chip-cloud">📄 Cloud API Docs</a>
+  <a href="http://localhost:8001/health" target="_blank" class="chip chip-cloud" style="color:#4ade80;border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.1)">
+    <span class="stat-dot pulse pulse-green"></span> Edge :8001
+  </a>
+  <a href="http://localhost:5173" target="_blank" class="chip chip-web">
+    <span class="stat-dot pulse" style="background:#fbbf24"></span> Admin Portal :5173
+  </a>
+</div>
+
+<div class="container">
+
+  <!-- HOW TO OPEN -->
+  <div class="how-box">
+    <div class="how-title">🚀 How to Open the App for Testing</div>
+    <div class="step-grid">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-name">🌐 Admin Portal (main thing to test)</div>
+        <div class="step-desc">This is what Phase 1+2a built. Open in browser:</div>
+        <div class="step-cmd">http://localhost:5173</div>
+        <span class="tag tag-ok">✅ Already Running</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-name">☁️ Cloud API (backend)</div>
+        <div class="step-desc">Test endpoints directly via Swagger interactive docs:</div>
+        <div class="step-cmd">http://localhost:8000/docs</div>
+        <span class="tag tag-ok">✅ Already Running</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-name">⚡ Edge API (backend)</div>
+        <div class="step-desc">Auth, exam, monitoring endpoints:</div>
+        <div class="step-cmd">http://localhost:8001/docs</div>
+        <span class="tag tag-ok">✅ Already Running</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-name">🔑 Clerk Login</div>
+        <div class="step-desc">Keys are set! Go to the admin portal and log in with your Clerk account (the one registered on the dev dashboard).</div>
+        <div class="step-cmd">http://localhost:5173</div>
+        <span class="tag tag-ok">✅ Keys Configured</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scope note -->
+  <div class="scope-note">
+    <strong>📌 What's actually built and what to test:</strong><br>
+    <strong>Phase 1 (Foundation):</strong> CSS design system, Clerk auth gate, sidebar navigation, shared UI components, API client wiring.<br>
+    <strong>Phase 2a (Question Bank):</strong> Dashboard page (with demo data + real API attempt), Questions list with search/filter, Question Editor (create + edit + encrypt), delete confirm modal.<br>
+    <br>
+    <strong>Pages that exist as stubs (nav link works, page is empty/placeholder):</strong> Exams, Packages, Distribution, Centers, Users, Audit, Monitoring, TamperDemo.<br>
+    <strong>Do not test</strong> Desktop Kiosk (Phase 3), Audit Viewer (Phase 4), Proctor Dashboard (Phase 4) — those pages aren't built yet.
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-strip">
+    <div><div class="sum-num" id="s-pass" style="color:var(--success)">0</div><div class="sum-lbl">Passed</div></div>
+    <div><div class="sum-num" id="s-fail" style="color:var(--danger)">0</div><div class="sum-lbl">Failed</div></div>
+    <div><div class="sum-num" id="s-skip" style="color:var(--warning)">0</div><div class="sum-lbl">Skipped</div></div>
+    <div class="prog-wrap">
+      <div class="prog-lbl"><span>Overall Progress</span><span id="prog-txt">0 / 0</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="ctrl ctrl-pri" onclick="expandAll()">Expand All</button>
+    <button class="ctrl ctrl-ghost" onclick="collapseAll()">Collapse All</button>
+    <button class="ctrl ctrl-ghost" onclick="resetAll()">🔄 Reset</button>
+    <button class="ctrl ctrl-ghost" onclick="exportReport()">📋 Copy Report</button>
+    <div class="filter-grp">
+      <button class="filter active" onclick="setFilter('all',this)">All</button>
+      <button class="filter" onclick="setFilter('pending',this)">Pending</button>
+      <button class="filter" onclick="setFilter('done',this)">Passed</button>
+      <button class="filter" onclick="setFilter('failed',this)">Failed</button>
+    </div>
+  </div>
+
+  <div id="tests-root"></div>
+
+</div>
+
+<script>
+const CATS = [
+  {
+    id:'infra', icon:'⚙️', title:'Infrastructure Check', color:'#6366f1',
+    sub:'Verify all servers are live before touching the UI',
+    tests:[
+      { id:'I-01', name:'Cloud server health check', exp:'GET http://localhost:8000/health → {"status":"ok","mode":"cloud"}' },
+      { id:'I-02', name:'Edge server health check', exp:'GET http://localhost:8001/health → {"status":"ok","mode":"edge"}' },
+      { id:'I-03', name:'PostgreSQL container healthy', exp:'docker ps → fortis-postgres shows (healthy)' },
+      { id:'I-04', name:'Admin portal loads at localhost:5173', exp:'Page loads (Clerk login or dashboard)' },
+      { id:'I-05', name:'Cloud Swagger docs accessible', exp:'http://localhost:8000/docs loads interactive API' },
+      { id:'I-06', name:'Edge Swagger docs accessible', exp:'http://localhost:8001/docs loads interactive API' },
+    ]
+  },
+  {
+    id:'auth', icon:'🔑', title:'Admin Login (Clerk)', color:'#8b5cf6',
+    sub:'Clerk publishable key is now configured — login should work',
+    tests:[
+      { id:'A-01', name:'Open localhost:5173 without being logged in', exp:'Clerk SignIn screen appears (not a blank page)' },
+      { id:'A-02', name:'Log in with your Clerk account', exp:'Redirected to Dashboard (/)', note:'Use the account registered on profound-chow-40.clerk.accounts.dev' },
+      { id:'A-03', name:'Try wrong password', exp:'Clerk shows error message, stays on login' },
+      { id:'A-04', name:'Manually go to /questions without login', exp:'Redirected back to Clerk login gate' },
+      { id:'A-05', name:'Sign out from admin portal (profile menu)', exp:'Session cleared, back to login' },
+      { id:'A-06', name:'Sign back in after signout', exp:'Dashboard loads again' },
+    ]
+  },
+  {
+    id:'nav', icon:'🗂️', title:'Navigation & Layout (Phase 1)', color:'#06b6d4',
+    sub:'Sidebar, routing, page shells — every nav link should work',
+    tests:[
+      { id:'N-01', name:'Sidebar is visible after login', exp:'Dark left sidebar with nav links' },
+      { id:'N-02', name:'Click "Dashboard" in sidebar', exp:'Navigates to / — Dashboard page' },
+      { id:'N-03', name:'Click "Question Bank" in sidebar', exp:'Navigates to /questions — table loads' },
+      { id:'N-04', name:'Click "Exams" in sidebar', exp:'Navigates to /exams — page loads (may be stub/placeholder)' },
+      { id:'N-05', name:'Click "Packages" in sidebar', exp:'Navigates to /packages — page loads (stub)' },
+      { id:'N-06', name:'Click "Distribution" in sidebar', exp:'Navigates to /distribution — page loads (stub)' },
+      { id:'N-07', name:'Click "Centers" in sidebar', exp:'Navigates to /centers — page loads (stub)' },
+      { id:'N-08', name:'Click "Users" in sidebar', exp:'Navigates to /users — page loads (stub)' },
+      { id:'N-09', name:'Click "Audit" in sidebar', exp:'Navigates to /audit — page loads (stub)' },
+      { id:'N-10', name:'Click "Monitoring" in sidebar', exp:'Navigates to /monitoring — page loads (stub)' },
+      { id:'N-11', name:'Browser back/forward buttons work', exp:'Navigation history works correctly' },
+      { id:'N-12', name:'Active nav item is highlighted in sidebar', exp:'Current page link is visually highlighted' },
+    ]
+  },
+  {
+    id:'dashboard', icon:'📊', title:'Admin Dashboard (Phase 2a)', color:'#22c55e',
+    sub:'Stats cards, activity feed, risk map, distribution bars',
+    tests:[
+      { id:'D-01', name:'Dashboard loads without crash', exp:'Page renders fully, no blank screen' },
+      { id:'D-02', name:'Four stat cards visible', exp:'Scheduled Exams / Active Centers / Enrolled Sessions / Critical Alerts' },
+      { id:'D-03', name:'If backend /dashboard/stats missing → demo banner shows', exp:'Yellow "Showing demo data — GET /dashboard/stats not yet implemented" banner visible' },
+      { id:'D-04', name:'Recent Activity Feed has entries', exp:'List of activity items with type badges (SUCCESS/INFO/WARNING/CRYPTO/ERROR)' },
+      { id:'D-05', name:'Activity timestamps are relative (e.g. "2 minutes ago")', exp:'Human-readable time shown next to each item' },
+      { id:'D-06', name:'Center Risk Map grid renders', exp:'Grid of center codes colored green/yellow/red by risk' },
+      { id:'D-07', name:'Package Distribution status bars render', exp:'Progress bars for exam packages (e.g. NEET-UG-2026)' },
+      { id:'D-08', name:'"Live Monitor" button → /monitoring', exp:'Navigates to monitoring page' },
+      { id:'D-09', name:'"Compile Exam" button → /exams', exp:'Navigates to exams page' },
+      { id:'D-10', name:'"View Full Log →" link → /audit', exp:'Navigates to audit page' },
+    ]
+  },
+  {
+    id:'questions', icon:'📝', title:'Question Bank — List (Phase 2a)', color:'#f59e0b',
+    sub:'Table load, search, filters, delete, encrypted badge',
+    tests:[
+      { id:'Q-01', name:'Navigate to /questions', exp:'Question Bank page loads with table (or empty state if no questions)' },
+      { id:'Q-02', name:'Table columns visible: Q.ID, Subject, Difficulty, Status, Created, Actions', exp:'All 6 columns present' },
+      { id:'Q-03', name:'If questions exist: "🔒 ENCRYPTED" badge shows on each row', exp:'Green lock icon + "ENCRYPTED" text badge' },
+      { id:'Q-04', name:'Stats sidebar visible on right', exp:'Donut chart, difficulty bar, Security Status panel' },
+      { id:'Q-05', name:'Donut chart shows total question count', exp:'Number in center of donut = total questions' },
+      { id:'Q-06', name:'Search box filters by subject text', exp:'Typing "Phys" filters to Physics questions' },
+      { id:'Q-07', name:'Subject filter dropdown works', exp:'Select "Chemistry" → only chemistry questions show' },
+      { id:'Q-08', name:'Difficulty filter dropdown works', exp:'Select "Hard" → only hard questions show' },
+      { id:'Q-09', name:'Clear button appears when filter active', exp:'"Clear" button appears, clicking it resets all filters' },
+      { id:'Q-10', name:'Empty state when no questions match filter', exp:'"No questions found" message with Add Question button' },
+      { id:'Q-11', name:'Click edit icon on a question row', exp:'Navigates to /questions/{id}/edit with pre-filled form' },
+      { id:'Q-12', name:'Click delete icon → confirm dialog appears', exp:'Modal: "This question will be permanently removed. This cannot be undone."' },
+      { id:'Q-13', name:'Confirm delete removes question from list', exp:'Question disappears from table, DELETE API called' },
+      { id:'Q-14', name:'Cancel delete leaves question in list', exp:'Question stays, modal closes' },
+      { id:'Q-16', name:'API error state shows retry button', exp:'If backend is down: error message + "Retry" button' },
+    ]
+  }
+];
+
+let state = {};
+let filter = 'all';
+
+function load() { try { const s = localStorage.getItem('fqa-v2'); if(s) state = JSON.parse(s); } catch(e){} }
+function save() { localStorage.setItem('fqa-v2', JSON.stringify(state)); }
+function get(id) { return state[id] || 'pending'; }
+function set(id, s) {
+  if (get(id) === s) delete state[id]; else state[id] = s;
+  save(); render();
+}
+
+function render() {
+  const root = document.getElementById('tests-root');
+  root.innerHTML = '';
+  let total=0, pass=0, fail=0, skip=0;
+
+  CATS.forEach(cat => {
+    let cp=0, cf=0, cs=0;
+    cat.tests.forEach(t => {
+      const s = get(t.id);
+      total++;
+      if(s==='done'){cp++;pass++;} if(s==='failed'){cf++;fail++;} if(s==='skipped'){cs++;skip++;}
+    });
+    const ratio = cp/cat.tests.length;
+    const isCol = localStorage.getItem('col-'+cat.id)==='1';
+
+    const tests = cat.tests.filter(t => {
+      const s=get(t.id);
+      if(filter==='all') return true;
+      if(filter==='pending') return s==='pending';
+      if(filter==='done') return s==='done';
+      if(filter==='failed') return s==='failed';
+      return true;
+    });
+
+    const el = document.createElement('div');
+    el.className = 'category'+(isCol?' collapsed':'');
+    el.dataset.id = cat.id;
+
+    el.innerHTML = `
+      <div class="cat-header" onclick="toggleCat('${cat.id}')">
+        <div class="cat-left">
+          <div class="cat-icon" style="background:${cat.color}22">${cat.icon}</div>
+          <div><div class="cat-title">${cat.title}</div><div class="cat-sub">${cat.sub}</div></div>
+        </div>
+        <div class="cat-right">
+          <div class="cat-pbar"><div class="cat-pfill" style="width:${Math.round(ratio*100)}%;background:${cat.color}"></div></div>
+          <div class="cat-count" style="color:${cat.color}">${cp}/${cat.tests.length}</div>
+          <div class="chevron">▼</div>
+        </div>
+      </div>
+      <div class="test-list">
+        ${tests.length===0 ? '<div style="padding:12px 18px;color:var(--text-muted);font-size:12px">No tests match filter.</div>' :
+          tests.map(t => {
+            const s=get(t.id);
+            return `<div class="test-row ${s}">
+              <div class="checkbox"><span class="ck-pass">✓</span><span class="ck-fail">✗</span><span class="ck-skip">–</span></div>
+              <div class="test-id">${t.id}</div>
+              <div class="test-content">
+                <div class="test-name">${t.name}</div>
+                <div class="test-exp">${t.exp}</div>
+                ${t.note ? `<div class="note-inline">💡 ${t.note}</div>` : ''}
+              </div>
+              <div class="btns">
+                <button class="btn btn-p" onclick="set('${t.id}','done')">✓ Pass</button>
+                <button class="btn btn-f" onclick="set('${t.id}','failed')">✗ Fail</button>
+                <button class="btn btn-s" onclick="set('${t.id}','skipped')">– Skip</button>
+              </div>
+            </div>`;
+          }).join('')
+        }
+      </div>
+    `;
+    root.appendChild(el);
+  });
+
+  const pend = total-pass-fail-skip;
+  document.getElementById('p-pass').textContent = pass;
+  document.getElementById('p-fail').textContent = fail;
+  document.getElementById('p-pend').textContent = pend;
+  document.getElementById('s-pass').textContent = pass;
+  document.getElementById('s-fail').textContent = fail;
+  document.getElementById('s-skip').textContent = skip;
+  document.getElementById('prog-txt').textContent = `${pass+fail+skip} / ${total}`;
+
+  const pct = total>0 ? Math.round((pass/total)*100) : 0;
+  document.getElementById('prog-fill').style.width = pct+'%';
+  document.getElementById('pct').textContent = pct+'%';
+  const circ = 62.83;
+  document.getElementById('ring').setAttribute('stroke-dasharray', `${(pass/total||0)*circ} ${circ}`);
+}
+
+function toggleCat(id) {
+  const el = document.querySelector(`[data-id="${id}"]`);
+  el.classList.toggle('collapsed');
+  localStorage.setItem('col-'+id, el.classList.contains('collapsed')?'1':'0');
+}
+function expandAll() { CATS.forEach(c => { const e=document.querySelector(`[data-id="${c.id}"]`); if(e) e.classList.remove('collapsed'); localStorage.setItem('col-'+c.id,'0'); }); }
+function collapseAll() { CATS.forEach(c => { const e=document.querySelector(`[data-id="${c.id}"]`); if(e) e.classList.add('collapsed'); localStorage.setItem('col-'+c.id,'1'); }); }
+function resetAll() { if(!confirm('Reset all to pending?')) return; state={}; save(); render(); }
+function setFilter(f,btn) { filter=f; document.querySelectorAll('.filter').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); render(); }
+function exportReport() {
+  let lines=['FortisExam Test Report (Phase 1+2a) — '+new Date().toLocaleString(),''];
+  let p=0,f=0,s=0,tot=0;
+  CATS.forEach(c => {
+    lines.push('=== '+c.title+' ===');
+    c.tests.forEach(t => {
+      const st=get(t.id);
+      const ic=st==='done'?'✅':st==='failed'?'❌':st==='skipped'?'⏭️':'⬜';
+      lines.push(`  ${ic} [${t.id}] ${t.name}`);
+      tot++; if(st==='done')p++; if(st==='failed')f++; if(st==='skipped')s++;
+    });
+    lines.push('');
+  });
+  lines.push(`Summary: ${p} passed, ${f} failed, ${s} skipped, ${tot-p-f-s} pending of ${tot} total`);
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>alert('Copied to clipboard!'));
+}
+
+load(); render();
+</script>
+</body>
+</html>
