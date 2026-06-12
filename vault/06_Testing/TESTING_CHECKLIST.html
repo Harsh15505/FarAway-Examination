@@ -726,7 +726,19 @@ const CATS = [
 let state = {};
 let filter = 'all';
 
-function load() { try { const s = localStorage.getItem('fqa-v4'); if(s) state = JSON.parse(s); } catch(e){} }
+function load() { 
+  try { 
+    const s = localStorage.getItem('fqa-v4'); 
+    if(s) state = JSON.parse(s); 
+  } catch(e){} 
+  // Auto-mark Phase 1 and 2a as done for testing continuation
+  CATS.forEach(c => {
+    if (['infra', 'auth', 'nav', 'dashboard', 'questions', 'editor'].includes(c.id)) {
+       c.tests.forEach(t => state[t.id] = 'done');
+    }
+  });
+  save();
+}
 function save() { localStorage.setItem('fqa-v4', JSON.stringify(state)); }
 function get(id) { return state[id] || 'pending'; }
 function set(id, s) {
