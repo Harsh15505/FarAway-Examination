@@ -256,15 +256,29 @@ export default function Centers() {
         <StatCard label="Total Seats"     value={stats.seats}    icon={<Users size={18} />}    color="purple" />
       </div>
 
-      {/* Table */}
-      <Card title="Exam Centers"
-        action={
-          <div style={{ position: 'relative' }}>
-            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-            <input className="input" style={{ paddingLeft: 32, width: 220 }} placeholder="Search centers…" value={search} onChange={e => setSearch(e.target.value)} />
-          </div>
-        }
-      >
+      {/* ── Filter Bar ── */}
+      <div className="filter-bar">
+        <div className="filter-bar-search">
+          <Search size={13} className="filter-bar-search-icon" />
+          <input
+            placeholder="Search by name or city…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            aria-label="Search centers"
+          />
+        </div>
+        <div className="filter-bar-actions">
+          {search && (
+            <Button variant="ghost" size="sm" onClick={() => setSearch('')}>Clear</Button>
+          )}
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+            {filtered.length} of {centers.length} centers
+          </span>
+        </div>
+      </div>
+
+      {/* ── Table ── */}
+      <Card title="Exam Centers" subtitle={`${stats.active} active · ${stats.seats.toLocaleString()} total seats`}>
         {loading ? (
           <LoadingState message="Loading centers..." />
         ) : filtered.length === 0 ? (

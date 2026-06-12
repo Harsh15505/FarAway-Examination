@@ -1,12 +1,17 @@
-/** Shared UI Components — Button, Card, Badge, Modal, Table, Spinner, etc. */
+/** Shared UI Components — FortisExam Design System v2.0
+ *  All components upgraded for government-grade professional appearance.
+ *  No components removed — only improved.
+ */
 
 import React from 'react';
-import { X, AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react';
+import { X, AlertCircle, CheckCircle, Info, AlertTriangle, ChevronRight } from 'lucide-react';
 
-// ─── Button ─────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// BUTTON
+// ────────────────────────────────────────────────────────────────
 
 type BtnVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success';
-type BtnSize = 'sm' | 'md' | 'lg';
+type BtnSize    = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: BtnVariant;
@@ -25,25 +30,37 @@ export function Button({
   className = '',
   ...props
 }: ButtonProps) {
+  const sizeClass = size === 'md' ? '' : `btn-${size}`;
   return (
     <button
-      className={`btn btn-${variant} btn-${size === 'md' ? '' : size} ${className}`}
+      className={`btn btn-${variant} ${sizeClass} ${className}`.trim()}
       disabled={disabled || loading}
       {...props}
     >
-      {loading ? <Spinner size="sm" /> : icon}
+      {loading
+        ? <Spinner size="sm" />
+        : icon
+      }
       {children}
     </button>
   );
 }
 
-// ─── Spinner ────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// SPINNER
+// ────────────────────────────────────────────────────────────────
 
 export function Spinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
-  return <div className={`spinner${size === 'lg' ? ' spinner-lg' : ''}`} style={size === 'sm' ? { width: 14, height: 14, borderWidth: 2 } : {}} />;
+  const style: React.CSSProperties =
+    size === 'sm'  ? { width: 14, height: 14, borderWidth: 2 }   :
+    size === 'lg'  ? { width: 36, height: 36, borderWidth: 3 }   :
+                    {};
+  return <div className="spinner" style={style} />;
 }
 
-// ─── Card ───────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// CARD
+// ────────────────────────────────────────────────────────────────
 
 interface CardProps {
   title?: string;
@@ -52,15 +69,16 @@ interface CardProps {
   children: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
+  noPadding?: boolean;
 }
 
-export function Card({ title, subtitle, action, children, className = '', style }: CardProps) {
+export function Card({ title, subtitle, action, children, className = '', style, noPadding = false }: CardProps) {
   return (
-    <div className={`card ${className}`} style={style}>
+    <div className={`card ${className}`} style={{ padding: noPadding ? 0 : undefined, ...style }}>
       {(title || action) && (
         <div className="card-header">
           <div>
-            {title && <div className="card-title">{title}</div>}
+            {title    && <div className="card-title">{title}</div>}
             {subtitle && <div className="card-subtitle">{subtitle}</div>}
           </div>
           {action}
@@ -71,7 +89,9 @@ export function Card({ title, subtitle, action, children, className = '', style 
   );
 }
 
-// ─── Stat Card ──────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// STAT CARD
+// ────────────────────────────────────────────────────────────────
 
 interface StatCardProps {
   label: string;
@@ -88,7 +108,9 @@ export function StatCard({ label, value, change, changeDir = 'neutral', icon, co
       <div className={`stat-card-icon ${color}`}>{icon}</div>
       <div className="stat-card-body">
         <div className="stat-card-label">{label}</div>
-        <div className="stat-card-value">{typeof value === 'number' ? value.toLocaleString() : value}</div>
+        <div className="stat-card-value">
+          {typeof value === 'number' ? value.toLocaleString() : value}
+        </div>
         {change && (
           <div className={`stat-card-change ${changeDir}`}>{change}</div>
         )}
@@ -97,7 +119,9 @@ export function StatCard({ label, value, change, changeDir = 'neutral', icon, co
   );
 }
 
-// ─── Badge ──────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// BADGE
+// ────────────────────────────────────────────────────────────────
 
 type BadgeColor = 'blue' | 'green' | 'yellow' | 'red' | 'purple' | 'grey';
 
@@ -105,47 +129,55 @@ interface BadgeProps {
   color?: BadgeColor;
   dot?: boolean;
   children: React.ReactNode;
+  size?: 'sm' | 'md';
 }
 
-export function Badge({ color = 'grey', dot = false, children }: BadgeProps) {
+export function Badge({ color = 'grey', dot = false, children, size }: BadgeProps) {
   return (
-    <span className={`badge badge-${color}`}>
+    <span
+      className={`badge badge-${color}`}
+      style={size === 'sm' ? { fontSize: 10, padding: '1px 6px' } : undefined}
+    >
       {dot && <span className="dot" />}
       {children}
     </span>
   );
 }
 
-// Status badge mapping
+// Status badge — maps backend status strings to color + label
 export function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { color: BadgeColor; label: string }> = {
-    generated:     { color: 'blue', label: 'Generated' },
-    distributed:   { color: 'yellow', label: 'Distributed' },
-    key_released:  { color: 'green', label: 'Key Released' },
-    DRAFT:         { color: 'grey', label: 'Draft' },
-    ENCRYPTED:     { color: 'purple', label: 'Encrypted' },
-    ACTIVE:        { color: 'green', label: 'Active' },
-    COMPILED:      { color: 'blue', label: 'Compiled' },
-    DISTRIBUTED:   { color: 'yellow', label: 'Distributed' },
-    KEY_RELEASED:  { color: 'green', label: 'Key Released' },
-    COMPLETED:     { color: 'grey', label: 'Completed' },
-    Easy:          { color: 'green', label: 'Easy' },
-    Medium:        { color: 'yellow', label: 'Medium' },
-    Hard:          { color: 'red', label: 'Hard' },
-    valid:         { color: 'green', label: 'Valid' },
-    tampered:      { color: 'red', label: 'Tampered' },
-    LOW:           { color: 'green', label: 'Low' },
-    MEDIUM:        { color: 'yellow', label: 'Medium' },
-    HIGH:          { color: 'red', label: 'High' },
-    CRITICAL:      { color: 'red', label: 'Critical' },
-    active:        { color: 'green', label: 'Active' },
-    inactive:      { color: 'grey', label: 'Inactive' },
+    generated:     { color: 'blue',   label: 'Generated'    },
+    distributed:   { color: 'yellow', label: 'Distributed'  },
+    key_released:  { color: 'green',  label: 'Key Released' },
+    DRAFT:         { color: 'grey',   label: 'Draft'        },
+    ENCRYPTED:     { color: 'purple', label: 'Encrypted'    },
+    ACTIVE:        { color: 'green',  label: 'Active'       },
+    COMPILED:      { color: 'blue',   label: 'Compiled'     },
+    DISTRIBUTED:   { color: 'yellow', label: 'Distributed'  },
+    KEY_RELEASED:  { color: 'green',  label: 'Key Released' },
+    COMPLETED:     { color: 'grey',   label: 'Completed'    },
+    Easy:          { color: 'green',  label: 'Easy'         },
+    Medium:        { color: 'yellow', label: 'Medium'       },
+    Hard:          { color: 'red',    label: 'Hard'         },
+    valid:         { color: 'green',  label: 'Valid'        },
+    tampered:      { color: 'red',    label: 'Tampered'     },
+    LOW:           { color: 'green',  label: 'Low'          },
+    MEDIUM:        { color: 'yellow', label: 'Medium'       },
+    HIGH:          { color: 'red',    label: 'High'         },
+    CRITICAL:      { color: 'red',    label: 'Critical'     },
+    active:        { color: 'green',  label: 'Active'       },
+    inactive:      { color: 'grey',   label: 'Inactive'     },
+    submitted:     { color: 'blue',   label: 'Submitted'    },
+    recovered:     { color: 'purple', label: 'Recovered'    },
   };
   const cfg = map[status] ?? { color: 'grey' as BadgeColor, label: status };
   return <Badge color={cfg.color} dot>{cfg.label}</Badge>;
 }
 
-// ─── Modal ──────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// MODAL
+// ────────────────────────────────────────────────────────────────
 
 interface ModalProps {
   open: boolean;
@@ -153,19 +185,26 @@ interface ModalProps {
   title: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export function Modal({ open, onClose, title, children, footer, size = 'md' }: ModalProps) {
   if (!open) return null;
-  const maxWidth = size === 'sm' ? 400 : size === 'lg' ? 760 : 560;
-
+  const maxWidth = size === 'sm' ? 400 : size === 'lg' ? 760 : size === 'xl' ? 960 : 560;
   return (
-    <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+    <div
+      className="modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
       <div className="modal" style={{ maxWidth }}>
         <div className="modal-header">
           <span className="modal-title">{title}</span>
-          <button className="icon-btn" onClick={onClose}><X size={16} /></button>
+          <button className="icon-btn" onClick={onClose} aria-label="Close">
+            <X size={16} />
+          </button>
         </div>
         <div className="modal-body">{children}</div>
         {footer && <div className="modal-footer">{footer}</div>}
@@ -174,7 +213,9 @@ export function Modal({ open, onClose, title, children, footer, size = 'md' }: M
   );
 }
 
-// ─── Empty State ─────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// EMPTY STATE
+// ────────────────────────────────────────────────────────────────
 
 interface EmptyStateProps {
   icon?: React.ReactNode;
@@ -194,7 +235,9 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
   );
 }
 
-// ─── Loading State ───────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// LOADING STATE
+// ────────────────────────────────────────────────────────────────
 
 export function LoadingState({ message = 'Loading...' }: { message?: string }) {
   return (
@@ -205,7 +248,9 @@ export function LoadingState({ message = 'Loading...' }: { message?: string }) {
   );
 }
 
-// ─── Error State ─────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// ERROR STATE
+// ────────────────────────────────────────────────────────────────
 
 export function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
@@ -213,27 +258,40 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
       <AlertCircle size={32} color="var(--danger)" />
       <h3>Something went wrong</h3>
       <p>{message}</p>
-      {onRetry && <Button variant="outline" onClick={onRetry}>Retry</Button>}
+      {onRetry && (
+        <Button variant="outline" onClick={onRetry}>
+          Try Again
+        </Button>
+      )}
     </div>
   );
 }
 
-// ─── Alert ───────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// ALERT
+// ────────────────────────────────────────────────────────────────
 
 type AlertVariant = 'info' | 'success' | 'warning' | 'danger';
 
 export function Alert({ variant = 'info', children }: { variant?: AlertVariant; children: React.ReactNode }) {
-  const icons = { info: Info, success: CheckCircle, warning: AlertTriangle, danger: AlertCircle };
+  const icons = {
+    info:    Info,
+    success: CheckCircle,
+    warning: AlertTriangle,
+    danger:  AlertCircle,
+  };
   const Icon = icons[variant];
   return (
     <div className={`alert alert-${variant}`}>
-      <Icon size={16} style={{ flexShrink: 0, marginTop: 1 }} />
+      <Icon size={15} style={{ flexShrink: 0, marginTop: 1 }} />
       <div>{children}</div>
     </div>
   );
 }
 
-// ─── Confirm Dialog ──────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// CONFIRM DIALOG
+// ────────────────────────────────────────────────────────────────
 
 interface ConfirmProps {
   open: boolean;
@@ -246,20 +304,36 @@ interface ConfirmProps {
   loading?: boolean;
 }
 
-export function ConfirmDialog({ open, onClose, onConfirm, title, message, confirmLabel = 'Confirm', danger = false, loading = false }: ConfirmProps) {
+export function ConfirmDialog({
+  open, onClose, onConfirm,
+  title, message,
+  confirmLabel = 'Confirm',
+  danger = false,
+  loading = false,
+}: ConfirmProps) {
   return (
-    <Modal open={open} onClose={onClose} title={title} size="sm" footer={
-      <div className="flex gap-3">
-        <Button variant="ghost" onClick={onClose}>Cancel</Button>
-        <Button variant={danger ? 'danger' : 'primary'} onClick={onConfirm} loading={loading}>{confirmLabel}</Button>
-      </div>
-    }>
-      <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{message}</p>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={title}
+      size="sm"
+      footer={
+        <div className="flex gap-3">
+          <Button variant="ghost" onClick={onClose} disabled={loading}>Cancel</Button>
+          <Button variant={danger ? 'danger' : 'primary'} onClick={onConfirm} loading={loading}>
+            {confirmLabel}
+          </Button>
+        </div>
+      }
+    >
+      <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{message}</p>
     </Modal>
   );
 }
 
-// ─── Form Group ──────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// FORM GROUP
+// ────────────────────────────────────────────────────────────────
 
 interface FormGroupProps {
   label: string;
@@ -273,21 +347,24 @@ export function FormGroup({ label, required, hint, children }: FormGroupProps) {
     <div className="form-group">
       <label className="form-label">
         {label}
-        {required && <span style={{ color: 'var(--danger)', marginLeft: 2 }}>*</span>}
+        {required && <span style={{ color: 'var(--danger)', marginLeft: 3 }}>*</span>}
       </label>
       {children}
-      {hint && <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{hint}</span>}
+      {hint && <span className="form-hint">{hint}</span>}
     </div>
   );
 }
 
-// ─── Table ───────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// TABLE
+// ────────────────────────────────────────────────────────────────
 
 interface Column<T> {
   key: string;
   label: string;
   width?: string | number;
   render?: (value: unknown, row: T) => React.ReactNode;
+  align?: 'left' | 'center' | 'right';
 }
 
 interface TableProps<T extends Record<string, unknown>> {
@@ -295,42 +372,68 @@ interface TableProps<T extends Record<string, unknown>> {
   data: T[];
   keyField: keyof T;
   onRowClick?: (row: T) => void;
+  emptyMessage?: string;
+  footer?: React.ReactNode;
 }
 
-export function Table<T extends Record<string, unknown>>({ columns, data, keyField, onRowClick }: TableProps<T>) {
+export function Table<T extends Record<string, unknown>>({
+  columns, data, keyField, onRowClick, emptyMessage = 'No records found.', footer,
+}: TableProps<T>) {
   return (
     <div className="table-wrapper">
       <table>
         <thead>
           <tr>
             {columns.map(col => (
-              <th key={col.key} style={{ width: col.width }}>{col.label}</th>
+              <th
+                key={col.key}
+                style={{ width: col.width, textAlign: col.align ?? 'left' }}
+              >
+                {col.label}
+              </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {data.map(row => (
-            <tr
-              key={String(row[keyField])}
-              onClick={() => onRowClick?.(row)}
-              style={onRowClick ? { cursor: 'pointer' } : {}}
-            >
-              {columns.map(col => (
-                <td key={col.key}>
-                  {col.render
-                    ? col.render(row[col.key], row)
-                    : String(row[col.key] ?? '')}
-                </td>
-              ))}
+          {data.length === 0 ? (
+            <tr>
+              <td colSpan={columns.length}>
+                <div style={{ textAlign: 'center', padding: '32px 16px', color: 'var(--text-muted)', fontSize: 13 }}>
+                  {emptyMessage}
+                </div>
+              </td>
             </tr>
-          ))}
+          ) : (
+            data.map(row => (
+              <tr
+                key={String(row[keyField])}
+                onClick={() => onRowClick?.(row)}
+                className={onRowClick ? 'clickable' : ''}
+              >
+                {columns.map(col => (
+                  <td key={col.key} style={{ textAlign: col.align ?? 'left' }}>
+                    {col.render
+                      ? col.render(row[col.key], row)
+                      : String(row[col.key] ?? '')}
+                  </td>
+                ))}
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
+      {footer && (
+        <div className="pagination">
+          {footer}
+        </div>
+      )}
     </div>
   );
 }
 
-// ─── Tabs ────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// TABS
+// ────────────────────────────────────────────────────────────────
 
 interface TabsProps {
   tabs: { id: string; label: string; count?: number }[];
@@ -349,7 +452,18 @@ export function Tabs({ tabs, active, onChange }: TabsProps) {
         >
           {tab.label}
           {tab.count !== undefined && (
-            <span style={{ marginLeft: 6, fontSize: 11, background: 'var(--surface-2)', padding: '1px 6px', borderRadius: 99, color: 'var(--text-muted)' }}>
+            <span style={{
+              marginLeft: 7,
+              fontSize: 10,
+              fontWeight: 700,
+              background: active === tab.id ? 'var(--primary-bg)' : 'var(--surface-3)',
+              color: active === tab.id ? 'var(--primary)' : 'var(--text-muted)',
+              padding: '1px 7px',
+              borderRadius: 99,
+              border: '1px solid',
+              borderColor: active === tab.id ? 'var(--primary-border)' : 'var(--border)',
+              verticalAlign: 'middle',
+            }}>
               {tab.count}
             </span>
           )}
@@ -359,28 +473,60 @@ export function Tabs({ tabs, active, onChange }: TabsProps) {
   );
 }
 
-// ─── Page Header ─────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// PAGE HEADER
+// ────────────────────────────────────────────────────────────────
 
 interface PageHeaderProps {
   title: string;
   subtitle?: string;
   actions?: React.ReactNode;
   breadcrumb?: string[];
+  badge?: React.ReactNode;
 }
 
-export function PageHeader({ title, subtitle, actions, breadcrumb }: PageHeaderProps) {
+export function PageHeader({ title, subtitle, actions, breadcrumb, badge }: PageHeaderProps) {
   return (
-    <div className="page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-      <div>
+    <div className="page-header">
+      <div className="page-header-left">
         {breadcrumb && (
-          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>
-            {breadcrumb.join(' / ')}
+          <div className="page-header-breadcrumb">
+            {breadcrumb.map((crumb, i) => (
+              <React.Fragment key={i}>
+                {i > 0 && <ChevronRight size={10} style={{ margin: '0 3px', opacity: 0.5 }} />}
+                <span>{crumb}</span>
+              </React.Fragment>
+            ))}
           </div>
         )}
-        <h1>{title}</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <h1>{title}</h1>
+          {badge}
+        </div>
         {subtitle && <p>{subtitle}</p>}
       </div>
-      {actions && <div className="flex gap-3 items-center">{actions}</div>}
+      {actions && (
+        <div className="page-header-actions">{actions}</div>
+      )}
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────
+// SECTION HEADER (inside cards)
+// ────────────────────────────────────────────────────────────────
+
+interface SectionHeaderProps {
+  label: string;
+  action?: React.ReactNode;
+  className?: string;
+}
+
+export function SectionHeader({ label, action, className = '' }: SectionHeaderProps) {
+  return (
+    <div className={`flex items-center justify-between mb-4 ${className}`}>
+      <div className="section-label">{label}</div>
+      {action}
     </div>
   );
 }

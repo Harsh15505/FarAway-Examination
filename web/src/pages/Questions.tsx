@@ -7,7 +7,7 @@ import { useAuth } from '@clerk/clerk-react';
 import { Plus, Edit2, Trash2, Lock, FileText, Search, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Button, Badge, Card, Table, LoadingState, ErrorState,
+  Button, Badge, Table, LoadingState, ErrorState,
   PageHeader, EmptyState, ConfirmDialog,
 } from '../components/ui';
 import { questionsApi, type QuestionMeta } from '../services/api';
@@ -39,22 +39,23 @@ function difficultyColor(d: string): 'green' | 'yellow' | 'red' | 'grey' {
 
 function StatsSidebar({ total, encrypted, pending }: { total: number; encrypted: number; pending: number }) {
   const pctPhysics = 38, pctChem = 31, pctBio = 31;
-  const C = 2 * Math.PI * 60; // circumference for r=60
+  const C = 2 * Math.PI * 60;
 
   return (
-    <div style={{
-      width: 280, flexShrink: 0, borderLeft: '1px solid var(--border)',
-      paddingLeft: 24, display: 'flex', flexDirection: 'column', gap: 24,
-    }}>
-      <h3 style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-        Database Statistics
-      </h3>
+    <div style={{ width: 264, flexShrink: 0, position: 'sticky', top: 74, display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-      {/* Donut chart */}
-      <div>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>Subject Distribution</div>
-        <div style={{ position: 'relative', width: 140, height: 140, margin: '0 auto 16px' }}>
+      {/* ── Subject Distribution ── */}
+      <div className="card" style={{ padding: '16px 20px' }}>
+        <div className="section-label" style={{ marginBottom: 16 }}>Database Statistics</div>
+
+        <div style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>
+          Subject Distribution
+        </div>
+
+        {/* Donut */}
+        <div style={{ position: 'relative', width: 130, height: 130, margin: '0 auto 16px' }}>
           <svg viewBox="0 0 160 160" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+            <circle cx="80" cy="80" r="60" fill="none" stroke="var(--surface-3)" strokeWidth="20" />
             <circle cx="80" cy="80" r="60" fill="none" stroke="var(--primary)" strokeWidth="20"
               strokeDasharray={`${(pctPhysics / 100) * C} ${C}`} strokeDashoffset="0" />
             <circle cx="80" cy="80" r="60" fill="none" stroke="var(--warning)" strokeWidth="20"
@@ -63,66 +64,70 @@ function StatsSidebar({ total, encrypted, pending }: { total: number; encrypted:
               strokeDasharray={`${(pctBio / 100) * C} ${C}`} strokeDashoffset={`${-((pctPhysics + pctChem) / 100) * C}`} />
           </svg>
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--text-primary)' }}>{total.toLocaleString()}</span>
-            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Total</span>
+            <span style={{ fontWeight: 700, fontSize: 20, color: 'var(--text-primary)', lineHeight: 1 }}>{total.toLocaleString()}</span>
+            <span style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 2 }}>Total</span>
           </div>
         </div>
+
+        {/* Legend */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {[
-            { label: 'Physics', pct: pctPhysics, color: 'var(--primary)' },
-            { label: 'Chemistry', pct: pctChem, color: 'var(--warning)' },
-            { label: 'Biology', pct: pctBio, color: 'var(--success)' },
+            { label: 'Physics',   pct: pctPhysics, color: 'var(--primary)' },
+            { label: 'Chemistry', pct: pctChem,    color: 'var(--warning)' },
+            { label: 'Biology',   pct: pctBio,     color: 'var(--success)' },
           ].map(({ label, pct, color }) => (
-            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13 }}>
+            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 12, height: 12, borderRadius: 2, background: color }} />
-                <span style={{ color: 'var(--text-secondary)' }}>{label}</span>
+                <div style={{ width: 10, height: 10, borderRadius: 2, background: color, flexShrink: 0 }} />
+                <span style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>{label}</span>
               </div>
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{pct}%</span>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-primary)' }}>{pct}%</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div style={{ height: 1, background: 'var(--border)' }} />
-
-      {/* Difficulty bar */}
-      <div>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>Difficulty Spread</div>
-        <div style={{ height: 12, borderRadius: 6, display: 'flex', overflow: 'hidden', marginBottom: 8 }}>
+      {/* ── Difficulty Spread ── */}
+      <div className="card" style={{ padding: '16px 20px' }}>
+        <div style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>
+          Difficulty Spread
+        </div>
+        <div style={{ height: 10, borderRadius: 6, display: 'flex', overflow: 'hidden', marginBottom: 10 }}>
           <div style={{ width: '45%', background: 'var(--success)' }} />
           <div style={{ width: '35%', background: 'var(--warning)' }} />
           <div style={{ width: '20%', background: 'var(--danger)' }} />
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-muted)' }}>
-          <span>Easy (45%)</span><span>Med (35%)</span><span>Hard (20%)</span>
+          <span>Easy 45%</span><span>Med 35%</span><span>Hard 20%</span>
         </div>
       </div>
 
-      <div style={{ height: 1, background: 'var(--border)' }} />
-
-      {/* Security status */}
-      <div>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>Security Status</div>
-        <div style={{
-          background: 'var(--success-light)', border: '1px solid var(--success)', borderRadius: 8,
-          padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Lock size={16} color="var(--success)" />
-            <span style={{ fontSize: 13, color: 'var(--success-text)', fontWeight: 500 }}>Encrypted</span>
-          </div>
-          <span style={{ fontWeight: 700, color: 'var(--success-text)' }}>{encrypted.toLocaleString()}</span>
+      {/* ── Security Status ── */}
+      <div className="card" style={{ padding: '16px 20px' }}>
+        <div style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>
+          Security Status
         </div>
-        <div style={{
-          background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 8,
-          padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <FileText size={16} color="var(--text-muted)" />
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 }}>Pending Review</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{
+            background: 'var(--success-light)', border: '1px solid var(--success-mid)', borderRadius: 8,
+            padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Lock size={14} color="var(--success)" />
+              <span style={{ fontSize: 12.5, color: 'var(--success-text)', fontWeight: 500 }}>Encrypted</span>
+            </div>
+            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--success-text)' }}>{encrypted.toLocaleString()}</span>
           </div>
-          <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{pending}</span>
+          <div style={{
+            background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 8,
+            padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <FileText size={14} color="var(--text-muted)" />
+              <span style={{ fontSize: 12.5, color: 'var(--text-secondary)', fontWeight: 500 }}>Pending Review</span>
+            </div>
+            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{pending}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -257,7 +262,7 @@ export default function Questions() {
   const pendingCount   = questions.filter(q => !q.is_encrypted).length;
 
   return (
-    <div style={{ display: 'flex', gap: 0 }}>
+    <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
       {/* Main Area */}
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 20 }}>
         <PageHeader
@@ -282,38 +287,55 @@ export default function Questions() {
           </div>
         )}
 
-        {/* Filter Bar */}
-        <Card style={{ padding: '12px 16px' }}>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{ position: 'relative', flex: '1 1 220px' }}>
-              <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-              <input
-                className="input"
-                style={{ paddingLeft: 34, width: '100%', boxSizing: 'border-box' }}
-                placeholder="Search by subject…"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
-            </div>
-            <select className="input" style={{ width: 140 }} value={subject} onChange={e => setSubject(e.target.value)}>
-              <option value="">All Subjects</option>
-              <option value="Physics">Physics</option>
-              <option value="Chemistry">Chemistry</option>
-              <option value="Biology">Biology</option>
-            </select>
-            <select className="input" style={{ width: 140 }} value={difficulty} onChange={e => setDifficulty(e.target.value)}>
-              <option value="">All Difficulties</option>
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
+        {/* ── Filter Bar ── */}
+        <div className="filter-bar">
+          <div className="filter-bar-search">
+            <Search size={13} className="filter-bar-search-icon" />
+            <input
+              placeholder="Search by subject or keyword…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              aria-label="Search questions"
+            />
+          </div>
+
+          <div className="filter-bar-divider" />
+
+          <select
+            className="filter-bar-select"
+            value={subject}
+            onChange={e => setSubject(e.target.value)}
+            aria-label="Filter by subject"
+          >
+            <option value="">All Subjects</option>
+            <option value="Physics">Physics</option>
+            <option value="Chemistry">Chemistry</option>
+            <option value="Biology">Biology</option>
+          </select>
+
+          <select
+            className="filter-bar-select"
+            value={difficulty}
+            onChange={e => setDifficulty(e.target.value)}
+            aria-label="Filter by difficulty"
+          >
+            <option value="">All Difficulties</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+
+          <div className="filter-bar-actions">
             {(search || subject || difficulty) && (
               <Button variant="ghost" size="sm" onClick={() => { setSearch(''); setSubject(''); setDifficulty(''); }}>
-                Clear
+                Clear Filters
               </Button>
             )}
+            <span style={{ fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+              {filtered.length.toLocaleString()} result{filtered.length !== 1 ? 's' : ''}
+            </span>
           </div>
-        </Card>
+        </div>
 
         {/* Table */}
         {loading ? (
