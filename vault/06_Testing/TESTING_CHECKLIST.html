@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FortisExam — Testing Checklist (Phase 1 + 2a + 2b + 3)</title>
+  <title>FortisExam — Testing Checklist (Phases 1-5 Final)</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
 
@@ -296,9 +296,9 @@
   <div class="scope-sep">|</div>
   <div class="scope-item"><span class="scope-check">✓</span> Phase 3 — Desktop Kiosk (Auth, Exam, Submit)</div>
   <div class="scope-sep">|</div>
-  <div class="scope-item"><span class="scope-check">✓</span> Phase 4 — Audit Explorer, Live Monitoring, Tamper Demo</div>
+  <div class="scope-item"><span class="scope-check">✓</span> Phase 4 — Audit &amp; Monitoring Dashboard</div>
   <div class="scope-sep">|</div>
-  <div class="scope-item"><span class="scope-x">✗</span> Phase 5 — Demo Polish (seed scripts, rehearsal)</div>
+  <div class="scope-item"><span class="scope-check">✓</span> Phase 5 — Demo Polish (seed scripts, rehearsal)</div>
 </div>
 
 <!-- Service links -->
@@ -366,11 +366,11 @@
 
   <!-- Scope note -->
   <div class="scope-note">
-    <strong>📌 Current Implementation State (Phase 1 + 2a + 2b):</strong><br>
+    <strong>📌 Current Implementation State (Phases 1-5 Final):</strong><br>
     <strong>Phase 1:</strong> CSS design system, Clerk auth gate, sidebar navigation, shared UI components, API client.<br>
-    <strong>Phase 2a:</strong> Dashboard (demo stats + real API attempt), Question Bank (search/filter), Question Editor (Save &amp; Encrypt now fixed).<br>
+    <strong>Phase 2a:</strong> Dashboard (demo stats + real API attempt), Question Bank (search/filter), Question Editor.<br>
     <strong>Phase 2b:</strong> Exam Builder (blueprint editor + compile + release key), Package Management (list + verify + download), Distribution (status timeline), Centers (full CRUD), Users (profile + sync).<br><br>
-    <strong>Pages NOT yet built (skip these):</strong> Audit, Monitoring, TamperDemo (all Phase 4), Desktop Kiosk (Phase 3).
+    <strong>Phase 3, 4, 5:</strong> Fully implemented (Desktop Kiosk, Audit, Monitoring, TamperDemo, Seed Scripts).
   </div>
 
   <!-- Summary -->
@@ -765,7 +765,7 @@ function render() {
             const s=get(t.id);
             return `<div class="test-row ${s}">
               <div class="checkbox"><span class="ck-pass">✓</span><span class="ck-fail">✗</span><span class="ck-skip">–</span></div>
-              <div class="test-id">${t.id}</div>
+              <div class="test-id">#${t.overall_idx.toString().padStart(3, '0')}<br>${t.id}</div>
               <div class="test-content">
                 <div class="test-name">${t.name}</div>
                 <div class="test-exp">${t.exp}</div>
@@ -810,14 +810,14 @@ function collapseAll() { CATS.forEach(c => { const e=document.querySelector(`[da
 function resetAll() { if(!confirm('Reset all to pending?')) return; state={}; save(); render(); }
 function setFilter(f,btn) { filter=f; document.querySelectorAll('.filter').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); render(); }
 function exportReport() {
-  let lines=['FortisExam Test Report (Phase 1 + 2a + 2b) — '+new Date().toLocaleString(),''];
+  let lines=['FortisExam Test Report (Phases 1-5 Final) — '+new Date().toLocaleString(),''];
   let p=0,f=0,s=0,tot=0;
   CATS.forEach(c => {
     lines.push('=== '+c.title+' ===');
     c.tests.forEach(t => {
       const st=get(t.id);
       const ic=st==='done'?'✅':st==='failed'?'❌':st==='skipped'?'⏭️':'⬜';
-      lines.push(`  ${ic} [${t.id}] ${t.name}`);
+      lines.push(`  ${ic} #${t.overall_idx.toString().padStart(3, '0')} [${t.id}] ${t.name}`);
       tot++; if(st==='done')p++; if(st==='failed')f++; if(st==='skipped')s++;
     });
     lines.push('');
@@ -825,6 +825,13 @@ function exportReport() {
   lines.push(`Summary: ${p} passed, ${f} failed, ${s} skipped, ${tot-p-f-s} pending of ${tot} total`);
   navigator.clipboard.writeText(lines.join('\n')).then(()=>alert('Copied to clipboard!'));
 }
+
+let globalCounter = 1;
+CATS.forEach(c => {
+  c.tests.forEach(t => {
+    t.overall_idx = globalCounter++;
+  });
+});
 
 load(); render();
 </script>
