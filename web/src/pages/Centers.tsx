@@ -161,8 +161,16 @@ export default function Centers() {
       setCenters(c => c.filter(x => x.id !== deleteId));
       setDeleteId(null); return;
     }
-    // No delete endpoint yet, but handle gracefully
-    setDeleteId(null);
+    
+    try {
+      const token = await getToken();
+      await centersApi.delete(token!, deleteId);
+      load(); // Reload after delete
+    } catch (e: any) {
+      alert(e.message ?? 'Failed to delete center');
+    } finally {
+      setDeleteId(null);
+    }
   }
 
   function onSaved() {

@@ -185,12 +185,12 @@ export default function ExamPage() {
         
         <div style={{ flex: 1 }} />
         
-        <button className="btn btn-ghost btn-sm" onClick={() => window.open('#', '_blank')}>
+        <button className="btn btn-ghost btn-sm" onClick={() => alert('Scientific Calculator is disabled by Invigilator for this specific exam subject.')}>
           Calculator
         </button>
         
         <div className="timer-ring">
-          <svg width="60" height="60" viewBox="0 0 26 26" style={{ width: '100%', height: '100%' }}>
+          <svg width="60" height="60" viewBox="0 0 26 26" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
             <circle className="ring-bg" cx="13" cy="13" r="10" strokeWidth="2" />
             <circle 
               className="ring-fill" 
@@ -257,7 +257,7 @@ export default function ExamPage() {
         {/* Right pane: Question Content */}
         <div style={{ flex: 1, padding: '40px 60px', overflowY: 'auto' }}>
           
-          <div className="flex justify-between items-center mb-24">
+          <div className="flex flex-wrap justify-between items-center mb-24 gap-12">
             <div className="step-badge step-badge-exam" style={{ margin: 0 }}>
               Question {currentIndex + 1} of {session.total_questions}
             </div>
@@ -314,6 +314,19 @@ export default function ExamPage() {
             disabled={currentIndex === 0}
           >
             ← Previous
+          </button>
+          
+          <button 
+            className="btn btn-ghost" 
+            style={{ color: 'var(--primary)', borderColor: 'var(--primary)' }}
+            onClick={() => {
+              if (localAnswers[currentQ.id]) {
+                handleSelectOption(localAnswers[currentQ.id] as any);
+              }
+            }}
+            disabled={!localAnswers[currentQ.id]}
+          >
+            💾 Save Answer
           </button>
           
           {currentIndex < session.total_questions - 1 ? (

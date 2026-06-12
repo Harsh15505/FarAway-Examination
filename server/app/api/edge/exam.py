@@ -142,17 +142,42 @@ async def get_session(
     aes_key = b"12345678901234567890123456789012"
     q_service = QuestionService(db, aes_key)
     
+    # Load recovered state if it exists
+    rec_svc = RecoveryService(db)
+    recovery_state = None
+    try:
+        recovery_state = await rec_svc.get_state(session_id)
+    except Exception:
+        pass
+    
     decrypted_questions = []
     for i, q in enumerate(db_questions):
         try:
             q_data = await q_service.get(str(q.id))
+            raw_options = q_data.get("options", [])
+            if isinstance(raw_options, list):
+                mapped_options = {
+                    "A": raw_options[0] if len(raw_options) > 0 else "",
+                    "B": raw_options[1] if len(raw_options) > 1 else "",
+                    "C": raw_options[2] if len(raw_options) > 2 else "",
+                    "D": raw_options[3] if len(raw_options) > 3 else "",
+                }
+            else:
+                mapped_options = raw_options
+
+            # Re-attach selected option
+            sel_opt = None
+            if recovery_state and "answers" in recovery_state:
+                sel_opt = recovery_state["answers"].get(str(q.id))
+
             decrypted_questions.append({
                 "id": str(q.id),
                 "index": i,
                 "content": q_data["content"],
-                "options": q_data["options"],
+                "options": mapped_options,
                 "subject": q.subject,
                 "difficulty": q.difficulty,
+                "selected_option": sel_opt,
             })
         except Exception as e:
             print(f"Failed to decrypt question {q.id}: {e}")
@@ -230,6 +255,7 @@ async def submit_exam(
             submission_id=result["submission_id"],
             total_answers=result["total_answers"],
             submission_hash=result["submission_hash"],
+            submitted_at=result.get("submitted_at")
         )
 
     except ValueError as e:

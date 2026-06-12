@@ -1,110 +1,104 @@
 """
-Cloud API — Center Management
+Cloud API — Center Management (GAP-2)
 
-CRUD endpoints for exam centers.
-Protected by Clerk JWT middleware.
+CRUD routes for exam centers.
 
-Routes:
-  POST   /centers/            — Create center
-  GET    /centers/            — List all centers
-  GET    /centers/{center_id} — Get center details
-  PUT    /centers/{center_id} — Update center
-  DELETE /centers/{center_id} — Delete center
+Endpoints:
+  GET  /centers/          — list all centers
+  POST /centers/          — create a new center
+  GET  /centers/{id}      — get center detail
+  PUT  /centers/{id}      — update center
 """
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.app.db.database import get_db
 from server.app.middleware.clerk_auth import require_role
-from server.app.schemas.center import CenterCreate, CenterUpdate
+from server.app.schemas.center import (
+    CenterCreate,
+    CenterListResponse,
+    CenterResponse,
+    CenterUpdate,
+)
 from server.app.services.center_service import CenterService
 
-router = APIRouter(prefix="/centers")
+router = APIRouter(prefix="/centers", tags=["Centers"])
 
 
-def _get_center_service(db: AsyncSession = Depends(get_db)) -> CenterService:
+def get_center_service(db: AsyncSession = Depends(get_db)) -> CenterService:
     return CenterService(db)
 
 
-@router.post("/", status_code=201)
-async def create_center(
-    data: CenterCreate,
-    auth: dict = Depends(require_role("admin", "center_admin")),
-    svc: CenterService = Depends(_get_center_service),
-):
-    """Create a new exam center."""
-    center = await svc.create(
-        name=data.name,
-        code=data.code,
-        seat_count=data.seat_count,
-        city=data.city,
-        state=data.state,
-        address=data.address,
-    )
-    await svc.db.commit()
-    return {"id": str(center.id), "status": "created"}
-
-
-@router.get("/")
+@router.get("/", response_model=CenterListResponse)
 async def list_centers(
-    page: int = 1,
-    page_size: int = 50,
-    auth: dict = Depends(require_role("admin", "center_admin")),
-    svc: CenterService = Depends(_get_center_service),
-):
-    """List all centers."""
-    return await svc.list_all(page=page, page_size=page_size)
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=50, ge=1, le=200),
+    auth: dict = Depends(require_role("admin", "expert", "auditor", "center_admin")),
+    svc: CenterService = Depends(get_center_service),
+) -> CenterListResponse:
+    """List all exam centers, paginated."""
+    result = await svc.list_all(page=page, page_size=page_size)
+    return CenterListResponse(**result)
 
 
-@router.get("/{center_id}")
+@router.post("/", response_model=CenterResponse, status_code=status.HTTP_201_CREATED)
+async def create_center(
+    body: CenterCreate,
+    auth: dict = Depends(require_role("admin")),
+    svc: CenterService = Depends(get_center_service),
+) -> CenterResponse:
+    """Create a new exam center."""
+    try:
+        center = await svc.create(body.model_dump())
+        return CenterResponse.model_validate(center)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"error": "create_failed", "message": str(exc)},
+        ) from exc
+
+
+@router.get("/{center_id}", response_model=CenterResponse)
 async def get_center(
     center_id: str,
-    auth: dict = Depends(require_role("admin", "center_admin")),
-    svc: CenterService = Depends(_get_center_service),
-):
-    """Get center details."""
+    auth: dict = Depends(require_role("admin", "expert", "auditor", "center_admin")),
+    svc: CenterService = Depends(get_center_service),
+) -> CenterResponse:
+    """Get a single exam center by ID."""
     try:
-        return await svc.get(center_id)
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        center = await svc.get(center_id)
+        return CenterResponse.model_validate(center)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
-@router.put("/{center_id}")
+@router.put("/{center_id}", response_model=CenterResponse)
 async def update_center(
     center_id: str,
-    data: CenterUpdate,
-    auth: dict = Depends(require_role("admin", "center_admin")),
-    svc: CenterService = Depends(_get_center_service),
-):
-    """Update a center."""
+    body: CenterUpdate,
+    auth: dict = Depends(require_role("admin")),
+    svc: CenterService = Depends(get_center_service),
+) -> CenterResponse:
+    """Update mutable fields on an exam center."""
     try:
-        result = await svc.update(
-            center_id=center_id,
-            name=data.name,
-            city=data.city,
-            state=data.state,
-            seat_count=data.seat_count,
-            address=data.address,
-        )
-        await svc.db.commit()
-        return result
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        center = await svc.update(center_id, body.model_dump(exclude_unset=True))
+        return CenterResponse.model_validate(center)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
-@router.delete("/{center_id}")
+@router.delete("/{center_id}", status_code=status.HTTP_200_OK)
 async def delete_center(
     center_id: str,
     auth: dict = Depends(require_role("admin")),
-    svc: CenterService = Depends(_get_center_service),
-):
-    """Delete a center."""
+    svc: CenterService = Depends(get_center_service),
+) -> dict:
+    """Delete an exam center."""
     try:
-        await svc.delete_center(center_id)
-        await svc.db.commit()
-        return {"id": center_id, "status": "deleted"}
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        await svc.delete(center_id)
+        return {"status": "deleted"}
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc

@@ -406,6 +406,7 @@ class RecoveryService:
             "submission_id": submission_id,
             "total_answers": len(answers),
             "submission_hash": submission_hash,
+            "submitted_at": now.isoformat(),
             "submitted": True,
         }
 

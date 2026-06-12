@@ -56,7 +56,9 @@ export default function SummaryPage() {
       navigate('/complete', { 
         state: { 
           hash: response.submission_hash,
-          totalAnswers: response.total_answers 
+          totalAnswers: response.total_answers,
+          candidateName: sess.candidate_name,
+          submittedAt: response.submitted_at
         },
         replace: true 
       });
@@ -155,7 +157,7 @@ export default function SummaryPage() {
             </div>
             
             {unansweredCount > 0 && (
-              <p className="text-center text-xs text-warning mt-16">
+              <p className="text-center text-xs mt-16" style={{ color: 'var(--warning)' }}>
                 Warning: You have {unansweredCount} unanswered questions.
               </p>
             )}

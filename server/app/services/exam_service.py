@@ -25,17 +25,44 @@ class ExamService:
     async def create(
         self,
         name: str,
-        subject: str,
         duration_minutes: int,
-        blueprint: dict,
+        blueprint: list | dict,
         author_id: str,
+        exam_date: str = "",
+        subject: str = "",
     ) -> Exam:
-        """Create an exam definition."""
+        """Create an exam definition.
+
+        Blueprint can be either:
+        - A list of {subject, difficulty, count} rows (from the UI)
+        - A legacy dict format {difficulty_distribution: {...}}
+        
+        Subject is derived from the first blueprint row if not explicitly provided.
+        exam_date is stored inside the blueprint dict for portability.
+        """
+        # Normalise blueprint to a serialisable dict
+        if isinstance(blueprint, list):
+            rows = [r if isinstance(r, dict) else r.model_dump() for r in blueprint]
+            # Derive subject from the subjects in the blueprint rows
+            if not subject:
+                subjects = list(dict.fromkeys(r["subject"] for r in rows))
+                subject = ", ".join(subjects) if subjects else "Mixed"
+            blueprint_dict = {
+                "rows": rows,
+                "exam_date": exam_date,
+                "total_questions": sum(r["count"] for r in rows),
+            }
+        else:
+            blueprint_dict = dict(blueprint)
+            blueprint_dict.setdefault("exam_date", exam_date)
+            if not subject:
+                subject = "Mixed"
+
         exam = Exam(
             id=str(uuid.uuid4()),
             name=name,
             subject=subject,
-            blueprint=blueprint,
+            blueprint=blueprint_dict,
             status="draft",
             duration_minutes=str(duration_minutes),
             created_by=author_id,
@@ -66,7 +93,7 @@ class ExamService:
             raise ValueError(f"Exam is not in draft status (current: {exam.status})")
 
         exam.status = "compiled"
-        exam.compiled_at = datetime.now(timezone.utc)
+        exam.compiled_at = datetime.now(timezone.utc).replace(tzinfo=None)
         await self.db.flush()
 
         return {
@@ -89,13 +116,16 @@ class ExamService:
         if not exam:
             raise ValueError(f"Exam not found: {exam_id}")
 
+        blueprint_dict = exam.blueprint or {}
         return {
             "id": str(exam.id),
             "name": exam.name,
             "subject": exam.subject,
             "status": exam.status,
             "duration_minutes": exam.duration_minutes,
-            "blueprint": exam.blueprint,
+            "blueprint": blueprint_dict,
+            "exam_date": blueprint_dict.get("exam_date", ""),
+            "question_count": blueprint_dict.get("total_questions", 0),
             "created_by": exam.created_by,
             "created_at": exam.created_at.isoformat() if exam.created_at else "",
             "compiled_at": exam.compiled_at.isoformat() if exam.compiled_at else None,
@@ -118,19 +148,21 @@ class ExamService:
         result = await self.db.execute(stmt)
         exams = result.scalars().all()
 
-        items = [
-            {
+        items = []
+        for e in exams:
+            b_dict = e.blueprint or {}
+            items.append({
                 "id": str(e.id),
                 "name": e.name,
                 "subject": e.subject,
                 "status": e.status,
                 "duration_minutes": e.duration_minutes,
-                "blueprint": e.blueprint,
+                "blueprint": b_dict,
+                "exam_date": b_dict.get("exam_date", ""),
+                "question_count": b_dict.get("total_questions", 0),
                 "created_by": e.created_by,
                 "created_at": e.created_at.isoformat() if e.created_at else "",
                 "compiled_at": e.compiled_at.isoformat() if e.compiled_at else None,
-            }
-            for e in exams
-        ]
+            })
 
         return {"items": items, "total": total, "page": page, "page_size": page_size}

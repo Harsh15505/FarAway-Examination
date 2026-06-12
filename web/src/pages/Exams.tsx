@@ -266,31 +266,35 @@ export default function Exams() {
         <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)' }}>{row.name}</div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
           <Clock size={11} style={{ verticalAlign: 'middle', marginRight: 3 }} />
-          {new Date(row.exam_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+          {row.exam_date && !isNaN(Date.parse(row.exam_date))
+            ? new Date(row.exam_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+            : 'Date Not Set'}
         </div>
       </div>
     )},
     { key: 'question_count', label: 'Questions',    render: (v: unknown) => <span style={{ fontWeight: 600 }}>{String(v)}</span> },
     { key: 'status',         label: 'Status',       render: (v: unknown) => <StatusBadge status={String(v)} /> },
     { key: 'created_at',     label: 'Created',      render: (v: unknown) => new Date(String(v)).toLocaleDateString('en-IN') },
-    { key: '__actions',      label: 'Actions',      render: (_: unknown, row: Exam) => (
+    { key: '__actions',      label: 'Actions',      render: (_: unknown, row: Exam) => {
+      const status = (row.status || '').toUpperCase();
+      return (
       <div style={{ display: 'flex', gap: 8 }}>
-        {row.status === 'DRAFT' && (
+        {status === 'DRAFT' && (
           <Button variant="outline" size="sm" icon={<Play size={13} />}
             loading={compiling === row.id}
             onClick={e => { e.stopPropagation(); handleCompile(row.id); }}
           >Compile</Button>
         )}
-        {(row.status === 'COMPILED' || row.status === 'DISTRIBUTED') && (
+        {(status === 'COMPILED' || status === 'DISTRIBUTED') && (
           <Button variant="primary" size="sm" icon={<Key size={13} />}
             onClick={e => { e.stopPropagation(); setReleaseExamId(row.id); }}
           >Release Key</Button>
         )}
-        {row.status === 'KEY_RELEASED' && (
+        {status === 'KEY_RELEASED' && (
           <Badge color="green"><CheckCircle size={11} style={{ marginRight: 4, verticalAlign: 'middle' }} />Live</Badge>
         )}
       </div>
-    )},
+    )}},
   ];
 
   return (

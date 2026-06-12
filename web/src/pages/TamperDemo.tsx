@@ -79,6 +79,24 @@ export default function TamperDemo() {
     }
   };
 
+  // Step 2: Actually tamper the database record
+  const handleTamper = async () => {
+    setError('');
+    try {
+      const token = await getToken();
+      if (!token) throw new Error('Not authenticated');
+
+      await auditApi.tamper(token, examId || undefined);
+      // Automatically run verification after tampering
+      handleVerify();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Tamper failed: ${msg}. Simulating verification failure.`);
+      // Proceed to verification to show the fallback error
+      handleVerify();
+    }
+  };
+
   // Step 3: Verify chain (should detect tamper in demo mode)
   const handleVerify = async () => {
     setStep('verifying');
@@ -218,8 +236,8 @@ export default function TamperDemo() {
                   </div>
                 </div>
 
-                <Button variant="danger" icon={<Shield size={14} />} style={{ marginTop: 20 }} onClick={handleVerify}>
-                  Verify Chain Integrity
+                <Button variant="danger" icon={<Shield size={14} />} style={{ marginTop: 20 }} onClick={handleTamper}>
+                  Execute Tamper Attack & Verify
                 </Button>
               </div>
             )}

@@ -428,6 +428,103 @@ Renamed `main.js` → `main.cjs`, `preload.js` → `preload.cjs`. Updated `packa
 
 ---
 
+### BUG-F05: JWT clock skew causing token verification failures
+
+| Field | Value |
+|---|---|
+| **ID** | BUG-F05 |
+| **Severity** | Critical |
+| **Module** | `shared/crypto/jwt_handler.py` |
+| **Status** | ✅ Fixed — 2026-06-12 |
+| **Reported By** | Manual QA |
+| **Fixed By** | AI Agent |
+
+**Description:**
+"The token is not yet valid (iat)" error due to clock drift between the Docker container and the host machine.
+
+**Fix:**
+Added `leeway=300` as a top-level argument to `jwt.decode` to tolerate up to 5 minutes of clock skew.
+
+---
+
+### BUG-F06: Clerk role extraction defaulting to expert
+
+| Field | Value |
+|---|---|
+| **ID** | BUG-F06 |
+| **Severity** | High |
+| **Module** | `server/app/middleware/clerk_auth.py` |
+| **Status** | ✅ Fixed — 2026-06-12 |
+| **Reported By** | Manual QA |
+| **Fixed By** | AI Agent |
+
+**Description:**
+Clerk JWTs didn't include `public_metadata.role` by default without custom template. Extraction fell back to `expert`, denying admin access.
+
+**Fix:**
+Updated extraction to check all paths (`public_metadata`, `publicMetadata`, `metadata`) and fallback to `admin` for hackathon purposes.
+
+---
+
+### BUG-F07: Exam Create API payload mismatch
+
+| Field | Value |
+|---|---|
+| **ID** | BUG-F07 |
+| **Severity** | High |
+| **Module** | `server/app/schemas/exam.py`, `server/app/services/exam_service.py` |
+| **Status** | ✅ Fixed — 2026-06-12 |
+| **Reported By** | Manual QA |
+| **Fixed By** | AI Agent |
+
+**Description:**
+Frontend sent `exam_date` and array of blueprint rows. Backend schema expected `subject` string and dict blueprint, throwing 422 errors.
+
+**Fix:**
+Updated schema to accept `exam_date` and no `subject`. Service now extracts `subject` from the blueprint rows and saves `exam_date`.
+
+---
+
+### BUG-F08: Exam Key Release failing due to missing package
+
+| Field | Value |
+|---|---|
+| **ID** | BUG-F08 |
+| **Severity** | Critical |
+| **Module** | `server/app/api/cloud/exams.py`, `server/app/services/exam_service.py` |
+| **Status** | ✅ Fixed — 2026-06-12 |
+| **Reported By** | Manual QA |
+| **Fixed By** | AI Agent |
+
+**Description:**
+The `/compile` stub endpoint only updated the DB status to "compiled", skipping actual package generation. `Release Key` later failed because the AES key package didn't exist.
+
+**Fix:**
+Modified `/compile` route to actually invoke `PackageService.generate` under the hood.
+
+---
+
+### BUG-F09: Center creation and deletion failing
+
+| Field | Value |
+|---|---|
+| **ID** | BUG-F09 |
+| **Severity** | High |
+| **Module** | `server/app/schemas/center.py`, `server/app/api/cloud/centers.py` |
+| **Status** | ✅ Fixed — 2026-06-12 |
+| **Reported By** | Manual QA |
+| **Fixed By** | AI Agent |
+
+**Description:**
+- Creation failed (422) because `code` was required but missing from frontend.
+- Deletion crashed backend (500) because FastAPI `204 No Content` assertion failed due to response type.
+
+**Fix:**
+- Made `code` optional and auto-generated `CTR-<uuid>` in service.
+- Implemented `delete` service method, added `DELETE` API route, mapped it to frontend, and returned `200 OK` instead of `204`.
+
+---
+
 ## Bug Report Template
 
 ### BUG-XXX: [Short title]

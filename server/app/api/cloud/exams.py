@@ -38,15 +38,20 @@ async def create_exam(
     svc: ExamService = Depends(_get_exam_service),
 ):
     """Create a new exam definition with blueprint."""
+    blueprint_input = (
+        [r.model_dump() for r in data.blueprint]
+        if isinstance(data.blueprint, list)
+        else data.blueprint
+    )
     exam = await svc.create(
         name=data.name,
-        subject=data.subject,
         duration_minutes=data.duration_minutes,
-        blueprint=data.blueprint,
+        blueprint=blueprint_input,
         author_id=auth["clerk_user_id"],
+        exam_date=data.exam_date,
     )
     await svc.db.commit()
-    return {"id": str(exam.id), "status": "created"}
+    return {"id": str(exam.id), "status": "created", "name": exam.name}
 
 
 @router.get("/")
@@ -83,8 +88,17 @@ async def compile_exam(
     Compile exam: select questions per blueprint, generate variants via
     graph coloring, create signed+encrypted package.
     """
+    from server.app.api.cloud.packages import _load_server_private_key
+    from server.app.services.package_service import PackageService
+    
     try:
         result = await svc.compile(exam_id)
+        
+        # Automatically generate the package during compile step
+        private_key = _load_server_private_key()
+        pkg_svc = PackageService(svc.db)
+        await pkg_svc.generate(exam_id=exam_id, private_key_pem=private_key)
+        
         await svc.db.commit()
         return result
     except ValueError as e:

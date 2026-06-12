@@ -1,14 +1,26 @@
 """Pydantic schemas for Exam API request/response validation."""
 
-from pydantic import BaseModel
+from __future__ import annotations
+
+from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel, Field
+
+
+class BlueprintRow(BaseModel):
+    """Single row in the exam blueprint (subject + difficulty + count)."""
+    subject: str
+    difficulty: str  # easy | medium | hard
+    count: int = Field(..., ge=1)
 
 
 class ExamCreate(BaseModel):
-    """Request body for creating an exam."""
+    """Request body for creating an exam — matches frontend ExamCreateRequest."""
     name: str
-    subject: str
-    duration_minutes: int
-    blueprint: dict  # { difficulty_distribution: { easy: N, medium: N, hard: N } }
+    exam_date: str = Field(default="", description="ISO date string e.g. 2026-07-15")
+    duration_minutes: int = Field(..., ge=1)
+    blueprint: list[BlueprintRow] | dict[str, Any]  # list from UI or legacy dict
 
 
 class ExamResponse(BaseModel):

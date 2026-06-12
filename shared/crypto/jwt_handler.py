@@ -143,10 +143,13 @@ class JWTHandler:
         public_key = RSAAlgorithm.from_jwk(matching_key)
 
         # 5. Verify and decode
+        # leeway=300s (5m) tolerates clock skew between the Clerk issuer (browser),
+        # the Docker container, and the host machine.
         options: dict[str, Any] = {"verify_exp": True}
         decode_kwargs: dict[str, Any] = {
             "algorithms": ["RS256"],
             "options": options,
+            "leeway": 300,
         }
         if audience:
             decode_kwargs["audience"] = audience

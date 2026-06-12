@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 export default function CompletePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as { hash?: string; totalAnswers?: number } | null;
+  const state = location.state as { hash?: string; totalAnswers?: number; candidateName?: string; submittedAt?: string } | null;
 
   useEffect(() => {
     // Clear session from localStorage so it can't be reused
@@ -32,6 +32,14 @@ export default function CompletePage() {
         {state && (
           <div className="w-full bg-surface-3 p-16 rounded-md border border-border mb-32" style={{ background: 'var(--surface-3)', padding: 16, borderRadius: 8, border: '1px solid var(--border)', width: '100%' }}>
             <div className="flex justify-between items-center mb-8">
+              <span className="text-sm text-muted">Candidate Name:</span>
+              <span className="font-bold">{state.candidateName}</span>
+            </div>
+            <div className="flex justify-between items-center mb-8">
+              <span className="text-sm text-muted">Completion Time:</span>
+              <span className="font-bold">{new Date(state.submittedAt || '').toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between items-center mb-16">
               <span className="text-sm text-muted">Answers Logged:</span>
               <span className="font-bold">{state.totalAnswers}</span>
             </div>

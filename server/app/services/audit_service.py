@@ -109,7 +109,8 @@ class AuditService:
 
         # Build the DB record
         event_id = str(uuid.uuid4())
-        now = datetime.now(timezone.utc)
+        # Use a naive datetime in UTC because PostgreSQL column is TIMESTAMP WITHOUT TIME ZONE
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
 
         event = AuditEvent(
             id=event_id,

@@ -1,4 +1,5 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { UserButton, useUser } from '@clerk/clerk-react';
 import {
   LayoutDashboard,
@@ -41,7 +42,22 @@ const securityNav = [
 
 function Layout({ children }: LayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useUser();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showNotifToast, setShowNotifToast] = useState(false);
+
+  const handleNotifClick = () => {
+    setShowNotifToast(true);
+    setTimeout(() => setShowNotifToast(false), 3000);
+  };
+
+  const handleSearchKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      navigate(`/questions?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
+  };
 
   const isActive = (path: string) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
@@ -51,11 +67,13 @@ function Layout({ children }: LayoutProps) {
       {/* ── Sidebar ── */}
       <nav className="sidebar">
         <div className="sidebar-logo">
-          <div className="sidebar-logo-icon">FE</div>
-          <div className="sidebar-logo-text">
-            <h1>FortisExam</h1>
-            <span>Admin Terminal</span>
-          </div>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: 'inherit' }}>
+            <div className="sidebar-logo-icon">FE</div>
+            <div className="sidebar-logo-text">
+              <h1>FortisExam</h1>
+              <span>Admin Terminal</span>
+            </div>
+          </Link>
         </div>
 
         <div className="sidebar-nav">
@@ -96,7 +114,9 @@ function Layout({ children }: LayoutProps) {
         <header className="topbar">
           <div className="topbar-left">
             <div className="topbar-breadcrumb">
-              <span>FortisExam</span>
+              <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <span>FortisExam</span>
+              </Link>
               <ChevronRight size={14} />
               <span className="current">
                 {[...adminNav, ...securityNav].find(n => isActive(n.path))?.label ?? 'Dashboard'}
@@ -107,7 +127,13 @@ function Layout({ children }: LayoutProps) {
           <div className="topbar-right">
             <div className="topbar-search">
               <Search className="topbar-search-icon" size={14} />
-              <input type="text" placeholder="Search entity ID..." />
+              <input
+                type="text"
+                placeholder="Search questions (Enter)..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearchKey}
+              />
             </div>
 
             {/* Live Monitoring button */}
@@ -121,10 +147,21 @@ function Layout({ children }: LayoutProps) {
               </button>
             </Link>
 
-            <button className="icon-btn" title="Notifications">
+            <button className="icon-btn" title="Notifications" onClick={handleNotifClick} style={{ position: 'relative' }}>
               <Bell size={16} />
               <span className="badge-dot" />
             </button>
+
+            {showNotifToast && (
+              <div style={{
+                position: 'absolute', top: 60, right: 80, background: 'var(--surface)',
+                border: '1px solid var(--border)', borderRadius: 10, padding: '12px 16px',
+                fontSize: 13, color: 'var(--text-secondary)', boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                zIndex: 999, whiteSpace: 'nowrap',
+              }}>
+                ✅ No new notifications
+              </div>
+            )}
 
             <div
               style={{

@@ -2,7 +2,7 @@
  *  Matches Stitch screen A2 — Question Bank List.
  *  Uses QuestionMeta (Phase 1 api.ts) + Phase 1 CSS vars + ui components.
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { Plus, Edit2, Trash2, Lock, FileText, Search, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -145,7 +145,14 @@ export default function Questions() {
   const [deleting, setDeleting]   = useState(false);
   const [usingDemo, setUsingDemo] = useState(false);
 
+  const abortRef = useRef<AbortController | null>(null);
+
   const load = useCallback(async () => {
+    // Cancel any in-flight request
+    abortRef.current?.abort();
+    abortRef.current = new AbortController();
+    const { signal } = abortRef.current;
+
     setLoading(true); setError(null);
     try {
       const token = await getToken();
@@ -153,13 +160,18 @@ export default function Questions() {
         ...(subject    ? { subject }    : {}),
         ...(difficulty ? { difficulty } : {}),
       });
-      setQuestions(res.items ?? []);
+      if (!signal.aborted) {
+        setQuestions(res.items ?? []);
+        setUsingDemo(false);
+      }
     } catch (e: any) {
-      console.warn('Backend /questions endpoint failed or DB not running. Using demo data.');
-      setQuestions(DEMO_QUESTIONS);
-      setUsingDemo(true);
+      if (!signal.aborted) {
+        console.warn('Backend /questions endpoint failed or DB not running. Using demo data.');
+        setQuestions(DEMO_QUESTIONS);
+        setUsingDemo(true);
+      }
     } finally {
-      setLoading(false);
+      if (!signal.aborted) setLoading(false);
     }
   }, [getToken, subject, difficulty]);
 

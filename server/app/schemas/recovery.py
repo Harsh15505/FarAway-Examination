@@ -50,6 +50,7 @@ class SubmitExamResponse(BaseModel):
     submission_id: str
     total_answers: int
     submission_hash: str
+    submitted_at: str | None = None
     submitted: bool = True
 
 

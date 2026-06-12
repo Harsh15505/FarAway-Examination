@@ -72,7 +72,7 @@ async def get_dashboard_stats(
             recent_activity.append({
                 "id": str(ae.id),
                 "type": t,
-                "message": ae.description,
+                "message": f"{ae.event_type.replace('_', ' ').title()} by {ae.actor_id}",
                 "actor": ae.actor_id,
                 "timestamp": ae.created_at.isoformat() if ae.created_at else datetime.now(timezone.utc).isoformat()
             })

@@ -262,3 +262,33 @@ async def get_audit_stats(
         "latest_event_hash": latest.event_hash if latest else None,
         "exam_id": exam_id,
     }
+
+
+@router.post(
+    "/tamper",
+    summary="[Demo] Simulate database tampering",
+    description="Directly modifies the payload of the latest event in the database without updating the hashes, intentionally breaking the cryptographic chain for demonstration purposes.",
+)
+async def simulate_tampering(
+    audit_svc: Annotated[AuditService, Depends(get_audit_service)],
+    exam_id: str | None = Query(default=None),
+) -> dict:
+    """Intentionally corrupt an audit event to demonstrate tamper detection."""
+    # We will access the db directly through the service to perform the malicious update
+    result = await audit_svc._db.execute(
+        select(AuditEvent)
+        .where(AuditEvent.exam_id == exam_id if exam_id else True)
+        .order_by(AuditEvent.sequence.desc())
+        .limit(1)
+    )
+    event = result.scalar_one_or_none()
+    
+    if not event:
+        raise HTTPException(status_code=404, detail="No events found to tamper with")
+        
+    # Corrupt the payload directly
+    event.payload = '{"content":"MODIFIED BY ATTACKER — leak attempt"}'
+    await audit_svc._db.commit()
+    
+    return {"status": "tampered", "sequence": event.sequence}
+

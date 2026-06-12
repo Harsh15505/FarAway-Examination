@@ -20,7 +20,7 @@ import DemoLanding from './pages/DemoLanding';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <SignedOut>
         <div className="auth-container">
           <SignIn routing="hash" />

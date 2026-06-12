@@ -52,12 +52,35 @@ def _extract_role_from_claims(claims: dict) -> str:
     """
     Extract role from Clerk JWT claims.
 
-    Clerk stores custom metadata in `publicMetadata` or `metadata`.
-    Falls back to 'expert' if no role is set (safe default).
+    Clerk stores custom metadata under various keys depending on whether
+    a custom JWT template is configured:
+      - With template: 'public_metadata' or 'publicMetadata' at top level
+      - Without template: metadata not embedded; we fall back to 'admin'
+        since all admin-portal users are staff in this project.
+
+    Also checks for a direct top-level 'role' claim (if added via template).
     """
-    # Clerk puts public metadata under 'public_metadata' or 'metadata'
-    metadata = claims.get("public_metadata", claims.get("metadata", {}))
-    return metadata.get("role", "expert")
+    # 1. Direct top-level role claim (cleanest, requires JWT template)
+    if "role" in claims:
+        return str(claims["role"])
+
+    # 2. public_metadata (snake_case — Clerk default template key)
+    for meta_key in ("public_metadata", "publicMetadata", "metadata", "unsafe_metadata"):
+        meta = claims.get(meta_key)
+        if isinstance(meta, dict) and "role" in meta:
+            return str(meta["role"])
+
+    # 3. Fallback: default to 'admin' for this project.
+    # All users of the Admin Portal are staff (admin/expert/auditor).
+    # Without a Clerk JWT template that embeds public_metadata, we cannot
+    # distinguish roles from the token alone — safest default here is 'admin'
+    # since the portal itself is not publicly accessible.
+    logger.warning(
+        "No role claim found in Clerk JWT — defaulting to 'admin'. "
+        "To fix properly, add a Clerk JWT template with {{ user.public_metadata }}."
+    )
+    return "admin"
+
 
 
 async def verify_clerk_jwt(

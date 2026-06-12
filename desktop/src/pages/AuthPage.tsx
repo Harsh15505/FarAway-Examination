@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authenticate, checkEdgeHealth } from '../services/edgeApi';
+import { authenticate, checkEdgeHealth, supervisorOverride } from '../services/edgeApi';
 
 type AuthStep = 'CONNECTING' | 'SCAN_QR' | 'FACE_VERIFY' | 'AUTHENTICATING' | 'ERROR' | 'SUCCESS';
 
@@ -15,21 +15,22 @@ export default function AuthPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const qrInputRef = useRef<HTMLInputElement>(null);
 
+  const runHealthCheck = async (mounted = true) => {
+    const isHealthy = await checkEdgeHealth();
+    if (mounted) {
+      if (isHealthy) {
+        setStep('SCAN_QR');
+      } else {
+        setErrorMsg('Cannot connect to Edge Server. Please alert an invigilator.');
+        setStep('ERROR');
+      }
+    }
+  };
+
   // 1. Initial health check
   useEffect(() => {
     let mounted = true;
-    const init = async () => {
-      const isHealthy = await checkEdgeHealth();
-      if (mounted) {
-        if (isHealthy) {
-          setStep('SCAN_QR');
-        } else {
-          setErrorMsg('Cannot connect to Edge Server. Please alert an invigilator.');
-          setStep('ERROR');
-        }
-      }
-    };
-    init();
+    runHealthCheck(mounted);
     return () => { mounted = false; };
   }, []);
 
@@ -114,14 +115,38 @@ export default function AuthPage() {
     }
   };
 
+  const handleSupervisorOverride = async () => {
+    setStep('AUTHENTICATING');
+    try {
+      const response = await supervisorOverride(
+        '4a4224cb-d420-4107-bc62-d778f416dc99', // Seed Candidate ID
+        '21e87336-b68c-45c6-8f2b-3de2d8696ec3', // Seed Exam ID
+        'test_invigilator',
+        'automated_testing'
+      );
+      
+      setStep('SUCCESS');
+      localStorage.setItem('exam_session', JSON.stringify(response));
+      
+      setTimeout(() => {
+        navigate('/exam');
+      }, 3000);
+      
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Supervisor override failed.');
+      setStep('ERROR');
+    }
+  };
+
   const resetFlow = () => {
     setQrData('');
     setErrorMsg('');
-    setStep('SCAN_QR');
+    setStep('CONNECTING');
+    runHealthCheck(true);
   };
 
   return (
-    <div className="page auth-page">
+    <div className="page auth-page" style={{ overflowY: 'auto', gap: '40px', padding: '40px', justifyContent: 'center' }}>
       <div className="logo">
         <div className="logo-icon">🛡️</div>
         <div>
@@ -163,19 +188,23 @@ export default function AuthPage() {
             </form>
             
             {/* For testing without a scanner */}
-            <button className="btn btn-ghost btn-sm" onClick={() => {
-               // Demo QR payload for testing
-               setQrData(JSON.stringify({
-                 candidateId: 'test-cand-1',
-                 examId: 'test-exam-1',
-                 centerId: 'center-1',
-                 nonce: 'nonce-123',
-                 signature: 'dummy-sig'
-               }));
-               setStep('FACE_VERIFY');
-            }}>
-              [Simulate Scan]
-            </button>
+            <div className="flex gap-16 mt-16">
+              <button className="btn btn-ghost btn-sm" onClick={() => {
+                 setQrData(JSON.stringify({
+                   candidateId: 'test-cand-1',
+                   examId: 'test-exam-1',
+                   centerId: 'center-1',
+                   nonce: 'nonce-123',
+                   signature: 'dummy-sig'
+                 }));
+                 setStep('FACE_VERIFY');
+              }}>
+                [Simulate Scan]
+              </button>
+              <button className="btn btn-primary btn-sm" style={{ background: 'var(--warning)', borderColor: 'var(--warning)' }} onClick={handleSupervisorOverride}>
+                [Supervisor Override]
+              </button>
+            </div>
           </div>
         )}
 

@@ -252,6 +252,13 @@ export const auditApi = {
   /** POST /audit/log — internal event ingestion */
   log: (token: string, body: LogEventRequest) =>
     json<LogEventResponse>('/audit/log', { method: 'POST', body: JSON.stringify(body) }, token),
+
+  /** POST /audit/tamper?exam_id= — simulate database tampering */
+  tamper: (token: string, examId?: string) =>
+    json<{status: string, sequence: number}>('/audit/tamper', { 
+      method: 'POST',
+      params: examId ? { exam_id: examId } : undefined,
+    }, token),
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -381,6 +388,12 @@ export const centersApi = {
    */
   update: (token: string, id: string, body: Partial<CenterCreateRequest>) =>
     json<Center>(`/centers/${id}`, { method: 'PUT', body: JSON.stringify(body) }, token),
+
+  /**
+   * DELETE /centers/:id
+   */
+  delete: (token: string, id: string) =>
+    json<void>(`/centers/${id}`, { method: 'DELETE' }, token),
 };
 
 // =============================================================

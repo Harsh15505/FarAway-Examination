@@ -161,7 +161,9 @@ export default function LiveMonitoring() {
   // UI state
   const [severityTab, setSeverityTab] = useState('ALL');
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
-  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [autoRefresh, setAutoRefresh] = useState(() => {
+    return localStorage.getItem('monitoring_autoRefresh') !== 'false';
+  });
   const [lastRefresh, setLastRefresh] = useState(new Date());
 
   // A7f — Anomaly Detail Drawer
@@ -252,6 +254,11 @@ export default function LiveMonitoring() {
   // Initial load
   useEffect(() => { loadEvents(); }, [loadEvents]);
   useEffect(() => { loadSessions(); }, [loadSessions]);
+
+  // Persist autoRefresh preference
+  useEffect(() => {
+    localStorage.setItem('monitoring_autoRefresh', String(autoRefresh));
+  }, [autoRefresh]);
 
   // Auto-refresh every 15s
   useEffect(() => {
