@@ -20,11 +20,41 @@ from server.app.config import settings
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan — startup and shutdown hooks."""
-    # TODO: Initialize database connection pool
-    # TODO: Load crypto keys
-    # TODO: Initialize audit chain
+    import os
+    from server.app.db.database import engine, Base
+    import server.app.models  # Ensure all models are imported before create_all
+    from shared.crypto.rsa import RSASigner
+    from sqlalchemy.ext.asyncio import async_sessionmaker
+    from server.app.models.candidate import Candidate
+    from server.app.models.exam import Exam
+    from sqlalchemy import select
+    
+    # Auto-generate RSA keys for mock if missing
+    if not os.path.exists("./keys"):
+        os.makedirs("./keys", exist_ok=True)
+    if not os.path.exists("./keys/private.pem"):
+        private_pem, public_pem = RSASigner.generate_key_pair()
+        with open("./keys/private.pem", "wb") as f:
+            f.write(private_pem)
+        with open("./keys/public.pem", "wb") as f:
+            f.write(public_pem)
+            
+    # Auto-create tables (useful for edge mode SQLite and hackathon cloud mock)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+        
+    # Inject dummy candidate for Vercel Kiosk mock if missing
+    AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(Candidate).where(Candidate.id == '4a4224cb-d420-4107-bc62-d778f416dc99'))
+        if not result.scalar_one_or_none():
+            dummy_exam = Exam(id='21e87336-b68c-45c6-8f2b-3de2d8696ec3', name='Hackathon Demo Exam', subject='Demo', blueprint={}, duration_minutes='60', created_by='system')
+            dummy_candidate = Candidate(id='4a4224cb-d420-4107-bc62-d778f416dc99', name='Test Candidate', roll_number='TEST001', center_id='c1', exam_id='21e87336-b68c-45c6-8f2b-3de2d8696ec3', seat_number='1A')
+            session.add_all([dummy_exam, dummy_candidate])
+            await session.commit()
+        
     yield
-    # TODO: Close database connections
+    await engine.dispose()
 
 
 def create_app() -> FastAPI:
