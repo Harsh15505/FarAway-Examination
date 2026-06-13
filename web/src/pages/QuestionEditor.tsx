@@ -3,7 +3,7 @@
  *  Uses Phase 1's QuestionCreateRequest / QuestionDetail types exactly.
  *  Handles both /questions/new (create) and /questions/:id/edit (update).
  */
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import {
@@ -105,6 +105,52 @@ function AnswerOptions({ options, correctOption, onValueChange, onCorrectChange 
       </div>
     </Card>
   );
+}
+
+// ─── Rich Text Preview Helper ─────────────────────────────────
+
+/** Convert markdown-like syntax to inline HTML for the preview pane. */
+function renderFormatted(text: string): React.ReactNode {
+  if (!text) return null;
+  // Process in order: bold (**), italic (*), underline (<u>), formula ($)
+  const parts: React.ReactNode[] = [];
+  // Use a regex that captures all our formatting tokens
+  const regex = /\*\*(.+?)\*\*|\*(.+?)\*|<u>(.+?)<\/u>|\$(.+?)\$/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let key = 0;
+
+  while ((match = regex.exec(text)) !== null) {
+    // Push plain text before match
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    if (match[1] !== undefined) {
+      // **bold**
+      parts.push(<strong key={key++}>{match[1]}</strong>);
+    } else if (match[2] !== undefined) {
+      // *italic*
+      parts.push(<em key={key++}>{match[2]}</em>);
+    } else if (match[3] !== undefined) {
+      // <u>underline</u>
+      parts.push(<u key={key++}>{match[3]}</u>);
+    } else if (match[4] !== undefined) {
+      // $formula$ — render in monospace with distinct styling
+      parts.push(
+        <code key={key++} style={{
+          background: 'var(--primary-light)', color: 'var(--primary)',
+          padding: '1px 5px', borderRadius: 4, fontFamily: 'var(--font-mono)',
+          fontSize: '0.9em', border: '1px solid var(--primary-mid)',
+        }}>{match[4]}</code>
+      );
+    }
+    lastIndex = match.index + match[0].length;
+  }
+  // Push remaining text
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+  return parts.length > 0 ? parts : text;
 }
 
 // ─── Main Page ────────────────────────────────────────────────
@@ -328,9 +374,9 @@ export default function QuestionEditor() {
             <h3 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Preview (Candidate View)
             </h3>
-            <p style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.6, marginBottom: 12 }}>
-              {content || <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Start typing the question…</span>}
-            </p>
+            <div style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.6, marginBottom: 12 }}>
+              {content ? renderFormatted(content) : <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Start typing the question…</span>}
+            </div>
             <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
               {(['A', 'B', 'C', 'D'] as OptionKey[]).map(key => (
                 <li key={key} style={{
@@ -339,7 +385,7 @@ export default function QuestionEditor() {
                   background: 'var(--surface)',
                 }}>
                   <span style={{ fontWeight: 700, width: 20 }}>{key}.</span>
-                  {options[key] || <span style={{ color: 'var(--text-muted)' }}>(empty)</span>}
+                  {options[key] ? renderFormatted(options[key]) : <span style={{ color: 'var(--text-muted)' }}>(empty)</span>}
                 </li>
               ))}
             </ol>
