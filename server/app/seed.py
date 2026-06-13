@@ -282,6 +282,60 @@ async def seed_cloud(session):
             role="admin", name="System Administrator",
         ))
 
+    # ── 3 Packages (Distribution) ──
+    from server.app.models.package import Package
+    packages_data = [
+        {"id": str(_uuid.uuid4()), "exam": EXAM_IDS[0], "status": "activated"},
+        {"id": str(_uuid.uuid4()), "exam": EXAM_IDS[1], "status": "distributed"},
+        {"id": str(_uuid.uuid4()), "exam": EXAM_IDS[2], "status": "generated"},
+    ]
+    for p in packages_data:
+        exists = (await session.execute(select(Package).where(Package.id == p["id"]))).scalar_one_or_none()
+        if not exists:
+            session.add(Package(
+                id=p["id"], exam_id=p["exam"], encrypted_payload="enc_demo",
+                encryption_iv="iv_demo", package_hash="hash_demo",
+                signature="sig_demo", status=p["status"]
+            ))
+
+    # ── Mock Audit Events ──
+    from server.app.models.audit_event import AuditEvent
+    import hashlib
+    
+    # We need to compute sequence and hashes properly to avoid unique constraint errors
+    max_seq = (await session.execute(select(func.max(AuditEvent.sequence)))).scalar() or 0
+    if max_seq == 0:
+        events = [
+            {"type": "SYSTEM_STARTUP", "actor": "system", "payload": '{"version": "0.1.0"}'},
+            {"type": "QUESTION_CREATED", "actor": "system_admin", "payload": '{"subject": "Physics"}'},
+            {"type": "PACKAGE_GENERATED", "actor": "system_admin", "payload": f'{{"exam_id": "{EXAM_IDS[0]}"}}'},
+            {"type": "PACKAGE_DISTRIBUTED", "actor": "system", "payload": f'{{"center_id": "{CENTER_IDS[0]}"}}'},
+            {"type": "KEY_RELEASE_AUTHORIZED", "actor": "system_admin", "payload": '{"authorized": true}'},
+            {"type": "EXAM_STARTED", "actor": "system", "payload": f'{{"exam_id": "{EXAM_IDS[0]}"}}'},
+        ]
+        
+        prev_hash = "0" * 64
+        for i, ev in enumerate(events):
+            seq = i + 1
+            payload_hash = hashlib.sha256(ev["payload"].encode()).hexdigest()
+            chain_str = f"{seq}{payload_hash}{prev_hash}"
+            event_hash = hashlib.sha256(chain_str.encode()).hexdigest()
+            
+            session.add(AuditEvent(
+                id=str(_uuid.uuid4()),
+                sequence=seq,
+                event_type=ev["type"],
+                actor_id=ev["actor"],
+                actor_role="admin" if "admin" in ev["actor"] else "system",
+                payload=ev["payload"],
+                payload_hash=payload_hash,
+                previous_hash=prev_hash,
+                event_hash=event_hash,
+            ))
+            prev_hash = event_hash
+
     await session.commit()
     final_count = (await session.execute(select(func.count(Question.id)))).scalar() or 0
-    print(f"[seed] Cloud seed complete — {final_count} questions, 3 exams, 5 centers, 10 candidates")
+    pkg_count = (await session.execute(select(func.count(Package.id)))).scalar() or 0
+    aud_count = (await session.execute(select(func.count(AuditEvent.id)))).scalar() or 0
+    print(f"[seed] Cloud seed complete — {final_count} questions, 3 exams, 5 centers, 10 candidates, {pkg_count} packages, {aud_count} audit events")
