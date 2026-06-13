@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
     from sqlalchemy.ext.asyncio import async_sessionmaker
     from server.app.models.candidate import Candidate
     from server.app.models.exam import Exam
-    from sqlalchemy import select
+    from sqlalchemy import select, func
     
     # Auto-generate RSA keys for mock if missing
     if not os.path.exists("./keys"):
