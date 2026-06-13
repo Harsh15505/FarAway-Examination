@@ -21,50 +21,80 @@ from server.app.config import settings
 async def lifespan(app: FastAPI):
     """Application lifespan — startup and shutdown hooks."""
     import os
+    import uuid
     from server.app.db.database import engine, Base
-    import server.app.models  # Ensure all models are imported before create_all
-    from shared.crypto.rsa import RSASigner
-    from sqlalchemy.ext.asyncio import async_sessionmaker
-    from server.app.models.candidate import Candidate
-    from server.app.models.exam import Exam
-    from sqlalchemy import select, func
-    
-    # Auto-generate RSA keys for mock if missing
-    if not os.path.exists("./keys"):
-        os.makedirs("./keys", exist_ok=True)
-    if not os.path.exists("./keys/private.pem"):
-        private_pem, public_pem = RSASigner.generate_key_pair()
-        with open("./keys/private.pem", "wb") as f:
-            f.write(private_pem)
-        with open("./keys/public.pem", "wb") as f:
-            f.write(public_pem)
-            
-    # Auto-create tables (useful for edge mode SQLite and hackathon cloud mock)
+    import server.app.models  # noqa: F401 — register all models before create_all
+
+    # --- Auto-create tables (both modes) ---
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        
-        # Inject dummy candidate and questions for Vercel Kiosk mock if missing
-    AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
-    async with AsyncSessionLocal() as session:
-        from server.app.models.question import Question
-        q_count = await session.execute(select(func.count(Question.id)))
-        if q_count.scalar() == 0:
-            # Seed questions
-            from server.seed_test_data import seed
-            # Note: seed() uses create_async_engine and asyncio.run internally, 
-            # so it's better to just inline the questions here to avoid loop conflicts
-            questions = [
-                Question(subject="Physics", difficulty="Easy", encrypted_content="enc1", encryption_iv="iv1", content_hash="hash1", created_by="system"),
-                Question(subject="Physics", difficulty="Hard", encrypted_content="enc2", encryption_iv="iv2", content_hash="hash2", created_by="system"),
-                Question(subject="Chemistry", difficulty="Medium", encrypted_content="enc3", encryption_iv="iv3", content_hash="hash3", created_by="system"),
-            ]
-            session.add_all(questions)
-            
-            dummy_exam = Exam(id='21e87336-b68c-45c6-8f2b-3de2d8696ec3', name='Hackathon Demo Exam', subject='Demo', blueprint={}, duration_minutes='60', created_by='system')
-            dummy_candidate = Candidate(id='4a4224cb-d420-4107-bc62-d778f416dc99', name='Test Candidate', roll_number='TEST001', center_id='c1', exam_id='21e87336-b68c-45c6-8f2b-3de2d8696ec3', seat_number='1A')
-            session.add_all([dummy_exam, dummy_candidate])
-            await session.commit()
-        
+
+    # --- Edge-only: generate RSA keys & seed demo data ---
+    if settings.server_mode == "edge":
+        try:
+            from shared.crypto.rsa import RSASigner
+
+            os.makedirs("./keys", exist_ok=True)
+            if not os.path.exists("./keys/private.pem"):
+                priv, pub = RSASigner.generate_key_pair()
+                with open("./keys/private.pem", "wb") as f:
+                    f.write(priv)
+                with open("./keys/public.pem", "wb") as f:
+                    f.write(pub)
+        except Exception as e:
+            print(f"[lifespan] RSA key generation skipped: {e}")
+
+        try:
+            from sqlalchemy import select, func
+            from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+            from server.app.models.question import Question
+            from server.app.models.exam import Exam
+            from server.app.models.candidate import Candidate
+
+            SessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+            async with SessionLocal() as session:
+                q_count = (await session.execute(select(func.count(Question.id)))).scalar() or 0
+                if q_count == 0:
+                    demo_questions = [
+                        Question(id=str(uuid.uuid4()), subject="Physics", difficulty="Easy",
+                                 encrypted_content="enc1", encryption_iv="iv1",
+                                 content_hash="hash1", created_by="system"),
+                        Question(id=str(uuid.uuid4()), subject="Physics", difficulty="Hard",
+                                 encrypted_content="enc2", encryption_iv="iv2",
+                                 content_hash="hash2", created_by="system"),
+                        Question(id=str(uuid.uuid4()), subject="Chemistry", difficulty="Medium",
+                                 encrypted_content="enc3", encryption_iv="iv3",
+                                 content_hash="hash3", created_by="system"),
+                    ]
+                    session.add_all(demo_questions)
+
+                exam_exists = (await session.execute(
+                    select(Exam).where(Exam.id == "21e87336-b68c-45c6-8f2b-3de2d8696ec3")
+                )).scalar_one_or_none()
+                if not exam_exists:
+                    session.add(Exam(
+                        id="21e87336-b68c-45c6-8f2b-3de2d8696ec3",
+                        name="Hackathon Demo Exam", subject="Demo",
+                        blueprint={}, duration_minutes="60", created_by="system",
+                    ))
+
+                cand_exists = (await session.execute(
+                    select(Candidate).where(Candidate.id == "4a4224cb-d420-4107-bc62-d778f416dc99")
+                )).scalar_one_or_none()
+                if not cand_exists:
+                    session.add(Candidate(
+                        id="4a4224cb-d420-4107-bc62-d778f416dc99",
+                        name="Test Candidate", roll_number="TEST001",
+                        center_id="c1",
+                        exam_id="21e87336-b68c-45c6-8f2b-3de2d8696ec3",
+                        seat_number="1A",
+                    ))
+
+                await session.commit()
+                print(f"[lifespan] Edge seed complete — {q_count} existing questions")
+        except Exception as e:
+            print(f"[lifespan] Edge seed skipped: {e}")
+
     yield
     await engine.dispose()
 
