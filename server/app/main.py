@@ -43,11 +43,23 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         
-    # Inject dummy candidate for Vercel Kiosk mock if missing
+        # Inject dummy candidate and questions for Vercel Kiosk mock if missing
     AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
     async with AsyncSessionLocal() as session:
-        result = await session.execute(select(Candidate).where(Candidate.id == '4a4224cb-d420-4107-bc62-d778f416dc99'))
-        if not result.scalar_one_or_none():
+        from server.app.models.question import Question
+        q_count = await session.execute(select(func.count(Question.id)))
+        if q_count.scalar() == 0:
+            # Seed questions
+            from server.seed_test_data import seed
+            # Note: seed() uses create_async_engine and asyncio.run internally, 
+            # so it's better to just inline the questions here to avoid loop conflicts
+            questions = [
+                Question(subject="Physics", difficulty="Easy", encrypted_content="enc1", encryption_iv="iv1", content_hash="hash1", created_by="system"),
+                Question(subject="Physics", difficulty="Hard", encrypted_content="enc2", encryption_iv="iv2", content_hash="hash2", created_by="system"),
+                Question(subject="Chemistry", difficulty="Medium", encrypted_content="enc3", encryption_iv="iv3", content_hash="hash3", created_by="system"),
+            ]
+            session.add_all(questions)
+            
             dummy_exam = Exam(id='21e87336-b68c-45c6-8f2b-3de2d8696ec3', name='Hackathon Demo Exam', subject='Demo', blueprint={}, duration_minutes='60', created_by='system')
             dummy_candidate = Candidate(id='4a4224cb-d420-4107-bc62-d778f416dc99', name='Test Candidate', roll_number='TEST001', center_id='c1', exam_id='21e87336-b68c-45c6-8f2b-3de2d8696ec3', seat_number='1A')
             session.add_all([dummy_exam, dummy_candidate])

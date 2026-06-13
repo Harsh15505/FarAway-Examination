@@ -257,39 +257,49 @@ export default function ExamPage() {
         {/* Right pane: Question Content */}
         <div style={{ flex: 1, padding: '40px 60px', overflowY: 'auto' }}>
           
-          <div className="flex flex-wrap justify-between items-center mb-24 gap-12">
-            <div className="step-badge step-badge-exam" style={{ margin: 0 }}>
-              Question {currentIndex + 1} of {session.total_questions}
+          {!currentQ ? (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', flexDirection: 'column', gap: 20 }}>
+              <div className="icon" style={{ fontSize: 48 }}>📋</div>
+              <h3>No questions found in this exam</h3>
+              <p className="text-muted">The exam database is empty. Please contact an invigilator.</p>
             </div>
-            <div className="flex gap-12">
-              <span className="text-xs text-muted" style={{ background: 'var(--surface-3)', padding: '4px 10px', borderRadius: 4 }}>
-                {currentQ.subject.toUpperCase()}
-              </span>
-              <span className="text-xs text-muted" style={{ background: 'var(--surface-3)', padding: '4px 10px', borderRadius: 4 }}>
-                {currentQ.difficulty.toUpperCase()}
-              </span>
-            </div>
-          </div>
+          ) : (
+            <>
+              <div className="flex flex-wrap justify-between items-center mb-24 gap-12">
+                <div className="step-badge step-badge-exam" style={{ margin: 0 }}>
+                  Question {currentIndex + 1} of {session.total_questions}
+                </div>
+                <div className="flex gap-12">
+                  <span className="text-xs text-muted" style={{ background: 'var(--surface-3)', padding: '4px 10px', borderRadius: 4 }}>
+                    {currentQ.subject.toUpperCase()}
+                  </span>
+                  <span className="text-xs text-muted" style={{ background: 'var(--surface-3)', padding: '4px 10px', borderRadius: 4 }}>
+                    {currentQ.difficulty.toUpperCase()}
+                  </span>
+                </div>
+              </div>
 
-          <h2 className="mb-24" style={{ lineHeight: 1.4, fontWeight: 500 }}>
-            {currentQ.content}
-          </h2>
+              <h2 className="mb-24" style={{ lineHeight: 1.4, fontWeight: 500 }}>
+                {currentQ.content}
+              </h2>
 
-          <div className="flex-col gap-16 mt-24">
-            {(['A', 'B', 'C', 'D'] as const).map(opt => {
-              const isSelected = localAnswers[currentQ.id] === opt;
-              return (
-                <button 
-                  key={opt}
-                  className={`option-btn ${isSelected ? 'selected' : ''}`}
-                  onClick={() => handleSelectOption(opt)}
-                >
-                  <div className="option-letter">{opt}</div>
-                  <div className="option-text">{currentQ.options[opt]}</div>
-                </button>
-              );
-            })}
-          </div>
+              <div className="flex-col gap-16 mt-24">
+                {(['A', 'B', 'C', 'D'] as const).map(opt => {
+                  const isSelected = localAnswers[currentQ.id] === opt;
+                  return (
+                    <button 
+                      key={opt}
+                      className={`option-btn ${isSelected ? 'selected' : ''}`}
+                      onClick={() => handleSelectOption(opt)}
+                    >
+                      <div className="option-letter">{opt}</div>
+                      <div className="option-text">{currentQ.options[opt]}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
 
         </div>
         
