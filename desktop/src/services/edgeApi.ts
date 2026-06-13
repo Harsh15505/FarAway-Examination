@@ -215,9 +215,13 @@ export async function reportMonitoringEvent(
 
 export async function checkEdgeHealth(): Promise<boolean> {
   try {
-    const res = await fetch(`http://localhost:8001/health`, { signal: AbortSignal.timeout(3000) });
+    const healthUrl = EDGE_SERVER_URL.includes('/api/v1') 
+      ? EDGE_SERVER_URL.replace('/api/v1', '/health')
+      : 'http://localhost:8001/health';
+    const res = await fetch(healthUrl, { signal: AbortSignal.timeout(15000) });
     return res.ok;
-  } catch {
+  } catch (err) {
+    console.error("Health check failed:", err);
     return false;
   }
 }
