@@ -21,19 +21,18 @@ from server.app.config import settings
 async def lifespan(app: FastAPI):
     """Application lifespan — startup and shutdown hooks."""
     import os
-    import uuid
     from server.app.db.database import engine, Base
+    from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
     import server.app.models  # noqa: F401 — register all models before create_all
 
     # --- Auto-create tables (both modes) ---
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    # --- Edge-only: generate RSA keys & seed demo data ---
+    # --- RSA keys (edge mode needs them for JWT signing) ---
     if settings.server_mode == "edge":
         try:
             from shared.crypto.rsa import RSASigner
-
             os.makedirs("./keys", exist_ok=True)
             if not os.path.exists("./keys/private.pem"):
                 priv, pub = RSASigner.generate_key_pair()
@@ -44,89 +43,17 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             print(f"[lifespan] RSA key generation skipped: {e}")
 
-        try:
-            from sqlalchemy import select, func
-            from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
-            from server.app.models.question import Question
-            from server.app.models.exam import Exam
-            from server.app.models.candidate import Candidate
-
-            SessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-            async with SessionLocal() as session:
-                q_count = (await session.execute(select(func.count(Question.id)))).scalar() or 0
-                if q_count == 0:
-                    import json
-                    import base64
-                    from shared.crypto.aes import AESCipher
-
-                    aes_key = b"12345678901234567890123456789012"  # same key used in exam.py
-
-                    demo_data = [
-                        {"subject": "Physics", "difficulty": "Easy",
-                         "content": "A ball is thrown vertically upward. At the highest point, its velocity is:",
-                         "options": ["Maximum", "Zero", "Equal to initial", "Negative"], "correct_option": 1},
-                        {"subject": "Physics", "difficulty": "Hard",
-                         "content": "The SI unit of electric current is:",
-                         "options": ["Volt", "Ohm", "Ampere", "Watt"], "correct_option": 2},
-                        {"subject": "Chemistry", "difficulty": "Medium",
-                         "content": "The chemical formula for water is:",
-                         "options": ["H2O2", "H2O", "HO", "OH2"], "correct_option": 1},
-                        {"subject": "Biology", "difficulty": "Easy",
-                         "content": "The powerhouse of the cell is:",
-                         "options": ["Nucleus", "Ribosome", "Mitochondria", "Golgi body"], "correct_option": 2},
-                        {"subject": "Mathematics", "difficulty": "Medium",
-                         "content": "What is the derivative of x²?",
-                         "options": ["x", "2x", "2", "x³"], "correct_option": 1},
-                    ]
-
-                    for d in demo_data:
-                        plaintext = json.dumps({
-                            "content": d["content"],
-                            "options": d["options"],
-                            "correct_option": d["correct_option"],
-                        }).encode("utf-8")
-                        ct, nonce, tag = AESCipher.encrypt(plaintext, aes_key)
-                        enc_content = f"{base64.b64encode(ct).decode()}:{base64.b64encode(tag).decode()}"
-                        enc_iv = base64.b64encode(nonce).decode()
-                        from shared.crypto.hashing import HashUtils
-                        content_hash = HashUtils.sha256(plaintext)
-
-                        session.add(Question(
-                            id=str(uuid.uuid4()),
-                            subject=d["subject"],
-                            difficulty=d["difficulty"],
-                            encrypted_content=enc_content,
-                            encryption_iv=enc_iv,
-                            content_hash=content_hash,
-                            created_by="system",
-                        ))
-
-                exam_exists = (await session.execute(
-                    select(Exam).where(Exam.id == "21e87336-b68c-45c6-8f2b-3de2d8696ec3")
-                )).scalar_one_or_none()
-                if not exam_exists:
-                    session.add(Exam(
-                        id="21e87336-b68c-45c6-8f2b-3de2d8696ec3",
-                        name="Hackathon Demo Exam", subject="Demo",
-                        blueprint={}, duration_minutes="60", created_by="system",
-                    ))
-
-                cand_exists = (await session.execute(
-                    select(Candidate).where(Candidate.id == "4a4224cb-d420-4107-bc62-d778f416dc99")
-                )).scalar_one_or_none()
-                if not cand_exists:
-                    session.add(Candidate(
-                        id="4a4224cb-d420-4107-bc62-d778f416dc99",
-                        name="Test Candidate", roll_number="TEST001",
-                        center_id="c1",
-                        exam_id="21e87336-b68c-45c6-8f2b-3de2d8696ec3",
-                        seat_number="1A",
-                    ))
-
-                await session.commit()
-                print(f"[lifespan] Edge seed complete — {q_count} existing questions")
-        except Exception as e:
-            print(f"[lifespan] Edge seed skipped: {e}")
+    # --- Seed demo data ---
+    try:
+        from server.app.seed import seed_edge, seed_cloud
+        SessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+        async with SessionLocal() as session:
+            if settings.server_mode == "edge":
+                await seed_edge(session)
+            else:
+                await seed_cloud(session)
+    except Exception as e:
+        print(f"[lifespan] Seed skipped: {e}")
 
     yield
     await engine.dispose()
