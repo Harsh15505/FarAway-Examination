@@ -4,6 +4,15 @@
 
 ---
 
+## 🚀 Live Hackathon Demo
+
+* **Admin Portal (Cloud):** [https://far-away-examination.vercel.app](https://far-away-examination.vercel.app/)
+* **Candidate Kiosk Mock (Edge):** [https://far-away-examination-kisok.vercel.app](https://far-away-examination-kisok.vercel.app/)
+
+*(Note: The Kiosk is usually an air-gapped Electron app, but is hosted here as a web app for the judges' convenience!)*
+
+---
+
 ## Quick Start
 
 ```bash

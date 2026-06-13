@@ -1,43 +1,38 @@
 # FortisExam — Deployment Plan
 
-> **Last Updated:** 2026-06-08
+> **Last Updated:** 2026-06-13
 
 ---
 
-## Hackathon Deployment
+## 🚀 Live Hackathon Deployment Strategy
 
-### Single Machine Setup
-All components run on one machine using Docker Compose + native Electron.
+The FortisExam stack has been successfully deployed to the cloud for the hackathon presentation. The deployment leverages zero-cost, serverless infrastructure to provide a highly realistic mock of the Air-Gapped Edge Architecture.
 
-```bash
-# Start cloud + edge services
-docker compose -f infrastructure/docker-compose.yml up -d
+### 1. Cloud Database & Cache
+- **PostgreSQL:** Hosted on **Neon.tech** (`us-east-1`). Provides serverless, auto-scaling relational data storage.
+- **Redis:** Hosted on **Upstash** (`us-east-1`). Provides serverless key-value storage for rate limiting, locking, and asynchronous task queues.
 
-# Services available:
-# Cloud backend:  http://localhost:8000
-# Edge server:    http://localhost:8001
-# Admin portal:   http://localhost:3000
-# PostgreSQL:     localhost:5432
-# Redis (cloud):  localhost:6379
-# Redis (edge):   localhost:6380
+### 2. Cloud & Edge Backends (Render)
+Both the Cloud Backend and the Mock Edge Backend are deployed as Docker Web Services on **Render**.
+- **`fortis-cloud`:** Runs the FastAPI backend in `SERVER_MODE=cloud`. Connects to Neon (PostgreSQL) and Upstash (Redis).
+- **`fortis-edge`:** Runs a second instance of the FastAPI backend in `SERVER_MODE=edge`. It mimics a local exam center by using a local, ephemeral `sqlite+aiosqlite:///./fortis.db` database.
 
-# Start desktop app
-cd desktop && npm start
-```
+*(Note: Render free instances spin down after 15 minutes of inactivity. Ensure you visit the backend URLs briefly before the live demo to wake them up).*
+
+### 3. Frontends (Vercel)
+The React/Vite frontends are deployed globally via **Vercel** CDN.
+- **Admin Portal (`web/`):** Deployed to Vercel, pointing to the `fortis-cloud` backend. Handles exam creation, scheduling, and live proctor monitoring.
+- **Candidate Kiosk (`desktop/`):** Originally an air-gapped Electron application, this has been compiled as a standard Web App for the hackathon judges. It points to the `fortis-edge` backend to mimic the local exam center experience.
 
 ---
 
 ## Pre-Demo Checklist
 
-- [ ] Docker services running
-- [ ] Database migrated and seeded
-- [ ] RSA keys generated
-- [ ] Sample questions created (20+)
-- [ ] Sample exam compiled
-- [ ] Sample candidates registered with face embeddings
-- [ ] Seating layout configured
-- [ ] Electron app tested in kiosk mode
-- [ ] Demo script rehearsed
+- [ ] "Wake up" both Render backends 5 minutes before the demo.
+- [ ] Ensure Clerk allowed origins includes the Vercel Admin Portal URL.
+- [ ] Create at least 1 sample exam on the Admin Portal.
+- [ ] Create a sample candidate for the judges to log in with on the Kiosk.
+- [ ] Run the demo script from start to finish.
 
 ---
 
