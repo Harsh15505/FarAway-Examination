@@ -55,18 +55,51 @@ async def lifespan(app: FastAPI):
             async with SessionLocal() as session:
                 q_count = (await session.execute(select(func.count(Question.id)))).scalar() or 0
                 if q_count == 0:
-                    demo_questions = [
-                        Question(id=str(uuid.uuid4()), subject="Physics", difficulty="Easy",
-                                 encrypted_content="enc1", encryption_iv="iv1",
-                                 content_hash="hash1", created_by="system"),
-                        Question(id=str(uuid.uuid4()), subject="Physics", difficulty="Hard",
-                                 encrypted_content="enc2", encryption_iv="iv2",
-                                 content_hash="hash2", created_by="system"),
-                        Question(id=str(uuid.uuid4()), subject="Chemistry", difficulty="Medium",
-                                 encrypted_content="enc3", encryption_iv="iv3",
-                                 content_hash="hash3", created_by="system"),
+                    import json
+                    import base64
+                    from shared.crypto.aes import AESCipher
+
+                    aes_key = b"12345678901234567890123456789012"  # same key used in exam.py
+
+                    demo_data = [
+                        {"subject": "Physics", "difficulty": "Easy",
+                         "content": "A ball is thrown vertically upward. At the highest point, its velocity is:",
+                         "options": ["Maximum", "Zero", "Equal to initial", "Negative"], "correct_option": 1},
+                        {"subject": "Physics", "difficulty": "Hard",
+                         "content": "The SI unit of electric current is:",
+                         "options": ["Volt", "Ohm", "Ampere", "Watt"], "correct_option": 2},
+                        {"subject": "Chemistry", "difficulty": "Medium",
+                         "content": "The chemical formula for water is:",
+                         "options": ["H2O2", "H2O", "HO", "OH2"], "correct_option": 1},
+                        {"subject": "Biology", "difficulty": "Easy",
+                         "content": "The powerhouse of the cell is:",
+                         "options": ["Nucleus", "Ribosome", "Mitochondria", "Golgi body"], "correct_option": 2},
+                        {"subject": "Mathematics", "difficulty": "Medium",
+                         "content": "What is the derivative of x²?",
+                         "options": ["x", "2x", "2", "x³"], "correct_option": 1},
                     ]
-                    session.add_all(demo_questions)
+
+                    for d in demo_data:
+                        plaintext = json.dumps({
+                            "content": d["content"],
+                            "options": d["options"],
+                            "correct_option": d["correct_option"],
+                        }).encode("utf-8")
+                        ct, nonce, tag = AESCipher.encrypt(plaintext, aes_key)
+                        enc_content = f"{base64.b64encode(ct).decode()}:{base64.b64encode(tag).decode()}"
+                        enc_iv = base64.b64encode(nonce).decode()
+                        from shared.crypto.hashing import HashUtils
+                        content_hash = HashUtils.sha256(plaintext)
+
+                        session.add(Question(
+                            id=str(uuid.uuid4()),
+                            subject=d["subject"],
+                            difficulty=d["difficulty"],
+                            encrypted_content=enc_content,
+                            encryption_iv=enc_iv,
+                            content_hash=content_hash,
+                            created_by="system",
+                        ))
 
                 exam_exists = (await session.execute(
                     select(Exam).where(Exam.id == "21e87336-b68c-45c6-8f2b-3de2d8696ec3")

@@ -306,50 +306,52 @@ export default function ExamPage() {
       </div>
       
       {/* Bottom Floating Action Bar */}
-      <div style={{ 
-        position: 'absolute', bottom: 32, right: 60, left: 380, 
-        display: 'flex', justifyContent: 'space-between',
-        pointerEvents: 'none' // Allow clicking through the empty space
-      }}>
-        <div style={{ pointerEvents: 'auto' }}>
-          <button className="btn btn-ghost" onClick={toggleFlag}>
-            {flagged.has(currentQ.id) ? '🚩 Unflag Question' : '🏁 Flag for Review'}
-          </button>
-        </div>
-        
-        <div className="flex gap-16" style={{ pointerEvents: 'auto' }}>
-          <button 
-            className="btn btn-ghost" 
-            onClick={() => jumpTo(currentIndex - 1)}
-            disabled={currentIndex === 0}
-          >
-            ← Previous
-          </button>
-          
-          <button 
-            className="btn btn-ghost" 
-            style={{ color: 'var(--primary)', borderColor: 'var(--primary)' }}
-            onClick={() => {
-              if (localAnswers[currentQ.id]) {
-                handleSelectOption(localAnswers[currentQ.id] as any);
-              }
-            }}
-            disabled={!localAnswers[currentQ.id]}
-          >
-            💾 Save Answer
-          </button>
-          
-          {currentIndex < session.total_questions - 1 ? (
-            <button className="btn btn-primary" onClick={() => jumpTo(currentIndex + 1)}>
-              Next Question →
+      {currentQ && (
+        <div style={{ 
+          position: 'absolute', bottom: 32, right: 60, left: 380, 
+          display: 'flex', justifyContent: 'space-between',
+          pointerEvents: 'none' // Allow clicking through the empty space
+        }}>
+          <div style={{ pointerEvents: 'auto' }}>
+            <button className="btn btn-ghost" onClick={toggleFlag}>
+              {flagged.has(currentQ.id) ? '🚩 Unflag Question' : '🏁 Flag for Review'}
             </button>
-          ) : (
-            <button className="btn btn-success" onClick={finishExam}>
-              Review Submission
+          </div>
+          
+          <div className="flex gap-16" style={{ pointerEvents: 'auto' }}>
+            <button 
+              className="btn btn-ghost" 
+              onClick={() => jumpTo(currentIndex - 1)}
+              disabled={currentIndex === 0}
+            >
+              ← Previous
             </button>
-          )}
+            
+            <button 
+              className="btn btn-ghost" 
+              style={{ color: 'var(--primary)', borderColor: 'var(--primary)' }}
+              onClick={() => {
+                if (localAnswers[currentQ.id]) {
+                  handleSelectOption(localAnswers[currentQ.id] as any);
+                }
+              }}
+              disabled={!localAnswers[currentQ.id]}
+            >
+              💾 Save Answer
+            </button>
+            
+            {currentIndex < session.total_questions - 1 ? (
+              <button className="btn btn-primary" onClick={() => jumpTo(currentIndex + 1)}>
+                Next Question →
+              </button>
+            ) : (
+              <button className="btn btn-success" onClick={finishExam}>
+                Review Submission
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
     </div>
   );
