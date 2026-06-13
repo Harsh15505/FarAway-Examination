@@ -87,6 +87,9 @@ def create_app() -> FastAPI:
     # --- Mode-specific Routes ---
     if settings.server_mode == "cloud":
         _mount_cloud_routes(app)
+        # Also mount edge routes in cloud mode so the deployed kiosk
+        # (Vercel) can hit auth/exam endpoints on the same Render backend
+        _mount_edge_routes(app)
     elif settings.server_mode == "edge":
         _mount_edge_routes(app)
 

@@ -113,3 +113,63 @@ async def supervisor_override(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Override system error: {exc}",
         ) from exc
+
+
+@router.get(
+    "/candidates",
+    summary="List All Candidates",
+    description="Returns all candidates from the DB. Used by the kiosk supervisor override picker.",
+)
+async def list_candidates(
+    db: AsyncSession = Depends(get_db),
+):
+    """List all candidates — used by kiosk override picker."""
+    from sqlalchemy import select
+    from server.app.models.candidate import Candidate
+
+    result = await db.execute(select(Candidate))
+    candidates = result.scalars().all()
+    return [
+        {
+            "id": c.id,
+            "name": c.name,
+            "roll_number": c.roll_number,
+            "exam_id": c.exam_id,
+        }
+        for c in candidates
+    ]
+
+
+@router.get(
+    "/demo-qr/{candidate_id}",
+    summary="Generate Demo QR Token",
+    description="Generate a server-signed demo QR token for testing. NOT for production use.",
+)
+async def demo_qr(
+    candidate_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """Generate a demo QR JSON payload for a candidate — testing only."""
+    import json
+    import uuid
+    from datetime import datetime, timezone, timedelta
+    from sqlalchemy import select
+    from server.app.models.candidate import Candidate
+
+    result = await db.execute(select(Candidate).where(Candidate.id == candidate_id))
+    candidate = result.scalar_one_or_none()
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+
+    qr_payload = {
+        "candidate_id": candidate.id,
+        "exam_id": candidate.exam_id,
+        "nonce": str(uuid.uuid4()),
+        "issued_at": datetime.now(timezone.utc).isoformat(),
+        "expires_at": (datetime.now(timezone.utc) + timedelta(hours=4)).isoformat(),
+        "signature": "demo_bypass",
+    }
+    return {
+        "qr_data": json.dumps(qr_payload),
+        "candidate_name": candidate.name,
+    }
