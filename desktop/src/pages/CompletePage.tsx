@@ -1,64 +1,88 @@
+/**
+ * CompletePage — Post-Submission Confirmation Screen
+ * Reads submission state passed from SummaryPage via router state.
+ * Clears localStorage session (no re-use allowed).
+ * No API calls needed here — submission already done in SummaryPage.
+ */
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function CompletePage() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const state = location.state as { hash?: string; totalAnswers?: number; candidateName?: string; submittedAt?: string } | null;
+  const navigate  = useNavigate();
+  const location  = useLocation();
+  const state = location.state as {
+    hash?: string;
+    totalAnswers?: number;
+    candidateName?: string;
+    submittedAt?: string;
+  } | null;
 
+  // Clear session so it cannot be reused (security requirement)
   useEffect(() => {
-    // Clear session from localStorage so it can't be reused
     localStorage.removeItem('exam_session');
-    
-    // In a real kiosk, this page would show for a few seconds then
-    // automatically redirect to AuthPage for the next candidate, 
-    // or wait for invigilator reset. We'll add a manual button.
   }, []);
 
   return (
-    <div className="page auth-page">
-      <div className="card-glass" style={{ width: '560px', padding: '48px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        
-        <div className="check-circle mb-24" style={{ width: 96, height: 96, fontSize: '3rem' }}>
-          ✓
-        </div>
-        
-        <h2 className="mb-8">Exam Completed</h2>
-        <p className="text-center text-muted mb-32">
-          Your exam has been successfully submitted and cryptographically sealed.
+    <div className="complete-page">
+      <div className="complete-card">
+
+        {/* Success Icon */}
+        <div className="complete-icon">✓</div>
+
+        <h2>Exam Successfully Submitted</h2>
+        <p>
+          Your exam has been submitted and cryptographically sealed.
           You may now leave the testing area.
         </p>
 
+        {/* Submission Details */}
         {state && (
-          <div className="w-full bg-surface-3 p-16 rounded-md border border-border mb-32" style={{ background: 'var(--surface-3)', padding: 16, borderRadius: 8, border: '1px solid var(--border)', width: '100%' }}>
-            <div className="flex justify-between items-center mb-8">
-              <span className="text-sm text-muted">Candidate Name:</span>
-              <span className="font-bold">{state.candidateName}</span>
+          <div style={{ width: '100%', marginBottom: 24 }}>
+            <div style={{ borderTop: '1px solid #e0e0e0', paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {state.candidateName && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13.5 }}>
+                  <span style={{ color: '#666' }}>Candidate Name</span>
+                  <span style={{ fontWeight: 700, color: '#1a1a1a' }}>{state.candidateName}</span>
+                </div>
+              )}
+              {state.submittedAt && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13.5 }}>
+                  <span style={{ color: '#666' }}>Submitted At</span>
+                  <span style={{ fontWeight: 700, color: '#1a1a1a' }}>
+                    {new Date(state.submittedAt).toLocaleString()}
+                  </span>
+                </div>
+              )}
+              {state.totalAnswers !== undefined && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13.5 }}>
+                  <span style={{ color: '#666' }}>Answers Recorded</span>
+                  <span style={{ fontWeight: 700, color: '#26a65b' }}>{state.totalAnswers}</span>
+                </div>
+              )}
             </div>
-            <div className="flex justify-between items-center mb-8">
-              <span className="text-sm text-muted">Completion Time:</span>
-              <span className="font-bold">{new Date(state.submittedAt || '').toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between items-center mb-16">
-              <span className="text-sm text-muted">Answers Logged:</span>
-              <span className="font-bold">{state.totalAnswers}</span>
-            </div>
-            <div className="flex-col gap-4">
-              <span className="text-xs text-muted">Submission Hash (Proof):</span>
-              <span className="font-mono text-xs text-primary break-all" style={{ wordBreak: 'break-all' }}>
-                {state.hash}
-              </span>
-            </div>
+
+            {/* Submission Hash */}
+            {state.hash && (
+              <div style={{ marginTop: 16 }}>
+                <div className="hash-label">Submission Hash (Cryptographic Proof)</div>
+                <div className="hash-display">{state.hash}</div>
+              </div>
+            )}
           </div>
         )}
 
-        <button 
-          className="btn btn-ghost"
+        {/* Return Button (for invigilator to reset kiosk) */}
+        <button
+          style={{
+            background: '#0d5caa', color: '#fff', border: 'none',
+            borderRadius: 4, padding: '12px 32px',
+            fontWeight: 700, fontSize: 14, cursor: 'pointer',
+            width: '100%',
+          }}
           onClick={() => navigate('/', { replace: true })}
         >
-          Return to Login
+          Return to Login (Next Candidate)
         </button>
-
       </div>
     </div>
   );

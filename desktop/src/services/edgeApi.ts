@@ -126,6 +126,22 @@ export async function supervisorOverride(
   });
 }
 
+/** List all candidates from Edge DB — used by supervisor override picker */
+export interface CandidateInfo {
+  id: string;
+  name: string;
+  roll_number: string;
+  exam_id: string;
+}
+export async function getCandidates(): Promise<CandidateInfo[]> {
+  return edgeRequest<CandidateInfo[]>('/auth/candidates');
+}
+
+/** Generate a server-signed demo QR token for a candidate (testing only) */
+export async function getDemoQR(candidateId: string): Promise<{ qr_data: string; candidate_name: string }> {
+  return edgeRequest<{ qr_data: string; candidate_name: string }>(`/auth/demo-qr/${candidateId}`);
+}
+
 // ─── Exam ─────────────────────────────────────────────────────────────────
 
 /** Load exam session — includes decrypted questions for this candidate's variant */

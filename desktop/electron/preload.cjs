@@ -37,4 +37,12 @@ contextBridge.exposeInMainWorld('fortisAPI', {
     reportEvent: (eventType, severity, details) =>
       ipcRenderer.invoke('monitoring:report-event', eventType, severity, details),
   },
+
+  // --- System ---
+  system: {
+    onSupervisorClose: (callback) => {
+      ipcRenderer.on('trigger-supervisor-close', () => callback());
+    },
+    closeApp: () => ipcRenderer.send('system:close-app'),
+  },
 });
