@@ -3,7 +3,7 @@
  *  Uses Phase 1's QuestionCreateRequest / QuestionDetail types exactly.
  *  Handles both /questions/new (create) and /questions/:id/edit (update).
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import {
@@ -114,6 +114,7 @@ export default function QuestionEditor() {
   const { id }       = useParams<{ id: string }>();
   const { getToken } = useAuth();
   const isEdit = !!id;
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving]   = useState(false);
@@ -200,18 +201,41 @@ export default function QuestionEditor() {
             {/* Mini toolbar */}
             <div style={{ display: 'flex', gap: 6, marginBottom: 12, paddingBottom: 10, borderBottom: '1px solid var(--border)' }}>
               {[
-                { icon: <Bold size={14} />, title: 'Bold' },
-                { icon: <Italic size={14} />, title: 'Italic' },
-                { icon: <Underline size={14} />, title: 'Underline' },
-                { icon: <FunctionSquare size={14} />, title: 'Formula' },
-                { icon: <Image size={14} />, title: 'Image' },
-              ].map(({ icon, title }) => (
-                <button key={title} title={title} style={{ border: 'none', background: 'var(--surface-2)', cursor: 'pointer', color: 'var(--text-muted)', padding: '6px 8px', borderRadius: 6 }}>
+                { icon: <Bold size={14} />, title: 'Bold', prefix: '**', suffix: '**' },
+                { icon: <Italic size={14} />, title: 'Italic', prefix: '*', suffix: '*' },
+                { icon: <Underline size={14} />, title: 'Underline', prefix: '<u>', suffix: '</u>' },
+                { icon: <FunctionSquare size={14} />, title: 'Formula', prefix: '$', suffix: '$' },
+                { icon: <Image size={14} />, title: 'Image', prefix: '![alt](', suffix: ')' },
+              ].map(({ icon, title, prefix, suffix }) => (
+                <button key={title} title={title}
+                  onClick={() => {
+                    const el = textareaRef.current;
+                    if (!el) return;
+                    const start = el.selectionStart;
+                    const end = el.selectionEnd;
+                    const selected = content.substring(start, end);
+                    const replacement = selected
+                      ? `${prefix}${selected}${suffix}`
+                      : `${prefix}text${suffix}`;
+                    const newContent = content.substring(0, start) + replacement + content.substring(end);
+                    setContent(newContent);
+                    // Restore cursor after React re-render
+                    setTimeout(() => {
+                      el.focus();
+                      const cursorPos = selected
+                        ? start + replacement.length
+                        : start + prefix.length;
+                      el.setSelectionRange(cursorPos, cursorPos + (selected ? 0 : 4));
+                    }, 0);
+                  }}
+                  style={{ border: 'none', background: 'var(--surface-2)', cursor: 'pointer', color: 'var(--text-muted)', padding: '6px 8px', borderRadius: 6 }}
+                >
                   {icon}
                 </button>
               ))}
             </div>
             <textarea
+              ref={textareaRef}
               style={{
                 width: '100%', minHeight: 180, border: 'none', outline: 'none', resize: 'vertical',
                 fontFamily: 'var(--font-family)', fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.6,
@@ -271,8 +295,9 @@ export default function QuestionEditor() {
             <FormGroup label="Subject" required>
               <select className="input" value={subject} onChange={e => setSubject(e.target.value)}>
                 <option value="Physics">Physics</option>
-                <option value="Biology">Biology</option>
                 <option value="Chemistry">Chemistry</option>
+                <option value="Biology">Biology</option>
+                <option value="Mathematics">Mathematics</option>
               </select>
             </FormGroup>
 

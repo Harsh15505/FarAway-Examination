@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { UserButton, useUser } from '@clerk/clerk-react';
 import {
@@ -48,6 +48,7 @@ function Layout({ children }: LayoutProps) {
 
   const [searchQuery, setSearchQuery]   = useState('');
   const [showNotif, setShowNotif]       = useState(false);
+  const [hasNotifications]              = useState(false); // TODO: wire to real notification source
 
   const isActive = (path: string) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
@@ -190,7 +191,7 @@ function Layout({ children }: LayoutProps) {
                 aria-expanded={showNotif}
               >
                 <Bell size={16} />
-                <span className="badge-dot" />
+                {hasNotifications && <span className="badge-dot" />}
               </button>
 
               {showNotif && (

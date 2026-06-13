@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { Plus, Edit2, Trash2, Lock, FileText, Search, AlertCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Button, Badge, Table, LoadingState, ErrorState,
   PageHeader, EmptyState, ConfirmDialog,
@@ -139,16 +139,23 @@ function StatsSidebar({ total, encrypted, pending }: { total: number; encrypted:
 export default function Questions() {
   const navigate     = useNavigate();
   const { getToken } = useAuth();
+  const [searchParams] = useSearchParams();
 
   const [questions, setQuestions] = useState<QuestionMeta[]>([]);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState<string | null>(null);
-  const [search, setSearch]       = useState('');
+  const [search, setSearch]       = useState(searchParams.get('search') ?? '');
   const [subject, setSubject]     = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [deleteId, setDeleteId]   = useState<string | null>(null);
   const [deleting, setDeleting]   = useState(false);
   const [usingDemo, setUsingDemo] = useState(false);
+
+  // Sync search from URL param when it changes
+  useEffect(() => {
+    const q = searchParams.get('search');
+    if (q) setSearch(q);
+  }, [searchParams]);
 
   const abortRef = useRef<AbortController | null>(null);
 
@@ -182,9 +189,13 @@ export default function Questions() {
 
   useEffect(() => { load(); }, [load]);
 
-  const filtered = questions.filter(q =>
-    !search || q.subject.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = questions.filter(q => {
+    if (!search) return true;
+    const s = search.toLowerCase();
+    return q.subject.toLowerCase().includes(s)
+      || q.id.toLowerCase().includes(s)
+      || q.difficulty.toLowerCase().includes(s);
+  });
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -311,6 +322,7 @@ export default function Questions() {
             <option value="Physics">Physics</option>
             <option value="Chemistry">Chemistry</option>
             <option value="Biology">Biology</option>
+            <option value="Mathematics">Mathematics</option>
           </select>
 
           <select

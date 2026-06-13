@@ -1,6 +1,6 @@
 # FortisExam — Bug Tracker
 
-> **Last Updated:** 2026-06-13
+> **Last Updated:** 2026-06-13 (Evening batch — tester review fixes)
 
 ---
 
@@ -11,6 +11,106 @@
 ---
 
 ## Resolved Bugs
+
+### BUG-015: Global search bar not actually filtering questions
+
+| Field | Value |
+|---|---|
+| **ID** | BUG-015 |
+| **Severity** | Medium |
+| **Module** | Frontend — `Layout.tsx`, `Questions.tsx` |
+| **Status** | ✅ Fixed — 2026-06-13 |
+| **Reported By** | Tester |
+| **Fixed By** | AI Agent |
+
+**Description:**
+Typing in the topbar search bar and pressing Enter redirected to `/questions` but the search query was not applied — all subjects and difficulties always showed.
+
+**Fix:**
+- Questions page now reads `search` URL param via `useSearchParams()` and initializes the filter state from it.
+- Improved client-side filter to match against subject, difficulty, and question ID.
+
+---
+
+### BUG-014: Notification icon always shows red dot even with no notifications
+
+| Field | Value |
+|---|---|
+| **ID** | BUG-014 |
+| **Severity** | Low |
+| **Module** | Frontend — `Layout.tsx` |
+| **Status** | ✅ Fixed — 2026-06-13 |
+| **Reported By** | Tester |
+| **Fixed By** | AI Agent |
+
+**Description:**
+The bell icon in the topbar always displayed a red dot (`badge-dot`) even when there were no new notifications.
+
+**Fix:**
+Gated the `<span className="badge-dot" />` behind a `hasNotifications` state flag. Dot only appears when there are actual notifications.
+
+---
+
+### BUG-013: Question Editor toolbar buttons (Bold, Italic, etc.) non-functional
+
+| Field | Value |
+|---|---|
+| **ID** | BUG-013 |
+| **Severity** | Medium |
+| **Module** | Frontend — `QuestionEditor.tsx` |
+| **Status** | ✅ Fixed — 2026-06-13 |
+| **Reported By** | Tester |
+| **Fixed By** | AI Agent |
+
+**Description:**
+The formatting toolbar buttons (Bold, Italic, Underline, Formula, Image) had no `onClick` handlers — clicking them did nothing.
+
+**Fix:**
+- Added `useRef` for the textarea element.
+- Each button now wraps the selected text (or inserts placeholder) with the appropriate syntax (`**bold**`, `*italic*`, `$formula$`, etc.).
+- Cursor position is restored after insertion.
+
+---
+
+### BUG-012: Exam Builder status badge colors incorrect
+
+| Field | Value |
+|---|---|
+| **ID** | BUG-012 |
+| **Severity** | Low |
+| **Module** | Frontend — `ui/index.tsx` (StatusBadge) |
+| **Status** | ✅ Fixed — 2026-06-13 |
+| **Reported By** | Tester |
+| **Fixed By** | AI Agent |
+
+**Description:**
+In the Exam Builder, the "Compiled" status showed as grey instead of blue. The Exam Pipeline legend at the bottom showed correct colors, but the table badges didn't match because the DB returned lowercase status strings (e.g., `compiled`) which had no mapping.
+
+**Fix:**
+- Added lowercase variants (`compiled`, `draft`, `completed`) to the StatusBadge map.
+- Added case-insensitive fallback: if exact match fails, tries `status.toUpperCase()`.
+- Changed `COMPLETED` badge to purple (distinct from grey/draft).
+- Added `activated` status for packages.
+
+---
+
+### BUG-011: "Save as Draft" and "Save & Encrypt" fail with 'Failed to fetch'
+
+| Field | Value |
+|---|---|
+| **ID** | BUG-011 |
+| **Severity** | High |
+| **Module** | Frontend — `QuestionEditor.tsx` |
+| **Status** | ✅ Fixed — 2026-06-13 |
+| **Reported By** | Tester |
+| **Fixed By** | AI Agent |
+
+**Description:**
+Creating a new question via "Save as Draft" or "Save & Encrypt" failed with "Failed to fetch". The subject dropdown only offered Physics/Biology/Chemistry — Mathematics was missing even though the DB had math questions seeded.
+
+**Fix:**
+- Added "Mathematics" to the subject dropdown in both `QuestionEditor.tsx` and `Questions.tsx` filter bar.
+- The "Failed to fetch" was a CORS/network issue related to the Render deployment; the Neon DB schema mismatch (UUID vs String) was the root cause, fixed separately in the seed script.
 
 ### BUG-010: Live Monitoring — Alert toggle state not persisting
 

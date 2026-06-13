@@ -149,6 +149,7 @@ export function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { color: BadgeColor; label: string }> = {
     generated:     { color: 'blue',   label: 'Generated'    },
     distributed:   { color: 'yellow', label: 'Distributed'  },
+    activated:     { color: 'green',  label: 'Activated'    },
     key_released:  { color: 'green',  label: 'Key Released' },
     DRAFT:         { color: 'grey',   label: 'Draft'        },
     ENCRYPTED:     { color: 'purple', label: 'Encrypted'    },
@@ -156,7 +157,7 @@ export function StatusBadge({ status }: { status: string }) {
     COMPILED:      { color: 'blue',   label: 'Compiled'     },
     DISTRIBUTED:   { color: 'yellow', label: 'Distributed'  },
     KEY_RELEASED:  { color: 'green',  label: 'Key Released' },
-    COMPLETED:     { color: 'grey',   label: 'Completed'    },
+    COMPLETED:     { color: 'purple', label: 'Completed'    },
     Easy:          { color: 'green',  label: 'Easy'         },
     Medium:        { color: 'yellow', label: 'Medium'       },
     Hard:          { color: 'red',    label: 'Hard'         },
@@ -170,8 +171,12 @@ export function StatusBadge({ status }: { status: string }) {
     inactive:      { color: 'grey',   label: 'Inactive'     },
     submitted:     { color: 'blue',   label: 'Submitted'    },
     recovered:     { color: 'purple', label: 'Recovered'    },
+    draft:         { color: 'grey',   label: 'Draft'        },
+    compiled:      { color: 'blue',   label: 'Compiled'     },
+    completed:     { color: 'purple', label: 'Completed'    },
   };
-  const cfg = map[status] ?? { color: 'grey' as BadgeColor, label: status };
+  // Try exact match first, then uppercase fallback
+  const cfg = map[status] ?? map[status.toUpperCase()] ?? { color: 'grey' as BadgeColor, label: status };
   return <Badge color={cfg.color} dot>{cfg.label}</Badge>;
 }
 
