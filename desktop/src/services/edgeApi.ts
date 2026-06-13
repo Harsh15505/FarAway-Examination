@@ -5,6 +5,7 @@
  * No Clerk. No internet required. Auth uses edge-local RSA JWTs.
  */
 
+// @ts-ignore
 const EDGE_SERVER_URL = import.meta.env.VITE_EDGE_API_BASE_URL ?? 'http://localhost:8001/api/v1';
 
 // ─── Types ────────────────────────────────────────────────────────────────
