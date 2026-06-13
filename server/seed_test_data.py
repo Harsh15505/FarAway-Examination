@@ -1,7 +1,7 @@
 import asyncio
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from app.models.question import Question
-from app.config import settings
+from server.app.models.question import Question
+from server.app.config import settings
 
 async def seed():
     engine = create_async_engine(settings.database_url, echo=False)
