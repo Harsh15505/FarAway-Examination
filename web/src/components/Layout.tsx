@@ -17,6 +17,7 @@ import {
   Radio,
   ChevronRight,
   Sparkles,
+  Monitor,
   X,
 } from 'lucide-react';
 
@@ -180,6 +181,19 @@ function Layout({ children }: LayoutProps) {
               <Radio size={12} />
               Live
             </Link>
+
+            {/* Kiosk Demo — opens candidate exam app */}
+            <a
+              href="https://far-away-examination-kisok.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="topbar-live-btn"
+              style={{ background: 'var(--primary)', gap: 6 }}
+              aria-label="Open Kiosk Demo"
+            >
+              <Monitor size={12} />
+              Kiosk Demo
+            </a>
 
             {/* Notifications */}
             <div style={{ position: 'relative' }}>
