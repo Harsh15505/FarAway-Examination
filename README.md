@@ -350,7 +350,7 @@ python -m pytest tests/security/ -v
 
 ## 👥 Team
 
-Built at **Delhi Hackathon 2026** by Team FarAway
+Team C3I2 (Ayaan Goel, Dev Gami, Harsh Bhavsar, Nishu Shukla)
 
 ---
 
